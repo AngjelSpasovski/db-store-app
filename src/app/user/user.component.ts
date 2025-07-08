@@ -25,7 +25,7 @@ import { GlobalFooterComponent } from '../user/global-footer/global-footer.compo
   encapsulation: ViewEncapsulation.None
 })
 export class UserComponent implements OnInit {
-  public currentCredits = 0;
+
   public sidebarOpen = false;
   public isMobile = window.innerWidth < 992;
 
@@ -34,14 +34,6 @@ export class UserComponent implements OnInit {
   ngOnInit(): void {
     // open sidebar by default on desktop
     if (!this.isMobile) this.sidebarOpen = true;
-
-    // init credits
-    const user: User | null = this.auth.getCurrentUser();
-    if (user) {
-      const key = `credits_${user.email}`;
-      const stored = sessionStorage.getItem(key);
-      this.currentCredits = stored ? +stored : 0;
-    }
   }
 
   toggleSidebar(): void {

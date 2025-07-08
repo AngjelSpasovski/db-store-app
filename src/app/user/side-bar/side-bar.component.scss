@@ -1,4 +1,5 @@
 .sidebar {
+  height: 100%;
   background: var(--dark);
   color: var(--light);
   width: 240px;
@@ -25,8 +26,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem;
+    padding: 5%;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin: 8px 2px 2px 0px;
 
     .sidebar__brand {
       font-size: 1.25rem;
@@ -44,8 +46,11 @@
   &__menu {
     list-style: none;
     padding: 0.5rem 0;
-    margin: 0;
-    flex: 1;
+    /* margin: 0; */
+    /* flex: 1; */
+    border-top: 1px solid rgba(255,255,255,0.1);
+    height: 20%;
+    margin-right: 1%;
 
     li {
       margin-bottom: 0.5rem;
@@ -68,6 +73,7 @@
 
   &__footer {
     padding: 1rem;
+    margin-right: 1%;
     font-size: 0.9rem;
     border-top: 1px solid rgba(255,255,255,0.1);
 

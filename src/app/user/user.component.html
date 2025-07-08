@@ -9,17 +9,25 @@
 <div class="user-wrap">
 
   <!-- Sidebar (desktop & mobile off-canvas) -->
-  <app-sidebar [open]="sidebarOpen" [credits]="currentCredits" (close)="closeSidebar()"></app-sidebar>
+  <app-sidebar [open]="sidebarOpen" (close)="closeSidebar()"></app-sidebar>
 
   <!-- Main content area -->
-  <main class="content" [class.shifted]="sidebarOpen && !isMobile">
+  <main class="content">
     <!-- Header for desktop -->
-    <app-header-in></app-header-in>
-
+     <div class="main-header-wrap">
+      <app-header-in></app-header-in>
+     </div>
+    
     <!-- Main content -->
-    <router-outlet></router-outlet>
+    <div class="main-router-wrap">
+      <router-outlet></router-outlet>
+    </div>
+    
 
     <!-- Footer -->
-    <app-global-footer></app-global-footer>
+    <div class="main-footer-wrap">
+      <app-global-footer></app-global-footer>
+    </div>
+    
   </main>
 </div>

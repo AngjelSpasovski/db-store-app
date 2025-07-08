@@ -30,4 +30,26 @@ $secondary:  #555;
   flex: 1;
   transition: margin-left .3s ease;
   overflow-y: auto;
+
+  .main-header-wrap{
+    height: 5%;
+    background-color: $darker;
+    margin: 3px 0px 3px 0px;
+  }
+
+  .main-router-wrap {
+    padding: 1rem;
+    height: calc(100% - 12%); // adjust for header height
+    background-color: $dark;
+    margin-bottom: 3px;
+    overflow-y: auto;
+  }
+
+  .main-footer-wrap {
+    display: flex;
+    align-items: center;
+    height: 5%;
+    background-color: $darker;
+    margin: 3px 0px 3px 0px;
+  }
 }

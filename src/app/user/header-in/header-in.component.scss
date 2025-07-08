@@ -12,11 +12,9 @@ $card-button-bg: #42526a;
 $card-price-color: #658eb6;
 
 .header-in {
-    background-color: $darker;
-
-    &__title {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        font-weight: 600;
-    }
+    height: 100%;
+    padding-left: 1%;
+    font-size: larger;
+    font-weight: 700;
+    color: gray;
 }
