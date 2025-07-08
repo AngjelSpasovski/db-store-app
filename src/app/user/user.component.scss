@@ -1,0 +1,45 @@
+// боја/варијабли
+$dark:       #222428;
+$darker:     #1e1e1e;
+$light:      #ffffff;
+$primary:    #4d8dff;
+$secondary:  #555;
+
+// adjust mobile nav
+.mobile-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--dark);
+  color: var(--light);
+  padding: .75rem 1rem;
+
+  @media(min-width: 992px) {
+    display: none;
+  }
+}
+
+// main wrapper
+.user-wrap {
+  display: flex;
+  height: 93vh;
+}
+
+// shift main content when sidebar open on desktop
+.content {
+  flex: 1;
+  transition: margin-left .3s ease;
+  overflow-y: auto;
+  background: #f5f5f5;
+}
+
+// push footer to bottom
+.global-footer {
+  background-color: $darker;
+  color: var(--light);
+  text-align: center;
+  padding: .75rem;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+}

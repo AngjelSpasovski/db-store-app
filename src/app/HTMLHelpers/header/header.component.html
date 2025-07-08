@@ -1,0 +1,91 @@
+<header class="app-header"
+        [ngClass]="{
+          'header-home': viewMode === 'home',
+          'header-login': viewMode === 'login',
+          'header-forgot': viewMode === 'forgot-password',
+          'header-user': viewMode === 'user'
+        }">
+
+  <!-- HOME VIEW NAVIGATION BAR -->
+  <nav *ngIf="viewMode === 'home'" class="navbar navbar-expand-lg navbar-light w-100 home-nav bg-dark">
+    <div class="container-fluid">
+
+      <a class="navbar-brand" href="#home" (click)="scrollToSection('home', $event)">
+        <!-- LOGO -->
+        <!-- <img src="../../../assets/images/dbstore-transparent-full.png" alt="DBStore Logo" class="brand-logo"> -->
+        DBStore
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="#home"      (click)="scrollToSection('home',     $event)">{{ 'HOME' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about"        (click)="scrollToSection('about',       $event)">{{ 'ABOUT' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#how-it-works" (click)="scrollToSection('how-it-works',$event)">{{ 'HOW_IT_WORKS' | translate }}</a></li>
+          <!-- <li class="nav-item"><a class="nav-link" href="#features" (click)="scrollToSection('features',  $event)">{{ 'FEATURES' | translate }}</a></li> -->
+          <li class="nav-item"><a class="nav-link" href="#packages"     (click)="scrollToSection('packages',    $event)">{{ 'WHY_US' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#statistics"   (click)="scrollToSection('statistics',  $event)">{{ 'STATISTICS' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#showcase"     (click)="scrollToSection('showcase',    $event)">{{ 'SHOWCASE' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#people"       (click)="scrollToSection('people',      $event)">{{ 'PEOPLE' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact"      (click)="scrollToSection('contact',     $event)">{{ 'CONTACT' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#info"         (click)="scrollToSection('info',        $event)">{{ 'INFO' | translate }}</a></li>
+        </ul>
+
+        <app-language-selector></app-language-selector>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- LOGIN / FORGOT-PASSWORD VIEW -->
+  <div *ngIf="viewMode === 'login' || viewMode === 'forgot-password'" class="navbar navbar-expand-lg navbar-light w-100 login-nav bg-dark">
+    <div class="container-fluid">
+      
+      <a class="navbar-brand">
+        <!-- LOGO -->
+        <!-- <img src="../../../assets/images/dbstore-transparent-full.png" alt="DBStore Logo" class="brand-logo"> -->
+        DBStore
+      </a>
+
+      <app-language-selector></app-language-selector>
+    </div>
+  </div>
+
+  <!-- USER VIEW -->
+  <div *ngIf="viewMode === 'user'" class="navbar navbar-expand-lg navbar-light w-100 bg-dark">
+
+    <div class="container-fluid">
+      <a class="navbar-brand">
+        <!-- LOGO -->
+        <!-- <img src="../../../assets/images/dbstore-transparent-full.png" alt="DBStore Logo" class="brand-logo"> -->
+        DBStore
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="navbarSupportedContent" class="navbarSupportedContent user-nav collapse navbar-collapse" >
+
+        <div class="user-home">{{ 'LOGGEDIN_AS' | translate}} : {{ userEmail }}</div>
+
+        <app-language-selector></app-language-selector>
+
+        <!-- User settings if logged in -->
+        <div *ngIf="isLoggedIn" class="dropdown ms-3">
+          <button id="userMenuButton" class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-cog"></i> {{ 'SETTINGS' | translate}}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+            <li><a class="dropdown-item" (click)="logout()"><fa-icon [icon]="faSignOutAlt"></fa-icon>{{ 'LOGOUT' | translate }}</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>

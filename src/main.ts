@@ -1,6 +1,29 @@
+import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-import { AppModule } from './app/app.module';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { environment } from './environments/environment';
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.log(err));
+import { provideRouter } from '@angular/router';
+import { appRoutes } from './app/app.routes';
+
+import { provideHttpClient } from '@angular/common/http';
+import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { provideTranslateLoader } from './translate.providers';   // 👈 if there  is a configuration for ngx-translate
+
+if (environment.production) {
+  enableProdMode();
+}
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(appRoutes),
+    provideHttpClient(),
+    provideIonicAngular(),
+    provideAnimations(),
+    provideTranslateLoader(),                                       // 👈 if there  is a configuration for ngx-translate
+  ]
+}).catch(err => console.error(err));

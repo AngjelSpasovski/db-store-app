@@ -1,0 +1,63 @@
+.app-header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  .navbar {
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    .user-nav{
+      justify-content: flex-end;
+
+      .user-home{
+        padding: 7px;
+      }
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: gray;
+      cursor: pointer;
+
+      .brand-logo {
+        height: 32px;
+        vertical-align: middle;
+      }
+    }
+
+    .navbar-toggler-icon {
+      background-color: rgb(81 73 70);
+    }
+
+    .nav-link {
+      color: gray;
+      transition: color 0.3s ease;
+      &:hover {
+        color: #007bff;
+      }
+
+      &.active {
+        font-weight: bold;
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+      }
+    }
+
+    .dropdown-toggle {
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+    }
+
+    .dropdown-menu {
+      min-width: 180px;
+      font-size: 0.9rem;
+    }
+
+    .language-selector {
+      margin-left: auto;
+    }
+  }
+}

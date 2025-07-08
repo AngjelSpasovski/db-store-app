@@ -1,0 +1,25 @@
+<!-- Mobile top bar -->
+<nav class="mobile-nav" *ngIf="isMobile">
+  <div class="mobile-nav__brand">Menu</div>
+  <button class="mobile-nav__toggle" (click)="toggleSidebar()">
+    <span class="mobile-nav__icon"></span>
+  </button>
+</nav>
+
+<div class="user-wrap">
+
+  <!-- Sidebar (desktop & mobile off-canvas) -->
+  <app-sidebar [open]="sidebarOpen" [credits]="currentCredits" (close)="closeSidebar()"></app-sidebar>
+
+  <!-- Main content area -->
+  <main class="content" [class.shifted]="sidebarOpen && !isMobile">
+    <!-- Header for desktop -->
+    <!-- ... -->
+
+    <!-- Main content -->
+    <router-outlet></router-outlet>
+
+    <!-- Footer -->
+    <app-global-footer></app-global-footer>
+  </main>
+</div>

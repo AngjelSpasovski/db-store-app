@@ -1,0 +1,38 @@
+html,body,ion-app {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+#app-component-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+#header-wrap {
+    flex: 0 0 64px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    z-index: 10;
+}
+
+#content-wrap {
+    flex: 1 1 auto;
+    height: 93vh;
+    overflow-y: auto;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+app-logout-warning {
+    position: absolute;
+    top: 64px;
+    right: 16px;
+}

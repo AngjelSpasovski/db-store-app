@@ -1,0 +1,75 @@
+$dark:       #222428;
+$darker:     #1e1e1e;
+$light:      #ffffff;
+$primary:    #4d8dff;
+$secondary:  #555;
+
+$primary-blue: #00509e;
+$primary-blue-light: #00a8ff;
+
+$card-header-bg: #2a3443;
+$card-button-bg: #42526a;
+$card-price-color: #658eb6;
+
+.buy-credits {
+  height: 95%;
+  background-color: $dark;
+
+  .header-in{
+    background-color: $darker;
+  }
+
+  &__title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+}
+
+.card-grid{
+  padding: 1%;
+  height: 78vh;
+  overflow-y: auto;
+
+  .container-fluid {
+    height: 100%;
+  }
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .credit-card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .credit-card .card-header {
+    font-size: 1.25rem;
+    background-color: $card-header-bg;
+  }
+
+  .price {
+    color: $card-price-color;
+    font-weight: 500;
+  }
+
+  .card-body {
+    padding: 2rem;
+
+    .btn {
+      background-color: $card-button-bg;
+      color: $light;
+      font-weight: bold;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: darken($card-button-bg, 10%);
+      }
+    }
+  }
+}
+

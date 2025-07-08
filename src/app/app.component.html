@@ -1,3 +1,17 @@
-<ion-app>
-  <ion-router-outlet></ion-router-outlet>
-</ion-app>
+<div id="app-component-wrap" class="app-component-wrap">
+  <!-- Header -->
+  <header id="header-wrap" class="header-wrap">
+    <app-header [viewMode]="currentView" [isLoggedIn]="isLoggedIn" [userEmail]="userEmail"></app-header>
+  </header>
+
+  <!-- Main Content -->
+  <div id="content-wrap" class="content-wrap"  #contentWrap>
+    <router-outlet></router-outlet>
+  </div>
+
+  <!--Toast Container -->
+  <!-- This is where toasts will be displayed -->
+  <div id="toast-container"  class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"  aria-live="polite"  aria-atomic="true"></div>
+
+</div>
+
