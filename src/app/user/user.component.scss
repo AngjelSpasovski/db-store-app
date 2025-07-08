@@ -22,7 +22,7 @@ $secondary:  #555;
 // main wrapper
 .user-wrap {
   display: flex;
-  height: 93vh;
+  height: 100%;
 }
 
 // shift main content when sidebar open on desktop
@@ -30,16 +30,4 @@ $secondary:  #555;
   flex: 1;
   transition: margin-left .3s ease;
   overflow-y: auto;
-  background: #f5f5f5;
-}
-
-// push footer to bottom
-.global-footer {
-  background-color: $darker;
-  color: var(--light);
-  text-align: center;
-  padding: .75rem;
-  position: sticky;
-  bottom: 0;
-  width: 100%;
 }

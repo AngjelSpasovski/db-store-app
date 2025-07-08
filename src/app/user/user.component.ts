@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService, User } from '../../app/auth/auth.service';
 
 import { SidebarComponent } from '../user/side-bar/side-bar.component';
+import { HeaderInComponent } from './header-in/header-in.component';
 import { GlobalFooterComponent } from '../user/global-footer/global-footer.component';
 
 
@@ -15,7 +16,8 @@ import { GlobalFooterComponent } from '../user/global-footer/global-footer.compo
     CommonModule, 
     RouterModule, 
     TranslateModule, 
-    SidebarComponent, 
+    SidebarComponent,
+    HeaderInComponent,
     GlobalFooterComponent
   ],
   templateUrl: './user.component.html',

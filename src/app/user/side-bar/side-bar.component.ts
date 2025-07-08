@@ -10,15 +10,13 @@ import { RouterModule } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
-  /** Controls open/close state */
-  @Input() open = false;
-  /** Remaining credits to display */
-  @Input() credits = 0;
-  /** Emitted when a menu link is clicked on mobile */
-  @Output() close = new EventEmitter<void>();
+  
+  @Input() open = false;                        // Whether the sidebar is open or not ... Controls open/close state 
+  @Input() credits = 0;                         /** Credits to display in the sidebar */
+  @Output() close = new EventEmitter<void>();   /** Emitted when a menu link is clicked on mobile */
 
   /** Call this in the template on <a> click */
-  onLinkClick(): void {
+  closeSidebar(): void {
     this.close.emit();
   }
 }

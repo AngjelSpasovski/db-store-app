@@ -12,18 +12,8 @@ $card-button-bg: #42526a;
 $card-price-color: #658eb6;
 
 .buy-credits {
-  height: 95%;
+  height: 88%;
   background-color: $dark;
-
-  .header-in{
-    background-color: $darker;
-  }
-
-  &__title {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-  }
 }
 
 .card-grid{
