@@ -1,11 +1,18 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common'; // for *ngFor, *ngIf, etc.
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService, User } from 'src/app/auth/auth.service';
+import { CreditsService } from '../buy-credits/credit.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterModule],
+  imports: [
+    RouterModule,
+    CommonModule,
+    TranslateModule    
+  ],
   templateUrl: './side-bar.component.html',
   styleUrls: ['./side-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -19,8 +26,21 @@ export class SidebarComponent {
   public currentCredits = 0;
   public sidebarOpen = false;
   public isMobile = window.innerWidth < 992;
+  public credits$ = this.creditsSvc.credits$;    // ← Observable на кредити
 
-  constructor(private auth: AuthService) { }
+  public menuItems = [
+    { label: 'BUY_CREDITS', icon: '🛒', route: '/user/buy-credits' },
+    { label: 'NEW_RESEARCH',icon: '🔍', route: '/user/new-research' },
+    { label: 'BILLING',     icon: '💳', route: '/user/billing' },
+    { label: 'HISTORY',     icon: '📜', route: '/user/history' },
+    { label: 'FAQS',        icon: '❓', route: '/user/faqs' },
+    // …
+  ];
+
+  constructor(
+    private auth: AuthService,
+    private creditsSvc: CreditsService
+  ) { }
 
   ngOnInit() {
     // open sidebar by default on desktop

@@ -1,4 +1,5 @@
 // боја/варијабли
+$black:     #000000;
 $dark:       #222428;
 $darker:     #1e1e1e;
 $light:      #ffffff;
@@ -23,6 +24,8 @@ $secondary:  #555;
 .user-wrap {
   display: flex;
   height: 100%;
+  background: $black;
+  color:$secondary;
 }
 
 // shift main content when sidebar open on desktop

@@ -4,26 +4,17 @@
       <button class="sidebar__close" (click)="toggleSidebar()">×</button>
     </div>
 
-  <ul class="sidebar__menu">
-    <li routerLinkActive="active">
-      <a routerLink="buy-credits"   (click)="closeSidebar()"><i class="icon-cart"></i>Buy Credits</a>
-    </li>
-    <li routerLinkActive="active">
-      <a routerLink="new-research"  (click)="closeSidebar()"><i class="icon-chart"></i>New Research</a>
-    </li>
-    <li routerLinkActive="active">
-      <a routerLink="history"       (click)="closeSidebar()"><i class="icon-clock"></i>History</a>
-    </li>
-    <li routerLinkActive="active">
-      <a routerLink="billing"       (click)="closeSidebar()"><i class="icon-receipt"></i>Billing</a>
-    </li>
-    <li routerLinkActive="active">
-      <a routerLink="faqs"          (click)="closeSidebar()"><i class="icon-question"></i>FAQs</a>
-    </li>
-  </ul>
+    <ul class="sidebar__menu">
+      <li *ngFor="let item of menuItems" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <a [routerLink]="item.route" (click)="closeSidebar()">
+          <span class="icon" aria-hidden="true">{{ item.icon }}</span>
+          <span class="label">{{ item.label | translate}}</span>
+        </a>
+      </li>
+    </ul>
 
   <div class="sidebar__footer">
-    Remaining Credits: <span class="highlight">{{ credits }}</span>
+    Remaining Credits: <span class="highlight">{{ credits$ | async }}</span>
   </div>
   
 </aside>

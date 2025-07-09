@@ -1,3 +1,16 @@
+$dark:       #222428;
+$darker:     #1e1e1e;
+$light:      #ffffff;
+$primary:    #4d8dff;
+$secondary:  #555;
+
+$primary-blue: #00509e;
+$primary-blue-light: #00a8ff;
+
+$card-header-bg: #2a3443;
+$card-button-bg: #42526a;
+$card-price-color: #658eb6;
+
 .sidebar {
   height: 100%;
   background: var(--dark);
@@ -23,12 +36,14 @@
   }
 
   &__header {
-    display: flex;
+        display: flex
+;
     justify-content: space-between;
     align-items: center;
-    padding: 5%;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin: 8px 2px 2px 0px;
+    padding: 6%;
+    margin: 3px 2px 3px 1px;
+    background: $darker;
+    height: 5%;
 
     .sidebar__brand {
       font-size: 1.25rem;
@@ -54,19 +69,27 @@
 
     li {
       margin-bottom: 0.5rem;
+
       a {
         display: flex;
         align-items: center;
         padding: 0.5rem 1rem;
-        color: var(--light);
         text-decoration: none;
-        border-radius: 0.25rem;
+        color: inherit;
+        transition: background 0.2s;
 
-        &:hover,
-        &.active {
-          background: rgba(255,255,255,0.1);
-          border-left: 4px solid var(--primary);
+        .icon {
+          margin-right: 0.5rem;
+          /* стил за иконата */
         }
+      }
+
+      &.active a {
+        background-color: $card-header-bg;     /* или вашиот primary боја */
+        color: $light;
+      }
+      a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
       }
     }
   }
@@ -75,6 +98,7 @@
     padding: 1rem;
     margin-right: 1%;
     font-size: 0.9rem;
+    background-color: $darker;
     border-top: 1px solid rgba(255,255,255,0.1);
 
     .highlight {

@@ -1,2 +1,30 @@
 h2 { margin-bottom: 1rem; }
 p  { color: #666; }
+
+:host ::ng-deep .ag-theme-alpine {
+  // промени боја на header
+  .ag-header {
+    background-color: #343a40;   // темно сиво
+  }
+  .ag-header-cell-label {
+    color: #fff;                // бели titles
+    font-weight: 500;
+  }
+
+  // редови
+  .ag-row {
+    &.ag-row-hover {
+      background-color: #495057 !important; // hover dark
+    }
+  }
+
+  // селектирано
+  .ag-row-selected {
+    background-color: rgba(40,167,69,0.2) !important;
+  }
+
+  // ќелија при фокус
+  .ag-cell-focus {
+    outline: 2px solid #28a745;
+  }
+}

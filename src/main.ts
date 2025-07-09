@@ -14,6 +14,10 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { provideTranslateLoader } from './translate.providers';   // 👈 if there  is a configuration for ngx-translate
 
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+
+ModuleRegistry.registerModules([ AllCommunityModule ]);
+
 if (environment.production) {
   enableProdMode();
 }

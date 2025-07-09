@@ -5,6 +5,9 @@ import { RouterModule } from '@angular/router';     // if you ever use routerLin
 import { TranslateModule } from '@ngx-translate/core';
 import { Toast } from 'bootstrap';
 
+import { BillingService, Invoice } from '../billing/billing.service';
+import { CreditsService } from '../buy-credits/credit.service';
+
 interface CreditPackage {
   price: string;
   credits: number;
@@ -38,7 +41,8 @@ export class BuyCreditsComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private renderer: Renderer2,
-    private host: ElementRef<HTMLElement>
+    private billingSvc: BillingService,
+    private creditsSvc: CreditsService,
   ) {}
 
   ngOnInit(): void {
@@ -63,9 +67,21 @@ export class BuyCreditsComponent implements OnInit {
   }
 
   async purchase(pkg: CreditPackage): Promise<void> {
+    
     setTimeout(() => {
       debugger;
-      // ажурирање на кредити
+
+      const now = new Date();
+      const invoice: Invoice = {
+        id: `INV-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}-${now.getTime()}`,
+        timestamp: now.toLocaleString(),
+        amount: parseFloat(pkg.price.replace('$','')),  // assumes format '$10'
+        credits: pkg.credits
+      };
+      this.billingSvc.add(invoice);            // ← record invoice
+
+      this.creditsSvc.addCredits(pkg.credits);
+
       if (this.currentUser) {
         const key = `credits_${this.currentUser.email}`;
         this.currentCredits += pkg.credits;
@@ -102,6 +118,7 @@ export class BuyCreditsComponent implements OnInit {
       bsToast.show();
 
     }, 1000);
+
   }
 
 

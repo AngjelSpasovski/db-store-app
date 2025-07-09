@@ -1,2 +1,30 @@
-h2 { margin-bottom: 1rem; }
-p  { color: #666; }
+$dark:       #222428;
+$darker:     #1e1e1e;
+$light:      #ffffff;
+$primary:    #4d8dff;
+$secondary:  #555;
+
+$primary-blue: #00509e;
+$primary-blue-light: #00a8ff;
+
+$card-header-bg: #2a3443;
+$card-button-bg: #42526a;
+$card-price-color: #658eb6;
+
+.new-research {
+  //max-width: 600px;
+  //margin: auto;
+  background: $dark;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: 0 2px 8px $darker;
+
+  h2, h3 { margin-bottom: 1rem; }
+
+  .form-label { font-weight: 600; }
+  .list-group { margin-top: 2rem; }
+
+  &-toast-container {
+    z-index: 1050;
+  }
+}
