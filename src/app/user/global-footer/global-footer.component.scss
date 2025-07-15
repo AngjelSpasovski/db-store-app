@@ -3,6 +3,10 @@ $darker:     #1e1e1e;
 $light:      #ffffff;
 $primary:    #4d8dff;
 $secondary:  #555;
+$primary-blue: #00509e;
+$primary-blue-light: #00a8ff;
+$purple: #6262b2;
+
 
 .global-footer {
   color: var(--light);
@@ -23,6 +27,7 @@ $secondary:  #555;
       &:hover,
       &.active {
         text-decoration: underline;
+        color: $purple;
       }
     }
   }

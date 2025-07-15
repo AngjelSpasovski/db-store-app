@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $dark:       #222428;
 $darker:     #1e1e1e;
 $light:      #ffffff;
@@ -12,19 +14,42 @@ $card-button-bg: #42526a;
 $card-price-color: #658eb6;
 
 .new-research {
-  //max-width: 600px;
-  //margin: auto;
+  height: 81vh;
+  overflow-y: auto;
   background: $dark;
   border-radius: 0.5rem;
   padding: 2rem;
   box-shadow: 0 2px 8px $darker;
 
-  h2, h3 { margin-bottom: 1rem; }
+  .inner-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    color: $light;
+  }
 
   .form-label { font-weight: 600; }
   .list-group { margin-top: 2rem; }
 
   &-toast-container {
     z-index: 1050;
+  }
+
+  .input-group {
+    // 1) Make the text field dark & rounded on the right
+    .form-control {
+      background: #495057;
+      color:      $light;
+      border:     1px solid color.adjust($darker, $lightness: 20%);
+      // remove the right-side radius so it meets the button cleanly
+      border-top-right-radius:   0;
+      border-bottom-right-radius: 0;
+    }
+
+    // 2) Match the button radius on the left
+    .btn {
+      border-top-left-radius:   0;
+      border-bottom-left-radius: 0;
+    }
   }
 }

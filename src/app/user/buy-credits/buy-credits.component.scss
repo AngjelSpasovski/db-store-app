@@ -15,8 +15,20 @@ $table-header-bg: #343a40;
 $table-row-color: #495057;
 
 .buy-credits {
+  height: 81vh;
   overflow-y: auto;
   padding-top: 1%;
+  background: $dark;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: 0 2px 8px $darker;
+
+  .inner-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    color: $light;
+  }
   
   .card-grid {
 

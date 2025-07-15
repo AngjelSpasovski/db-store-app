@@ -1,17 +1,21 @@
 <aside class="sidebar" [class.open]="open">
   <div class="sidebar__header">
-      <div class="sidebar__brand">logo</div>
-      <button class="sidebar__close" (click)="toggleSidebar()">×</button>
-    </div>
 
-    <ul class="sidebar__menu">
-      <li *ngFor="let item of menuItems" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <a [routerLink]="item.route" (click)="closeSidebar()">
-          <span class="icon" aria-hidden="true">{{ item.icon }}</span>
-          <span class="label">{{ item.label | translate}}</span>
-        </a>
-      </li>
-    </ul>
+    <div class="p-5"> 
+      <div class="rounded-circle border d-flex justify-content-center align-items-center" style="width:50px; height:50px" alt="Avatar">
+        <i class="fas fa-user-alt text-info"></i>
+      </div>
+    </div>
+  </div>
+
+  <ul class="sidebar__menu">
+    <li *ngFor="let item of menuItems" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a [routerLink]="item.route" (click)="closeSidebar()">
+        <span class="icon" aria-hidden="true">{{ item.icon }}</span>
+        <span class="label">{{ item.label | translate}}</span>
+      </a>
+    </li>
+  </ul>
 
   <div class="sidebar__footer">
     Remaining Credits: <span class="highlight">{{ credits$ | async }}</span>

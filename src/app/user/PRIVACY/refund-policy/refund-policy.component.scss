@@ -1,0 +1,33 @@
+@use 'sass:color';
+
+$dark:       #222428;
+$darker:     #1e1e1e;
+$light:      #ffffff;
+$primary:    #4d8dff;
+$secondary:  #555;
+
+$primary-blue: #00509e;
+$primary-blue-light: #00a8ff;
+
+$card-header-bg: #2a3443;
+$card-button-bg: #42526a;
+$card-price-color: #658eb6;
+
+
+:host {
+    .refund-polisy-component{
+
+        .inner-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            color: $light;
+        }
+    }
+
+    pdf-viewer {
+        border: 1px solid #ccc;
+        border-radius: 0.25rem;
+        box-shadow: 0 2px 6px rgba(#000, 0.1);
+    }
+}

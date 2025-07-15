@@ -114,7 +114,7 @@ export class BuyCreditsComponent implements OnInit {
       this.renderer.appendChild(container, toastEl);
 
       // Пушти го toast-от
-      const bsToast = new Toast(toastEl, { delay: 4000 });
+      const bsToast = new Toast(toastEl, { delay: 2000 });
       bsToast.show();
 
     }, 1000);

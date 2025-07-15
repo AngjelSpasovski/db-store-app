@@ -1,3 +1,17 @@
-<p>
-  cookies-policy works!
-</p>
+<section class="cookies-polisy-component p-4 bg-dark">
+
+  <h3 class="inner-title mb-4">{{ 'COOKIES_POLICY' | translate }}</h3>
+
+  <div class="d-flex justify-content-center align-items-center flex-column">
+      <pdf-viewer
+        [src]="pdfSrc"
+        [render-text]="true"
+        style="display: block; width: 50%; height: 70vh;"
+        [original-size]="false"
+        [zoom]="1"
+        [show-all]="true"
+        [stick-to-page]="true"
+      ></pdf-viewer>
+  </div>
+
+</section>

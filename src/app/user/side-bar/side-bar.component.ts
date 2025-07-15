@@ -30,9 +30,9 @@ export class SidebarComponent {
 
   public menuItems = [
     { label: 'BUY_CREDITS', icon: '🛒', route: '/user/buy-credits' },
-    { label: 'NEW_RESEARCH',icon: '🔍', route: '/user/new-research' },
+    { label: 'SEARCH',      icon: '🔍', route: '/user/new-research' },
     { label: 'BILLING',     icon: '💳', route: '/user/billing' },
-    { label: 'HISTORY',     icon: '📜', route: '/user/history' },
+//  { label: 'HISTORY',     icon: '📜', route: '/user/history' },
     { label: 'FAQS',        icon: '❓', route: '/user/faqs' },
     // …
   ];

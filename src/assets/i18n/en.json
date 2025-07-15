@@ -141,6 +141,9 @@
     "DOWNLOAD_PDF": "Download PDF",
     "HISTORY": "History",
     "ID_NUMBER": "ID Number",
+    "PERSONAL_ID_NUMBER": "Personal ID Number",
+    "ID_MUST_BE_11_DIGITS": "The ID must contain 11 digits.",
+    "ENTER_SEARCH_VALUE": "Enter search value",
     "TIMESTAMP": "Timestamp",
     "STATUS": "Status",
     "FILTER_BY_ID": "Filter By ID",
@@ -170,6 +173,7 @@
     "FAQS_TITLE": "Frequently Asked Questions",
     "FAQS_SEARCH": "Search FAQs",
     "NO_FAQS": "No FAQs available at the moment.",
+    "FAQS_SEARCH_PLACEHOLDER": "Search for a question...",
 
     "FAQS_QUESTION_1": "How do I purchase more credits?",
     "FAQS_ANSWER_1": "Navigate to the Buy Credits page via the sidebar and select a package to purchase.",

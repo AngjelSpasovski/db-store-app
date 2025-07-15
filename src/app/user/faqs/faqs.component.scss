@@ -1,2 +1,95 @@
-h2 { margin-bottom: 1rem; }
-p  { color: #666; }
+@use 'sass:color';
+
+$dark:              #222428;
+$darker:            #1e1e1e;
+$light:             #ffffff;
+$card-header-bg:    #2a3443;
+$card-button-bg:    #42526a;
+$border-color:      color.adjust($darker, $lightness: 20%);
+
+:host {
+
+  .faqs-component{
+    height: 81vh;
+    overflow-y: auto;
+    background: $dark;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 2px 8px $darker;
+  } 
+
+  
+  .inner-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    color: $light;
+  }
+
+  // Search bar
+  .search-container {
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 1rem;
+      transform: translateY(-50%);
+      color: color.adjust($light, $lightness: -30%);
+      pointer-events: none;
+    }
+    .form-control {
+      width: 100%;
+      padding-left: 2.5rem;
+      height: 2.75rem;
+      background: $darker;
+      border: 1px solid $border-color;
+      border-radius: 0.5rem;
+      color: $light;
+      &::placeholder {
+        color: color.adjust($light, $lightness: -40%);
+      }
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba($card-button-bg, 0.25);
+        border-color: $card-button-bg;
+      }
+    }
+  }
+
+  // Accordion cards
+  .faq-card {
+    background: $card-button-bg;
+    border: 1px solid $border-color;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba($darker, 0.5);
+
+    .accordion-button {
+      background: $card-button-bg;
+      color: $light;
+      border: none;
+      padding: 1rem;
+      font-weight: 500;
+      border-radius: 0.5rem !important;
+      transition: background 0.2s;
+      &.collapsed {
+        background: $card-button-bg;
+      }
+      &:hover {
+        background: color.adjust($card-button-bg, $lightness: -5%);
+      }
+      &:not(.collapsed) {
+        background: $card-header-bg;
+      }
+      &::after {
+        filter: invert(1);
+      }
+    }
+
+    .accordion-collapse {
+      .accordion-body {
+        background: $card-header-bg;
+        color: $light;
+        padding: 1rem;
+        border-top: 1px solid $border-color;
+      }
+    }
+  }
+}

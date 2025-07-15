@@ -40,12 +40,12 @@ $secondary:  #555;
     margin: 3px 0px 3px 0px;
   }
 
-  .main-router-wrap {
+  .main-router-wrap { 
     padding: 1rem;
     height: calc(100% - 12%); // adjust for header height
     background-color: $dark;
-    margin-bottom: 3px;
     overflow-y: auto;
+    border-radius: 5px;
   }
 
   .main-footer-wrap {
@@ -53,6 +53,7 @@ $secondary:  #555;
     align-items: center;
     height: 5%;
     background-color: $darker;
-    margin: 3px 0px 3px 0px;
+    margin: 5px 0px 3px 0px;
+    border-radius: 5px;
   }
 }
