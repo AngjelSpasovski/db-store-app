@@ -1,30 +1,59 @@
-h2 { margin-bottom: 1rem; }
-p  { color: #666; }
+$dark:       #222428;
+$darker:     #1e1e1e;
+$light:      #ffffff;
+$primary:    #4d8dff;
+$secondary:  #555;
+
+$primary-blue: #00509e;
+$primary-blue-light: #00a8ff;
+
+$card-header-bg: #2a3443;
+$card-button-bg: #42526a;
+$card-price-color: #658eb6;
+
+$table-header-bg: #343a40;
+$table-row-color: #495057;
+$table-row-selected: rgba(40,167,69,0.2); // green with transparency
+$table-sucsess: #28a745;
+$table-danger: #dc3545;
+
 
 :host ::ng-deep .ag-theme-alpine {
-  // промени боја на header
+
   .ag-header {
-    background-color: #343a40;   // темно сиво
+    background-color: $table-header-bg;
   }
   .ag-header-cell-label {
-    color: #fff;                // бели titles
+    color: $light;
     font-weight: 500;
   }
 
-  // редови
   .ag-row {
     &.ag-row-hover {
-      background-color: #495057 !important; // hover dark
+      background-color: $table-row-color !important;
     }
   }
 
-  // селектирано
   .ag-row-selected {
-    background-color: rgba(40,167,69,0.2) !important;
+    background-color: $table-row-selected !important;
   }
 
-  // ќелија при фокус
   .ag-cell-focus {
-    outline: 2px solid #28a745;
+    outline: 2px solid $table-sucsess;
   }
+}
+
+:host ::ng-deep .status-dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin: auto;
+}
+:host ::ng-deep .status-dot.success {
+  background-color: $table-sucsess;
+}
+:host ::ng-deep .status-dot.danger {
+  background-color: $table-danger;
 }

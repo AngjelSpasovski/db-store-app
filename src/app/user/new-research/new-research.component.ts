@@ -6,11 +6,17 @@ import { SearchHistoryService, SearchRecord } from './new-search-history.service
 import { AuthService } from '../../auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { ToastService } from '../toast.service';
+import { HistoryComponent } from '../history/history.component'; // Import the HistoryComponent
 
 @Component({
   selector: 'app-new-research',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    TranslateModule,
+    HistoryComponent
+  ],
   templateUrl: './new-research.component.html',
   styleUrls: ['./new-research.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

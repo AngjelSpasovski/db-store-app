@@ -15,16 +15,16 @@ export interface User {
 @Injectable({providedIn: 'root'})
 
 export class AuthService {
-  private usersKey = 'users';                              // key for sessionStorage
-  private loggedInUserKey = 'loggedInUser';                // key for loggedInUser in sessionStorage
-  private resetCodesKey = 'resetCodes';                    // key for resetCodes in sessionStorage
+  private usersKey = 'users';                                     // key for sessionStorage
+  private loggedInUserKey = 'loggedInUser';                       // key for loggedInUser in sessionStorage
+  private resetCodesKey = 'resetCodes';                           // key for resetCodes in sessionStorage
   
-  private inactivityTimeout: any;                           // timeout for inactivity
-  private logoutWarningTimeout: any;                        // timeout for logout warning
-  public isLoggedIn: any;                                   // is logged in
+  private inactivityTimeout: any;                                 // timeout for inactivity
+  private logoutWarningTimeout: any;                              // timeout for logout warning
+  public isLoggedIn: any;                                         // is logged in
 
-  private readonly INACTIVITY_TIME = 1800000;                // 30 minutes in milliseconds
-  private readonly WARNING_TIME = 600000;                    // 10 minutes in milliseconds
+  private readonly INACTIVITY_TIME = 1800000;                     // 30 minutes in milliseconds
+  private readonly WARNING_TIME = 600000;                         // 10 minutes in milliseconds
 
   public logoutEvent = new BehaviorSubject<boolean>(false);       // BehaviorSubject event emitter for logout
   public showLogoutModal$ = new BehaviorSubject<boolean>(false);  // BehaviorSubject event emitter for logout modal

@@ -1,34 +1,24 @@
 <section class="new-research p-4">
 
   <form [formGroup]="searchForm" (ngSubmit)="submit()">
-    <div class="mb-3">
-      <label for="id" class="form-label">{{ 'PERSONAL_ID_NUMBER' | translate }}</label>
-      <input id="id" type="text" class="form-control" formControlName="id"
-        placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}" />
-      <div *ngIf="searchForm.get('id')?.invalid && searchForm.get('id')?.touched" class="text-danger small">
-        {{ 'ID_MUST_BE_11_DIGITS' | translate }}
-      </div>
 
-      <button type="submit" class="btn btn-primary" [disabled]="searchForm.invalid">
-        {{ 'SEARCH' | translate }}
-      </button>
+    <div class="container mb-3">
+
+      <label for="id" class="form-label">{{ 'PERSONAL_ID_NUMBER' | translate }}</label>
+      
+      <div class="input-group">
+        <input id="id" type="text" class="form-control" formControlName="id" placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}" />
+        <button type="submit" class="btn btn-primary" [disabled]="searchForm.invalid">{{ 'SEARCH' | translate }}</button>
+      </div>
+      <div *ngIf="searchForm.get('id')?.invalid && searchForm.get('id')?.touched" class="text-danger small">{{ 'ID_MUST_BE_11_DIGITS' | translate }}</div>
+     
+
     </div>
     
   </form>
 
-  <!-- Search history -->
-  <h3>{{ 'SEARCH_HISTORY' | translate }}</h3>
-  <ul class="list-group">
-    <!-- …your existing history list… -->
-  </ul>
-
-  <div *ngIf="fileUrl" class="mt-3">
-    <a [href]="fileUrl" download class="btn btn-success">
-      {{ 'DOWNLOAD_RESULTS'|translate }}
-    </a>
-  </div>
-  <div *ngIf="records.length === 0" class="text-muted mt-3">
-    {{ 'NO_SEARCH_HISTORY' | translate }}
+  <div class="">
+    <app-history></app-history>
   </div>
 
 </section>

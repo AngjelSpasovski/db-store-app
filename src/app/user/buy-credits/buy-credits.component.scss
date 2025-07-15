@@ -11,6 +11,9 @@ $card-header-bg: #2a3443;
 $card-button-bg: #42526a;
 $card-price-color: #658eb6;
 
+$table-header-bg: #343a40;
+$table-row-color: #495057;
+
 .buy-credits {
   overflow-y: auto;
   padding-top: 1%;
@@ -27,7 +30,7 @@ $card-price-color: #658eb6;
     }
 
     .credit-card {
-      border: 1px solid $card-header-bg;
+      border: 1px solid $table-row-color;
       border-radius: 1rem;
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -35,7 +38,7 @@ $card-price-color: #658eb6;
 
     .credit-card .card-header {
       font-size: 1.25rem;
-      background-color: $card-header-bg;
+      background-color: $table-row-color;
     }
 
     .price {
@@ -45,6 +48,7 @@ $card-price-color: #658eb6;
 
     .card-body {
       padding: 2rem;
+      background-color: $table-header-bg;
 
       .btn {
         background-color: $card-button-bg;
