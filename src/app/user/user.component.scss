@@ -6,6 +6,8 @@ $light:      #ffffff;
 $primary:    #4d8dff;
 $secondary:  #555;
 
+$header-total-height: 128px;
+
 // adjust mobile nav
 .mobile-nav {
   display: flex;
@@ -37,15 +39,15 @@ $secondary:  #555;
   .main-header-wrap{
     height: 5%;
     background-color: $darker;
-    margin: 3px 0px 3px 0px;
+    margin: 3px 0px 3px 3px;
   }
 
   .main-router-wrap { 
     padding: 1rem;
-    height: calc(100% - 12%); // adjust for header height
+    height: calc(100% - 11%); // adjust for header height
     background-color: $dark;
     overflow-y: auto;
-    border-radius: 5px;
+    margin-left: 3px;
   }
 
   .main-footer-wrap {
@@ -54,7 +56,23 @@ $secondary:  #555;
     align-items: center;
     height: 5%;
     background-color: $darker;
-    margin: 5px 0px 3px 0px;
-    border-radius: 5px;
+    margin: 3px 0px 0px 3px;
+  }
+}
+
+/* When sidebar is expanded */
+app-sidebar.open ~ .user-wrap .content {
+  margin-left: 240px;
+}
+
+/* When sidebar is collapsed mini-mode */
+app-sidebar.closed ~ .user-wrap .content {
+  margin-left: 60px;
+}
+
+/* On small screens, content should always be full-width */
+@media (max-width: 991px) {
+  app-sidebar ~ .user-wrap .content {
+    margin-left: 0 !important;
   }
 }

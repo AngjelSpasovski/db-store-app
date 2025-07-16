@@ -1,20 +1,24 @@
-<!-- Mobile top bar -->
-<nav class="mobile-nav" *ngIf="isMobile">
-  <div class="mobile-nav__brand">Menu</div>
-  <button class="mobile-nav__toggle" (click)="toggleSidebar()">
-    <span class="mobile-nav__icon"></span>
-  </button>
+<!-- Mobile “hamburger” only when sidebar closed -->
+<nav class="mobile-nav" *ngIf="isMobile && !sidebarIsOpen">
+  <button (click)="sidebarIsOpen = true">☰</button>
 </nav>
 
+<!-- Updated sidebar binding -->
+<app-sidebar
+  [isOpen]="sidebarIsOpen"
+  (close)="sidebarIsOpen = false">
+</app-sidebar>
+
 <div class="user-wrap">
-
-  <!-- Sidebar (desktop & mobile off-canvas) -->
-  <app-sidebar [open]="sidebarOpen" (close)="closeSidebar()"></app-sidebar>
-
-  <!-- Main content area -->
   <main class="content">
-    <div class="main-header-wrap"><app-header-in></app-header-in></div>
-    <div class="main-router-wrap"><router-outlet></router-outlet></div>
-    <div class="main-footer-wrap"><app-global-footer></app-global-footer></div>
+    <div class="main-header-wrap">
+      <app-header-in></app-header-in>
+    </div>
+    <div class="main-router-wrap">
+      <router-outlet></router-outlet>
+    </div>
+    <div class="main-footer-wrap">
+      <app-global-footer></app-global-footer>
+    </div>
   </main>
 </div>

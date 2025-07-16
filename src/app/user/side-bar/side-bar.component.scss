@@ -1,109 +1,84 @@
-$dark:       #222428;
-$darker:     #1e1e1e;
-$light:      #ffffff;
-$primary:    #4d8dff;
-$secondary:  #555;
-
+$dark:   #222428;
+$darker: #1e1e1e;
+$light:  #ffffff;
 $primary-blue: #00509e;
-$primary-blue-light: #00a8ff;
 
-$card-header-bg: #2a3443;
-$card-button-bg: #42526a;
-$card-price-color: #658eb6;
+$header-total-height: 64px;
+$header-total-height-margin: 70px; // Adjusted for larger header
 
 .sidebar {
-  height: 94vh;
-  border-radius: 5px;
-  background: var(--dark);
-  color: var(--light);
-  width: 240px;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  bottom: 0;
+  position: fixed; 
+  top: $header-total-height; 
+  bottom: 0; 
   left: 0;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  z-index: 1000;
+  width: 240px;
+  height: calc(100vh - #{$header-total-height-margin});
+  background: $darker;
+  overflow: hidden;
+  transition: width 0.3s ease, transform 0.3s ease;
+  margin-top: 3px;
 
-  &.open {
-    transform: translateX(0);
+  &.closed {
+    width: 60px;  /* mini-mode: icons only */
+    .label, .sidebar__footer { display: none; }
   }
 
-  @media (min-width: 992px) {
-    transform: none;
-    position: relative;
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    color: $light;
+    cursor: pointer;
   }
 
   &__header {
-        display: flex
-;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6%;
-    margin: 3px 2px 3px 1px;
-    background: $darker;
-    height: 5%;
-
-    .sidebar__brand {
-      font-size: 1.25rem;
-      font-weight: bold;
-    }
-    .sidebar__close {
-      background: none;
-      border: none;
-      color: var(--light);
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
+    padding: 11px;
+    margin-bottom: 5px;
+    box-shadow: 4px 0px 5px rgb(66, 82, 106);
   }
 
   &__menu {
+    margin-top: 1rem;
     list-style: none;
-    padding: 0.5rem 0;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 5px;
-    margin-right: 1%;
+    padding: 0;
+    box-shadow: 4px 0px 5px rgb(66, 82, 106);
 
-    li {
-      margin-bottom: 0.5rem;
+    li a {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      color: $light;
+      text-decoration: none;
 
-      a {
-        display: flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        text-decoration: none;
-        color: inherit;
-        transition: background 0.2s;
-        font-weight: bold;
-
-        .icon {
-          margin-right: 0.5rem;
-          /* стил за иконата */
-        }
+      .icon {
+        width: 30px;
+        text-align: center;
       }
-
-      &.active a {
-        background-color: $card-header-bg;     /* или вашиот primary боја */
-        color: $light;
+      .label {
+        margin-left: 0.5rem;
       }
-      a:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
+    }
+    li.active a {
+      background: $primary-blue;
+      color: $light;
+      border-radius: 4px;
     }
   }
 
   &__footer {
     padding: 1rem;
-    margin-right: 1%;
-    font-size: 0.9rem;
-    background-color: $darker;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.85rem;
+    color: $light;
+    box-shadow: 4px 0px 5px rgb(66, 82, 106);
+  }
 
-    .highlight {
-      color: var(--primary);
-      font-weight: bold;
-    }
+  /* Mobile off-canvas */
+  @media (max-width: 991px) {
+    &.open   { transform: translateX(0); }
+    &.closed { transform: translateX(-100%); }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, HostBinding  } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common'; // for *ngFor, *ngIf, etc.
 import { TranslateModule } from '@ngx-translate/core';
@@ -18,14 +18,21 @@ import { CreditsService } from '../buy-credits/credit.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
-
-  @Input() open = false;                        // Whether the sidebar is open or not ... Controls open/close state 
   @Input() credits = 0;                         /** Credits to display in the sidebar */
+  @Input() isOpen = false;                      /** Whether the sidebar is open */
+
   @Output() close = new EventEmitter<void>();   /** Emitted when a menu link is clicked on mobile */
 
-  public currentCredits = 0;
-  public sidebarOpen = false;
+  @HostBinding('class.open')  get opened() { 
+    return this.isOpen; 
+  }
+  @HostBinding('class.closed') get closed() { 
+    return !this.isOpen; 
+  }
+
   public isMobile = window.innerWidth < 992;
+
+  public currentCredits = 0;                    // ← Current credits from session storage
   public credits$ = this.creditsSvc.credits$;    // ← Observable на кредити
 
   public menuItems = [
@@ -43,8 +50,6 @@ export class SidebarComponent {
   ) { }
 
   ngOnInit() {
-    // open sidebar by default on desktop
-    if (!this.isMobile) this.sidebarOpen = true;
 
     // init credits
     const user: User | null = this.auth.getCurrentUser();
@@ -55,13 +60,17 @@ export class SidebarComponent {
     }
   }
 
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
+  toggle(): void {
+    this.isOpen = !this.isOpen;
+    if (this.isMobile && !this.isOpen) {
+      this.close.emit();  // notify parent on mobile collapse
+    }
   }
 
-  closeSidebar() {
+  /** Called when any menu link is clicked */
+  onMenuItemClick(): void {
+    // only collapse on mobile
     if (this.isMobile) {
-      this.sidebarOpen = false;
       this.close.emit();
     }
   }
@@ -69,9 +78,7 @@ export class SidebarComponent {
   @HostListener('window:resize')
   onResize() {
     this.isMobile = window.innerWidth < 992;
-    if (!this.isMobile) {
-      this.sidebarOpen = true;  // секогаш отворено на desktop
-    }
+    this.isOpen = !this.isMobile;   // open on desktop, closed on mobile
   }
 
 }
