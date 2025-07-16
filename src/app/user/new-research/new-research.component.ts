@@ -1,10 +1,11 @@
 import { Component, OnInit, Renderer2, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { DummyIdService } from './dummy-id.service';
 import { SearchHistoryService, SearchRecord } from './new-search-history.service';
 import { AuthService } from '../../auth/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { CreditsService } from '../buy-credits/credit.service';
 import { ToastService } from '../toast.service';
 import { HistoryComponent } from '../history/history.component'; // Import the HistoryComponent
 
@@ -33,6 +34,7 @@ export class NewResearchComponent implements OnInit {
     private auth: AuthService,
     private renderer: Renderer2,
     private toasts: ToastService,
+    private creditsSvc: CreditsService,
     @Inject(DOCUMENT) private doc: Document
   ) {}
 
@@ -60,7 +62,10 @@ export class NewResearchComponent implements OnInit {
     const id = this.searchForm.value.id.trim();
     const success = this.idSvc.exists(id);
 
-    if (success) this.auth.deductCredits(1);
+    if (success) {
+      this.auth.deductCredits(1);         // keep your existing logic
+      this.creditsSvc.addCredits(-1);     // push a –1 update to the BehaviorSubject
+    }
 
     const rec: SearchRecord = {
       id,
