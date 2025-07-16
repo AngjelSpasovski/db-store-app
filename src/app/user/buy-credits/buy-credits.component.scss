@@ -41,11 +41,15 @@ $table-row-color: #495057;
       margin-right: 0;
     }
 
+    .col{
+      padding: 1%;
+    }
+
     .credit-card {
       border: 1px solid $table-row-color;
       border-radius: 1rem;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 4px 4px 5px rgb(66 82 106);
     }
 
     .credit-card .card-header {
