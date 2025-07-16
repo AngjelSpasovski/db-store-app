@@ -3,11 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule }  from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AgGridModule }  from 'ag-grid-angular';
+import { Subscription } from 'rxjs';
 
 import { SearchHistoryService, SearchRecord } from '../new-research/new-search-history.service';
 
 // Importing themes from ag-Grid
 import { themeAlpine } from 'ag-grid-community';
+
 
 @Component({
   selector: 'app-history',
@@ -31,6 +33,8 @@ export class HistoryComponent  implements OnInit {
   columnDefs: any[] = [];
   defaultColDef = { sortable: true, filter: true, resizable: true, flex: 1 };
   rowData: SearchRecord[] = [];
+
+  private sub!: Subscription;
 
    public theme = themeAlpine.withParams({
       
@@ -56,8 +60,10 @@ export class HistoryComponent  implements OnInit {
     private translate: TranslateService) {}
 
   ngOnInit(): void {
-    // Load all SearchRecords from sessionStorage :contentReference[oaicite:2]{index=2}
-    this.rowData = this.historySvc.getAll();
+    // Subscribe to every update
+    this.sub = this.historySvc.history$.subscribe(list => {
+      this.rowData = list;
+    });
 
     // Define columns, using translate.instant for headers
     this.columnDefs = [
@@ -103,6 +109,10 @@ export class HistoryComponent  implements OnInit {
         }
       }
     ];
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
 
