@@ -16,6 +16,13 @@ $header-total-height: 128px;
   background: var(--dark);
   color: var(--light);
   padding: .75rem 1rem;
+  color: $secondary;
+  border: 1px solid $secondary;
+
+  .btn{
+    color: $secondary;
+    border: 1px solid $secondary;
+  }
 
   @media(min-width: 992px) {
     display: none;

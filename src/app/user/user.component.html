@@ -1,6 +1,6 @@
 <!-- Mobile “hamburger” only when sidebar closed -->
-<nav class="mobile-nav" *ngIf="isMobile && !sidebarIsOpen">
-  <button (click)="sidebarIsOpen = true">☰</button>
+<nav class="mobile-nav bg-dark" *ngIf="isMobile && !sidebarIsOpen">
+  <button class="btn" (click)="sidebarIsOpen = true"><i class="fa-solid fa-arrows-turn-right"></i></button>
 </nav>
 
 <!-- Updated sidebar binding -->

@@ -17,6 +17,7 @@ $header-total-height-margin: 70px; // Adjusted for larger header
   overflow: hidden;
   transition: width 0.3s ease, transform 0.3s ease;
   margin-top: 3px;
+  z-index: 1000;
 
   &.closed {
     width: 60px;  /* mini-mode: icons only */
