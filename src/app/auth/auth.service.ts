@@ -67,7 +67,22 @@ export class AuthService {
         { id: 3, name: 'Jane Smith',  email: 'jane.smith@example.com',  password: 'Secret456!',   role: 'user' },
         { id: 3, name: 'eee',         email: 'eee@eee.com',             password: 'eeeeeeee',     role: 'user' },
       ];
-      sessionStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
+      const stored = sessionStorage.getItem(this.usersKey);
+      if (!stored) {
+        // nothing there → seed
+        sessionStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
+      } else {
+        // if it’s there but empty array → re-seed
+        try {
+          const arr = JSON.parse(stored) as User[];
+          if (!arr || arr.length === 0) {
+            sessionStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
+          }
+        } catch {
+          // parse error → overwrite
+          sessionStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
+        }
+      }
     }
   }
 
