@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd  } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -20,14 +20,19 @@ import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
     TranslateModule
   ]
 })
-export class HeaderComponent {
+export class HeaderComponent implements AfterViewInit {
   public faSignOutAlt = faSignOutAlt;                 // Logout icon
 
   @Input() viewMode: 'home' | 'login' | 'forgot-password' | 'user' = 'home';
   @Input() isLoggedIn: boolean = false;
   @Input() userEmail: string = '';
   
+  @ViewChild('userNav') userNav!: ElementRef<HTMLElement>;
+  @ViewChild('userMenuButton') userMenuBtn!: ElementRef<HTMLElement>;
 
+  // new state for settings submenu
+  public showSettingsMenu = false;
+  
   constructor(
     private router: Router, 
     private authService: AuthService, 
@@ -72,8 +77,12 @@ export class HeaderComponent {
     });
   }
 
+  ngAfterViewInit() {}
+
   logout() {
-    this.authService.logout();    // AuthService.logout() ќе го избрише 'loggedInUser' и ќе те редиректира на '/login?tab=login'
+    // close the menu immediately
+    this.showSettingsMenu = false;
+    this.authService.logout();        // AuthService.logout() ќе го избрише 'loggedInUser' и ќе те редиректира на '/login?tab=login'
   }
 
   // navigation between the sections of the home page
@@ -89,4 +98,12 @@ export class HeaderComponent {
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
+
+  /** toggle settings menu open/closed */
+  toggleSettings(): void {
+    this.showSettingsMenu = !this.showSettingsMenu;
+  }
+
+
 }
+

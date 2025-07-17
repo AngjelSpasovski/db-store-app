@@ -254,7 +254,7 @@
               </div>
               <div *ngIf="signupSubmitted && signupForm.get('file')?.hasError('invalidFileType')"
                 class="invalid-feedback d-block text-right">
-                Само PDF-фајлови се дозволени.
+                {{ 'ONLY_PDF' | translate }}
               </div>
             </div>
 

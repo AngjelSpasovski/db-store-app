@@ -220,7 +220,9 @@
     "FAQS_ANSWER_8": "Yes! You can change your preferences at any time by accessing your profile. This way you will always receive offers in line with your interests.",
 
     "FAQS_QUESTION_9": "Can I delete my account at any time?",
-    "FAQS_ANSWER_9": "Yes, you can request deletion of your account at any time from your profile settings or by contacting our support. Once deleted, all your data will be removed in accordance with our privacy policy."
+    "FAQS_ANSWER_9": "Yes, you can request deletion of your account at any time from your profile settings or by contacting our support. Once deleted, all your data will be removed in accordance with our privacy policy.",
+
+    "ONLY_PDF": "Only PDF files are allowed."
 
 
 }

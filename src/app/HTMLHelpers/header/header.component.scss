@@ -61,4 +61,67 @@
       margin-left: auto;
     }
   }
+
+
+  .settings-container {
+      position: relative;      // contained to its flex parent
+      z-index: 1;              // ensure it sits below the navbar toggler
+
+    .settings-btn {
+      display: flex;
+      align-items: center;
+      background-color: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: gray;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(255,255,255,0.1);
+      }
+    }
+
+    .settings-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 0.25rem;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 0.25rem;
+      list-style: none;
+      padding: 0.5rem 0;
+      min-width: 180px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 200;
+
+      li {
+        a {
+          display: flex;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          color: #333;
+          text-decoration: none;
+
+          fa-icon {
+            margin-right: 0.5rem;
+          }
+
+          &:hover {
+            background-color: rgba(0,0,0,0.05);
+          }
+        }
+      }
+    }
+  }
+
+  .navbar-toggler {
+  z-index: 1050;    // higher than your collapsed menu
+}
+
+.user-nav {         // the <div class="collapse navbar-collapse">
+  z-index: 1000;    // below the toggler
+}
+
 }
