@@ -23,6 +23,6 @@
 
   <!-- NEW: footer only when open -->
   <div class="sidebar__footer" *ngIf="isOpen">
-    Remaining Credits: <span class="highlight">{{ credits$ | async }}</span>
+    {{ 'REMAINING_CREDITS' | translate }}: <span class="highlight">{{ credits$ | async }}</span>
   </div>
 </aside>

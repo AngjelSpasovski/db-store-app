@@ -1,6 +1,6 @@
 <section class="buy-credits p-4 ">
 
- <h3 class="inner-title mb-4">Buy packages for search credits </h3>
+ <h3 class="inner-title mb-4">{{ 'BUY_CREDITS_TITLE' | translate}} </h3>
 
   <!-- Grid of cards -->
   <div class="card-grid">
@@ -10,12 +10,12 @@
           <div class="card credit-card">
 
             <div class="card-header text-white">
-              {{ pkg.credits | number }} Credits
+              {{ pkg.credits | number }} {{ 'CREDITS' | translate }}
             </div>
 
             <div class="card-body text-center text-white">
               <p class="price display-6 mb-4">{{ pkg.price }}</p>
-              <button type="button" class="btn btn-lg w-100" (click)="purchase(pkg)">Buy Now<i class="bi bi-cart-plus ms-2"></i></button>
+              <button type="button" class="btn btn-lg w-100" (click)="purchase(pkg)">{{ 'BUY_NOW' | translate}}<i class="bi bi-cart-plus ms-2"></i></button>
             </div>
           </div>
         </div>

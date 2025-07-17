@@ -78,8 +78,9 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       companyName:          ['',    Validators.required],
       companyAddress:       ['',    Validators.required],
       companyAddressSecond: [''],
-      vat:                  ['',    [Validators.required, Validators.pattern(/^\w{11}$/)]],
+      
       phoneNumber:          ['',    [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      vat:                  ['',    [Validators.required, Validators.pattern(/^\w{11}$/)]],
   
       // 1c. Column 3
       city:                 ['',    Validators.required],
@@ -144,6 +145,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // LOGIN FORM
   onSubmitLogin() {
+    console.log('📤 onSubmitLogin fired:', this.loginForm.value);
+
     this.loginSubmitted = true;
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -151,8 +154,12 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const { email, password, rememberMe } = this.loginForm.value;
+
+    console.log('🔑 Calling AuthService.login with', email, password, rememberMe);
+
     this.auth.login(email, password, rememberMe).subscribe({
       next: user => {
+        console.log('✅ AuthService.login succeeded, redirecting…');
         // ✅ On successful login, navigate to User page
         this.router.navigate(['/user']);
       },
@@ -166,6 +173,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // SIGNUP FORM
   onSubmitSignup(evt: Event) {
+    console.log('📤 onSubmitSignup fired:', this.loginForm.value);
     // спречува default HTML submit
     evt.preventDefault();
   

@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $dark:       #222428;
 $darker:     #1e1e1e;
 $light:      #ffffff;
@@ -8,7 +10,7 @@ $primary-blue: #00509e;
 $primary-blue-light: #00a8ff;
 
 $card-header-bg: #2a3443;
-$card-button-bg: #42526a;
+$card-button-bg: rgb(46 69 104);;
 $card-price-color: #658eb6;
 
 $table-header-bg: #343a40;
@@ -49,7 +51,7 @@ $table-row-color: #495057;
       border: 1px solid $table-row-color;
       border-radius: 1rem;
       overflow: hidden;
-      box-shadow: 4px 4px 5px rgb(66 82 106);
+      box-shadow: 3px 3px 3px rgb(66 82 106);
     }
 
     .credit-card .card-header {
@@ -71,9 +73,10 @@ $table-row-color: #495057;
         color: $light;
         font-weight: bold;
         transition: background-color 0.3s;
+        //background-color: color.adjust($card-button-bg, $lightness: -10%);
 
         &:hover {
-          background-color: darken($card-button-bg, 10%);
+          background-color: color.adjust($card-button-bg, $lightness: -10%);
         }
       }
     }
