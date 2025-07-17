@@ -1,7 +1,7 @@
 {
     "OUR_COMPANY_NAME": "Alexander Adv Dooel",
     "HOME_INFO": "Trova le Offerte Perfette con il Nostro Matching Intelligente",
-    "LOGIN_BTN": "Annuncio/Registrazione",
+    "LOGIN_BTN": "Accedi/Registrazione",
     "APP_DESCRIPTION": "Vivi il meglio dei nostri servizi.",
     "DOWNLOAD_GOOGLE_PLAY": "Scarica da Google Play",
     "DOWNLOAD_APP_STORE": "Scarica da App Store",
@@ -18,7 +18,7 @@
      "WRITE_YOUR_MESSAGE": "Scrivi il tuo messaggio...",
 
     "PHONE": "Telefono",
-    "LOGIN": "Accesso",
+    "LOGIN": "Accedi",
     "SIGNUP": "Iscriviti",
     "LOGIN_ENTER": "Accedi",
     "SIGNUP_ENTER": "Registrati",
@@ -38,7 +38,7 @@
     "VAT_NUMBER": "Partita IVA",
     "UPLOAD_FILE": "Carica",
     "CHOOSE_FILE": "Trova",
-    "NO_FILE_CHOSEN": "Nessun file selezionato",
+    "NO_FILE_CHOSEN": "Visura Camerale/Autortificazione",
     "CHOOSE_OPTION": "* Scegli opzione *",
     "CITY": "Città",
     "CITY_NAME": "Skopje",
@@ -162,7 +162,7 @@
     "HISTORY": "Storia",
     "ID_NUMBER": "Numero identificativo",
     "SEARCH_PERSON": "Cerca persona per ID",
-    "PERSONAL_ID_NUMBER": "Numero di identificazione personale",
+    "PERSONAL_ID_NUMBER": "Codice alfanumerico",
     "ID_MUST_BE_11_DIGITS": "Il numero di identificazione deve contenere 11 cifre.",
     "ENTER_SEARCH_VALUE": "Inserisci il valore di ricerca",
     "TIMESTAMP": "Timbro temporale",
@@ -173,7 +173,6 @@
     "FAQS": "FAQ",
     "YOUR_BALANCE": "La tua disponibilità",
     "BUY_NOW": "Acquista ora",
-    "PERSONAL_ID_NUMER": "Numero di identificazione personale",
 
     "SETTINGS": "Impostazioni",
     "LOGGEDIN_AS": "Accedi come",
@@ -192,6 +191,10 @@
     "HOW_IT_WORKS_TEXT5_1": "Il nostro algoritmo confronta migliaia di offerte e seleziona quelle perfette per te.",
 
     "MEET_PEOPLE": "Incontra le persone in DBStore",
+    "CEO": "CEO",
+    "SALES_MANAGER": "Responsabile Commerciale",
+    "SOFTWARE_ENGINEER": "Ingegnere del Software",
+    "ADMINISTRATIVE_MANAGER": "Responsabile amministrativo",
 
     "FAQS_TITLE": "Domande frequenti",
     "FAQS_SEARCH": "Cerca nelle FAQs",

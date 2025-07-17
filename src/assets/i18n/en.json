@@ -37,7 +37,7 @@
     "VAT_NUMBER": "VAT Number",
     "UPLOAD_FILE": "Upload",
     "CHOOSE_FILE": "Find",
-    "NO_FILE_CHOSEN": "No file chosen",
+    "NO_FILE_CHOSEN": "Company Register/Self-Sertification",
     "CHOOSE_OPTION": "* Choose Option *",
     "CITY": "City",
     "CITY_NAME": "Skopje",
@@ -188,7 +188,12 @@
     "HOW_IT_WORKS_TEXT4_1": "Create your profile and indicate your preferences.",
     "HOW_IT_WORKS_TEXT5": "Leave it to us",
     "HOW_IT_WORKS_TEXT5_1": "Our algorithm compares thousands of offers and selects the perfect ones for you.",
+
     "MEET_PEOPLE": "Meet the people behind DBStore",
+    "CEO": "CEO",
+    "SALES_MANAGER": "Sales Manager",
+    "SOFTWARE_ENGINEER": "Software Engineer",
+    "ADMINISTRATIVE_MANAGER": "Administrative Manager",
 
     "FAQS_TITLE": "Frequently Asked Questions",
     "FAQS_SEARCH": "Search FAQs",
