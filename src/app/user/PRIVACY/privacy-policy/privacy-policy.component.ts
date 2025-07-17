@@ -16,7 +16,7 @@ import { PdfViewerModule }   from 'ng2-pdf-viewer';
 })
 export class PrivacyPolicyComponent  implements OnInit {
   
-  public culture: string = 'EN'; // Default culture
+  public culture: string = 'IT'; // Default culture
   public pdfSrc = `../../../../assets/privacy/privacy-policy/privacy-policy-${this.culture}.pdf`; // Path to the PDF file
 
   constructor() { }

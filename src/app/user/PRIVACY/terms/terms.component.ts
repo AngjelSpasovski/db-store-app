@@ -16,7 +16,7 @@ import { PdfViewerModule }   from 'ng2-pdf-viewer';
 })
 export class TermsComponent  implements OnInit {
 
-  public culture: string = 'EN'; // Default culture
+  public culture: string = 'IT'; // Default culture
   public pdfSrc = `../../../../assets/privacy/terms/terms-${this.culture}.pdf`; // Path to the PDF file
 
   constructor() { }
