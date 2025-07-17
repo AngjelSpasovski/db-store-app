@@ -2,7 +2,7 @@
        [class.open]="isOpen"
        [class.closed]="!isOpen">
 
-  <!-- NEW: toggle button -->
+  <!-- toggle button -->
   <div class="sidebar__header">
     <button class="sidebar__toggle" (click)="toggle()">
       <i class="fas" [ngClass]="isOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
@@ -14,15 +14,23 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }">
       <a [routerLink]="item.route" (click)="onMenuItemClick()">
-         <span class="icon">{{ item.icon }}</span>
-        <!-- NEW: hide labels when closed -->
+        <span class="icon">{{ item.icon }}</span>
         <span class="label" *ngIf="isOpen">{{ item.label | translate }}</span>
+      </a>
+    </li>
+
+    <!-- Credits indicator when closed -->
+    <li class="credits-indicator" *ngIf="!isOpen" [title]="(credits$ | async) + ' credits'">
+      <a>
+        <span class="icon">💰</span>
       </a>
     </li>
   </ul>
 
-  <!-- NEW: footer only when open -->
+  <!-- full footer when open -->
   <div class="sidebar__footer" *ngIf="isOpen">
-    {{ 'REMAINING_CREDITS' | translate }}: <span class="highlight">{{ credits$ | async }}</span>
+    {{ 'REMAINING_CREDITS' | translate }}:
+    <span class="highlight">{{ credits$ | async }}</span>
   </div>
+
 </aside>

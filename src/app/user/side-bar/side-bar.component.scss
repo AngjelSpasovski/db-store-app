@@ -77,6 +77,25 @@ $header-total-height-margin: 70px; // Adjusted for larger header
     box-shadow: 4px 0px 5px rgb(66, 82, 106);
   }
 
+  &__menu {
+    li.credits-indicator {
+      margin-top: 1rem;        // мало растојание од долу
+      text-align: center;      // центрирај ја иконата
+      cursor: default;
+      box-shadow: 4px 0px 5px rgb(66, 82, 106);
+
+      .icon {
+        display: inline-block;
+        font-size: 1.2rem;     // поудебелен преглед
+        color: $primary-blue;  // или било која accent боја
+      }
+
+      a {
+        pointer-events: none;  // не е кликабилно
+      }
+    }
+  }
+
   /* Mobile off-canvas */
   @media (max-width: 991px) {
     &.open   { transform: translateX(0); }
