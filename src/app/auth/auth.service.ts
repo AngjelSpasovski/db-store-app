@@ -62,7 +62,7 @@ export class AuthService {
   private initializeUsers(): void {
     if (!sessionStorage.getItem(this.usersKey)) {
       const defaultUsers: User[] = [
-        { id: 1, name: 'Admin Admin', email: 'admin@admin.com',         password: 'admin123',     role: 'admin' },
+        { id: 1, name: 'DBStore',     email: 'dbstore@gmail.com',       password: 'dbstore123',   role: 'admin' },
         { id: 2, name: 'John Doe',    email: 'john.doe@example.com',    password: 'Password123!', role: 'user' },
         { id: 3, name: 'Jane Smith',  email: 'jane.smith@example.com',  password: 'Secret456!',   role: 'user' },
         { id: 3, name: 'eee',         email: 'eee@eee.com',             password: 'eeeeeeee',     role: 'user' },

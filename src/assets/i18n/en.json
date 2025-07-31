@@ -161,6 +161,7 @@
     "ID_NUMBER": "ID Number",
     "SEARCH_PERSON": "Search person by ID",
     "PERSONAL_ID_NUMBER": "Personal ID Number",
+    "VALID_TEST_SEARCH_CASES": "Valid test search cases",
     "ID_MUST_BE_11_DIGITS": "The ID must contain 11 digits.",
     "ENTER_SEARCH_VALUE": "Enter search value",
     "TIMESTAMP": "Timestamp",
@@ -171,7 +172,6 @@
     "FAQS": "FAQs",
     "YOUR_BALANCE": "Your Balance",
     "BUY_NOW": "Buy Now",
-    "PERSONAL_ID_NUMER": "Personal ID Number",
 
     "SETTINGS":"Settings",
     "LOGGEDIN_AS": "Logged in as",
