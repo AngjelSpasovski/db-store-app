@@ -6,6 +6,9 @@ import { DOCUMENT } from '@angular/common';
 export class ToastService {
   private renderer: Renderer2;
 
+  private lastMsg = '';
+  private lastAt = 0;
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document: Document
@@ -20,13 +23,17 @@ export class ToastService {
    * @param success Whether the toast is for success (green) or error (red).
    * @param duration How long the toast should be visible (default 4000ms).
    * @param position One of 'top-center' | 'top-end' | 'bottom-end' | etc.
+   * @param dedupeMs If the same message is shown within this time, it won't show again (default 1200ms).
    */
-  show(
-    message: string,
-    success = true,
-    duration = 4000,
-    position: 'top-center' | 'top-end' | 'bottom-end' = 'bottom-end'
-  ) {
+  show(message: string, success = true, duration = 4000, position: 'top-center' | 'top-end' | 'bottom-end' = 'bottom-end', dedupeMs = 1200 ) {
+
+    const now = Date.now();
+    const sameAsLast = message === this.lastMsg && (now - this.lastAt) < dedupeMs;
+    if (sameAsLast) return; // не спамирај
+
+    this.lastMsg = message;
+    this.lastAt = now;
+
     const container = this.document.getElementById('toast-container');
     if (!container) return;
 
