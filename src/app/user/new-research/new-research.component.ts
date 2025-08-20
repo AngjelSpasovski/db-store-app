@@ -6,7 +6,7 @@ import { DummyIdService } from './dummy-id.service';
 import { SearchHistoryService, SearchRecord } from './new-search-history.service';
 import { AuthService } from '../../auth/auth.service';
 import { CreditsService } from '../buy-credits/credit.service';
-import { ToastService } from '../toast.service';
+import { ToastService } from '../../shared/toast.service';
 import { HistoryComponent } from '../history/history.component'; // Import the HistoryComponent
 
 @Component({

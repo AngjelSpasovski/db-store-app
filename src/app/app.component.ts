@@ -7,6 +7,7 @@ import { AuthService } from './auth/auth.service';
 import { TranslateService } from '@ngx-translate/core';
 import { LanguageService } from './HTMLHelpers/language-selector/language.service';
 import { HeaderComponent } from './HTMLHelpers/header/header.component';
+import { LoadingBarComponent } from './shared/loading-bar.component';
 
 
 @Component({
@@ -18,7 +19,8 @@ import { HeaderComponent } from './HTMLHelpers/header/header.component';
     CommonModule,
     IonicModule,
     HeaderComponent,
-    RouterModule
+    RouterModule,
+    LoadingBarComponent
   ]
 })
 export class AppComponent implements OnInit {
@@ -72,15 +74,13 @@ export class AppComponent implements OnInit {
 
     // check if user is logged in
     const loggedInUser = sessionStorage.getItem('loggedInUser');
-
     if (loggedInUser) {
-      console.log('🔄 Restarting inactivity timer for logged-in user');
+      console.log('Logged-in user detected:', loggedInUser);
       this.authService.isLoggedIn = true;       // set isLoggedIn to true, showing logout modal
-      this.authService.startInactivityTimer();  // start inactivity timer
     }
     else {
-      console.log('No logged-in user detected. Timer will NOT start.');
-      this.authService.isLoggedIn = false; // set isLoggedIn to false, not showing logout modal
+      console.log('No logged-in user found');
+      this.authService.isLoggedIn = false;      // set isLoggedIn to false, not showing logout modal
     }
 
   }

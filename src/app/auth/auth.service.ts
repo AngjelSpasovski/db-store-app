@@ -1,305 +1,247 @@
+// src/app/auth/auth.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
-import { delay, map, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from './auth.environment';
 
-// Define the User interface
+// --- UPDATE: legacy-compat User interface (опционални полиња) ---
 export interface User {
-  id: number;
-  name: string;
+  id: string | number;
   email: string;
-  password: string;
-  role: string;
+  role: string;                // user | admin | superadmin
+  // опционални (за стар код што сè уште ги чита)
+  name?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  companyName?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-@Injectable({providedIn: 'root'})
 
+export interface SignInReq {
+  email: string;
+  password: string;
+}
+
+export interface SignInRes {
+  accessToken: string;
+  user: {
+    id:          string;
+    firstName:   string;
+    lastName:    string;
+    email:       string;
+    companyName: string;
+    role:        string;   // user | admin | superadmin
+    isActive:    boolean;
+    createdAt:   string;
+    updatedAt:   string;
+  };
+}
+
+export interface SignUpReq {
+  user: {
+    email:        string;
+    companyName:  string;
+    firstName:    string;
+    lastName:     string;
+    password:     string;
+    consent1:     boolean;
+    consent2:     boolean;
+    consent3?:    boolean;
+    consent4?:    boolean;
+    consent5?:    boolean;
+  };
+  billingDetails: {
+    email:           string;
+    company:         string;
+    address1:        string;
+    address2?:       string;
+    buildingNumber?: string;
+    zipCode:         string;
+    city:            string;
+    stateCode:       string;
+    nation:          string;
+    vatNumber:       string;
+  };
+}
+
+type ApiOk = { status: true };
+
+const TOKEN_KEY = 'auth_token';
+const USER_KEY  = 'auth_user';
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private usersKey = 'users';                                     // key for sessionStorage
-  private loggedInUserKey = 'loggedInUser';                       // key for loggedInUser in sessionStorage
-  private resetCodesKey = 'resetCodes';                           // key for resetCodes in sessionStorage
-  
-  private inactivityTimeout: any;                                 // timeout for inactivity
-  private logoutWarningTimeout: any;                              // timeout for logout warning
-  public isLoggedIn: any;                                         // is logged in
+  private readonly base = (environment as any).baseApiUrl ?? '/api';
 
-  private readonly INACTIVITY_TIME = 1800000;                     // 30 minutes in milliseconds
-  private readonly WARNING_TIME = 600000;                         // 10 minutes in milliseconds
+  public isAuthed$    = new BehaviorSubject<boolean>(!!(localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY)));
+  public currentUser$ = new BehaviorSubject<SignInRes['user'] | null>(this.readUser());
 
-  public logoutEvent = new BehaviorSubject<boolean>(false);       // BehaviorSubject event emitter for logout
-  public showLogoutModal$ = new BehaviorSubject<boolean>(false);  // BehaviorSubject event emitter for logout modal
+  // --- NEW: keep old flags so постоечкиот код компајлира ---
+  public isLoggedIn = !!(localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY));
+  public logoutEvent = new BehaviorSubject<boolean>(false);
+  public showLogoutModal$ = new BehaviorSubject<boolean>(false); // ако не се користи, не смета
 
-  // subscription to route events for reset on navigation
-  //private routeSub?: Subscription;  // <-- add Subscription if needed
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+  ) {}
 
-  constructor(private router: Router) {
-    this.initializeUsers();
-
-     // On init, check if user already in session or local storage
-    const existing = this.getCurrentUser();
-    if (existing) {
-      this.isLoggedIn = true;
-      this.startInactivityTimer();  // start timer if returning user
-    }
+  /** Build /auth/* URL */
+  private api(path: string): string {
+    const base = String(this.base).replace(/\/+$/, '');
+    return `${base}/auth/${path}`;
   }
 
-  ngOnInit(): void {
-    this.isLoggedIn = false;
+  // === REAL BACKEND METHODS ===================================================
+
+  signIn(body: SignInReq, remember = false): Observable<SignInRes> {
+    return this.http.post<SignInRes>(this.api('sign-in'), body).pipe(
+      tap(res => {
+        const user = { ...res.user, role: (res.user.role || 'user').toLowerCase() };
+        this.storeToken(res.accessToken, remember);
+        this.storeUser(user, remember);
+        this.currentUser$.next(user);
+        this.isAuthed$.next(true);
+      })
+    );
   }
 
-    ngOnDestroy(): void {
-      // clean up any subscriptions and event listeners
-      clearTimeout(this.inactivityTimeout);
-      clearTimeout(this.logoutWarningTimeout);
-      window.removeEventListener('mousemove', this.resetInactivityTimer.bind(this));
-      window.removeEventListener('keydown', this.resetInactivityTimer.bind(this));
-      this.logoutEvent.complete();
-      this.showLogoutModal$.complete();
-      //this.routeSub?.unsubscribe();
-    }
-
-  // initialize users in sessionStorage
-  private initializeUsers(): void {
-    if (!sessionStorage.getItem(this.usersKey)) {
-      const defaultUsers: User[] = [
-        { id: 1, name: 'DBStore',     email: 'dbstore@gmail.com',       password: 'dbstore123',   role: 'admin' },
-        { id: 2, name: 'John Doe',    email: 'john.doe@example.com',    password: 'Password123!', role: 'user' },
-        { id: 3, name: 'Jane Smith',  email: 'jane.smith@example.com',  password: 'Secret456!',   role: 'user' },
-        { id: 3, name: 'eee',         email: 'eee@eee.com',             password: 'eeeeeeee',     role: 'user' },
-      ];
-      const stored = sessionStorage.getItem(this.usersKey);
-      if (!stored) {
-        // nothing there → seed
-        sessionStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
-      } else {
-        // if it’s there but empty array → re-seed
-        try {
-          const arr = JSON.parse(stored) as User[];
-          if (!arr || arr.length === 0) {
-            sessionStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
-          }
-        } catch {
-          // parse error → overwrite
-          sessionStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
-        }
-      }
-    }
+  signUp(body: SignUpReq): Observable<ApiOk> {
+    return this.http.post<ApiOk>(this.api('sign-up'), body);
   }
 
-  /**
-   * 
-   * @returns 
-   * Returns the logged-in user's email address or null if not logged in.
-   * 
-   * @description 
-   * This method retrieves the logged-in user's email address from sessionStorage.
-   * If the user is not logged in, it returns null.
-   * 
-   */
-  // get users from sessionStorage
-  private getUsers(): User[] {
-    return JSON.parse(sessionStorage.getItem(this.usersKey) || '[]');
+  confirmEmailSend(email: string): Observable<ApiOk> {
+    return this.http.post<ApiOk>(this.api('confirm-email/send'), { email });
   }
 
+  confirmEmail(token: string): Observable<ApiOk> {
+    return this.http.post<ApiOk>(this.api('confirm-email'), { token });
+  }
 
-  /**
-   * 
-   * @returns 
-   * Returns the logged-in user's email address or null if not logged in.
-   * 
-   * @description
-   * This method retrieves the logged-in user's email address from sessionStorage.
-   * If the user is not logged in, it returns null.
-   */
-  // get current user from sessionStorage
-  public getCurrentUser(): User | null {
-    const sessionUser = sessionStorage.getItem(this.loggedInUserKey);   // get user from session storage
-    const localUser   = localStorage.getItem(this.loggedInUserKey);     // get user from local storage
+  resetPasswordSend(email: string) {
+    return this.http.post<ApiOk>(this.api('reset-password/send'), { email });
+  }
 
-    // return user
-    return sessionUser ? JSON.parse(sessionUser) : localUser ? JSON.parse(localUser) : null;
+  resetPasswordVerify(token: string) {
+    return this.http.post<ApiOk>(this.api('reset-password/verify'), { token });
+  }
+
+  resetPasswordSet(token: string, password: string) {
+    return this.http.post<ApiOk>(this.api('reset-password'), { token, password });
+  }
+
+  // === TOKEN/USER STORAGE =====================================================
+
+  get token(): string | null {
+    return localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY);
+  }
+
+  private storeToken(token: string, remember: boolean) {
+    const store = remember ? localStorage : sessionStorage;
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    store.setItem(TOKEN_KEY, token);
+  }
+
+  private storeUser(user: SignInRes['user'], remember: boolean) {
+    const store = remember ? localStorage : sessionStorage;
+    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(USER_KEY);
+    store.setItem(USER_KEY, JSON.stringify(user));
+  }
+
+  private readUser(): SignInRes['user'] | null {
+    const raw = localStorage.getItem(USER_KEY) ?? sessionStorage.getItem(USER_KEY);
+    try { return raw ? JSON.parse(raw) : null; } catch { return null; }
+  }
+
+  logout(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(USER_KEY);
+
+    this.logoutEvent.next(true);        // <-- избриши го, кога не е потребно
+    this.currentUser$.next(null);
+    this.isAuthed$.next(false);
+    this.router.navigate(['/login'], { queryParams: { tab: 'login' } });
+  }
+
+  // === COMPAT LAYER (задржани потписи за стар код) ============================
+
+  /** @deprecated – користи signIn(); wrapper за старите повици */
+  public login(email: string, password: string, rememberMe: boolean): Observable<User> {
+    return this.signIn({ email, password }, !!rememberMe).pipe(
+      map(res => ({
+        id: 0,
+        name: `${res.user.firstName ?? ''} ${res.user.lastName ?? ''}`.trim(),
+        email: res.user.email,
+        password: '',              // никогаш не враќаме password
+        role: (res.user.role || 'user').toLowerCase(),
+      }))
+    );
+  }
+
+  /** @deprecated – користи signUp(); го задржуваме само за компилација */
+  public register(name: string, email: string, password: string): Observable<User> {
+    console.warn('[AuthService.register] Deprecated API used. Please migrate to signUp().');
+    return throwError(() => new Error('Deprecated: use signUp() with full payload.'));
+  }
+
+  /** Погодно за стар код што чита „тековен корисник“ */
+  public getCurrentUser(): SignInRes['user'] | null {
+    return this.readUser();
   }
 
   public getLoggedInUserEmail(): string | null {
-    const user = this.getCurrentUser();                             // get current user
-    return user ? user.email : null;                                // return email if user exists
+    return this.getCurrentUser()?.email ?? null;
   }
 
-  // save users to sessionStorage
-  private saveUsers(users: User[]): void {
-    sessionStorage.setItem(this.usersKey, JSON.stringify(users));
-  }
-
-  // register method
-  public register(name: string, email: string, password: string): Observable<User> {
-    return of(this.getUsers()).pipe(
-      delay(1000),
-      map(users => {
-        // check if email already in use
-        if (users.some(u => u.email === email)) {
-          throw new Error('Email already in use');
-        }
-
-        // create new user
-        const newUser: User = {
-          id: users.length + 1,
-          name,
-          email,
-          password,
-          role: 'user'
-        };
-
-        users.push(newUser);    // add new user to users array
-        this.saveUsers(users);  // save users to session storage
-
-        return newUser;
-      })
-    );
-  }
-
-  // login method
-  public login(email: string, password: string, rememberMe: boolean): Observable<User> {
-    return of(this.getUsers()).pipe(
-      delay(1000),
-      tap(() => console.log('Attempting login for:', email)),
-      map(users => {
-        const user = users.find(u => u.email === email && u.password === password);
-        
-        // user found
-        if (user) {
-          const storage = rememberMe ? localStorage : sessionStorage;         // check if rememberMe is true or false
-          storage.setItem(this.loggedInUserKey, JSON.stringify(user));       // save logged in user to local or session storage
-          
-          this.isLoggedIn = true;                                             // set isLoggedIn to true
-
-          console.log('✅ User logged in:', user.email);
-          console.log('isLoggedIn:', this.isLoggedIn);
-          
-          this.startInactivityTimer();                                        // start inactivity timer
-
-          return user;
-        } 
-        else {
-          throw new Error('Invalid email or password');
-        }
-      })
-    );
-  }
-
-  // logout method
-  public logout(): void {
-    console.log('🚪 Logging out user due to inactivity...');
-
-    sessionStorage.removeItem(this.loggedInUserKey);  // remove user from sessionStorage
-    localStorage.removeItem(this.loggedInUserKey);    // remove user from localStorage
-
-    this.logoutEvent.next(true);                      // emit logout event
-    this.isLoggedIn = false;                           // set isLoggedIn to false
-
-    clearTimeout(this.inactivityTimeout);             // clear inactivity timeout
-    clearTimeout(this.logoutWarningTimeout);          // clear logout warning timeout
-
-    window.removeEventListener('mousemove', this.resetInactivityTimer); // remove event listeners
-    window.removeEventListener('keydown',   this.resetInactivityTimer); // remove event listeners
-
-    this.router.navigate(['/login'], { queryParams: { tab: 'login' } }); // navigate to login page
-    console.log('🔄 User logged out and redirected to login page.');
-  }
-
-  // strt inactivity timer
-  public startInactivityTimer(): void {
-    if (!this.isLoggedIn) return;
-    setTimeout(() => {
-      if (this.router.url === '/login') return; // avoid starting on login page
-      this.resetInactivityTimer();
-      window.addEventListener('mousemove', this.resetInactivityTimer.bind(this)); // 📌 add listener
-      window.addEventListener('keydown', this.resetInactivityTimer.bind(this)); // 📌 add listener
-    }, 100);
-  }
-
-  // reset inactivity timer
-  public resetInactivityTimer(): void {
-    if (!this.isLoggedIn) return;
-    clearTimeout(this.inactivityTimeout);
-    clearTimeout(this.logoutWarningTimeout);
-    this.logoutWarningTimeout = setTimeout(() => this.showLogoutWarning(), this.INACTIVITY_TIME - this.WARNING_TIME); // 📌 show warning first
-    this.inactivityTimeout = setTimeout(() => this.logout(), this.INACTIVITY_TIME); // 📌 auto logout
-  }
-
-  // show logout warning - changes: customizable modal
-  public showLogoutWarning(): void {
-    //this.showLogoutModal$.next(true); // 📌 trigger modal
-  }
-
-  // utility: check if email exists
-  public checkUserExists(email: string): boolean {
-    return this.getUsers().some(user => user.email === email);
-  }
-
-  // Generate a reset code for a given email
-  public generateResetCode(email: string) {
-    const users = this.getUsers();                    // get users from sessionStorage
-    const user = users.find(u => u.email === email);  // find user by email
-
-    if (user) {
-      // generate reset code
-      const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-      sessionStorage.setItem('resetCode_' + email, resetCode);        // store reset code in sessionStorage
-      console.log(`Generated reset code for ${email}: ${resetCode}`); // log reset code
-      alert(`${email}: ${resetCode}`);
-    }
-  }
-
-  // Verify the reset code
-  public verifyResetCode(email: string, code: string): boolean {
-    // get stored reset code
-    const storedCode = sessionStorage.getItem('resetCode_' + email);
-
-    // return true if stored code matches the code entered by the user
-    return storedCode === code;
-  }
-
-  // Update user password
-  public updateUserPassword(email: string, newPassword: string) {
-    const users = this.getUsers();                              // вчитува ја низата од 'users'
-    const userIndex = users.findIndex(u => u.email === email);  // наоѓа го корисникот по е-мејл
-
-    console.log('>>> AuthService.updateUserPassword: looking for', email, 'found index:', userIndex);
-
-    // update password if user exists
-    if (userIndex !== -1) {
-      users[userIndex].password = newPassword;          // сетира нова лозинка
-      this.saveUsers(users);                            // повторно ја чува целата низа во sessionStorage
-
-      console.log(`>>> AuthService.updateUserPassword: password now set to "${newPassword}" for`, users[userIndex]);
-      console.log(`Password updated for ${email}`);     // debug лог
-
-      sessionStorage.removeItem('resetCode_' + email);  // (мена) се брише reset кодот
-    }
-    else {
-      console.warn('>>> AuthService.updateUserPassword: could not find user with email', email);
-    }
-  }
-
-  /**
-  * Returns the current user’s stored credit balance (default 0)
-  */
+  /** Credits helper-и – ги оставаме како што се (ако не се користат, ќе ги тргнеме подоцна) */
   public getCredits(): number {
-    const user = this.getCurrentUser();
-    if (!user) return 0;
-    const key = `credits_${user.email}`;
+    const email = this.getLoggedInUserEmail();
+    if (!email) return 0;
+    const key = `credits_${email}`;
     const stored = sessionStorage.getItem(key);
     return stored ? +stored : 0;
+    // NOTE: ако имате бекенд endpoint за кредити, тука заменете со API call.
   }
 
   public deductCredits(amount: number): void {
-    const user = this.getCurrentUser();
-    if (!user) return;
-    const key = `credits_${user.email}`;
+    const email = this.getLoggedInUserEmail();
+    if (!email) return;
+    const key = `credits_${email}`;
     const current = this.getCredits();
     const updated = Math.max(0, current - amount);
     sessionStorage.setItem(key, updated.toString());
   }
 
+  /** @deprecated – стар mock, оставен како no-op за компатибилност */
+  public updateUserPassword(_email: string, _newPassword: string) {
+    console.warn('[AuthService.updateUserPassword] Deprecated mock used. Use resetPasswordSet().');
+    // no-op
+  }
+
+  // === СТАР МOCK КОД – КОМЕНТИРАН ЗА РЕФЕРЕНЦА =================================
+  /*
+  private usersKey  = 'users';
+  private loggedInUserKey = 'loggedInUser';
+  private resetCodesKey   = 'resetCodes';
+
+  // private getUsers(): User[] { ... }
+  // private saveUsers(users: User[]): void { ... }
+  // public register(name: string, email: string, password: string): Observable<User> { ... }
+  // public login(email: string, password: string, rememberMe: boolean): Observable<User> { ... }
+  // public generateResetCode(email: string) { ... }
+  // public verifyResetCode(email: string, code: string): boolean { ... }
+  // public updateUserPassword(email: string, newPassword: string) { ... }
+  // public getCredits(): number { ... }
+  // public deductCredits(amount: number): void { ... }
+  */
 }

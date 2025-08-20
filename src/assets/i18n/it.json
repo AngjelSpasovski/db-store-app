@@ -10,12 +10,12 @@
     "EMAIL_ADDRESS": "E-mail",
     "YOUR_MESSAGE": "Il tuo messaggio",
     "SEND_MESSAGE": "Invia messaggio",
-     "SURBSCRIBE": "Iscriviti",
-     "SURBSCRIBE_TO": "Iscriviti alla nostra newsletter",
-     "ALL_RIGHTS_RESERVED": "Tutti i diritti riservati.",
-     "YOUR_EMAIL": "La tua email",
-     "ENTER_YOUR_NAME": "Inserisci il tuo nome",
-     "WRITE_YOUR_MESSAGE": "Scrivi il tuo messaggio...",
+    "SURBSCRIBE": "Iscriviti",
+    "SURBSCRIBE_TO": "Iscriviti alla nostra newsletter",
+    "ALL_RIGHTS_RESERVED": "Tutti i diritti riservati.",
+    "YOUR_EMAIL": "La tua email",
+    "ENTER_YOUR_NAME": "Inserisci il tuo nome",
+    "WRITE_YOUR_MESSAGE": "Scrivi il tuo messaggio...",
 
     "PHONE": "Telefono",
     "LOGIN": "Accedi",
@@ -57,7 +57,6 @@
     "MAX_LENGTH_REQUIRED": "È consentito un massimo di 20 caratteri.",
     "PATTERN_INVALID": "Numero di cifre non valido.",
 
-
     "BACK_HOME": "Torna alla home",
     "BACK_LOGIN": "Torna al login",
 
@@ -65,6 +64,16 @@
     "FORGOT_PASSWORD_INFO": "Inserisci il tuo indirizzo email. Riceverai una nuova password via email.",
     "RESET_PASSWORD": "Reimposta password",
     "REMEMBER_ME": "Ricordati di me",
+
+    "VERIFY_LINK": "Verifica link...",
+    "RESET_MIN_LENGTH": "La lunghezza minima è di 6 caratteri.",
+    "PASSWORD_MISMATCH": "Le password non corrispondono.",
+    "SET_PASSWORD": "Imposta password",
+    "SAVING": "Salvataggio in corso...",
+    "REQUEST_NEW_LINK": "Richiedi nuovo link",
+    "ENTER_EMAIL_TO_RESET": "Inserisci la tua email per reimpostare la password",
+    "RESET_PASSWORD_LINK": "Ti abbiamo inviato un'email con un link per reimpostare la password.",
+    "SEND_RESET_LINK": "Invia link di reimpostazione",
 
     "SEND_RESET_CODE": "Invia codice",
     "ENTER_RESET_CODE": "Inserisci il codice di reimpostazione",

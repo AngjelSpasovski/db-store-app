@@ -4,15 +4,15 @@
     <app-header [viewMode]="currentView" [isLoggedIn]="isLoggedIn" [userEmail]="userEmail"></app-header>
   </header>
 
+  <app-loading-bar></app-loading-bar>
+
   <!-- Main Content -->
   <div id="content-wrap" class="content-wrap"  #contentWrap>
     <router-outlet></router-outlet>
   </div>
 
   <!--Toast Container -->
-  <!-- This is where toasts will be displayed -->
-  <!-- <div id="toast-container"  class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"  aria-live="polite"  aria-atomic="true"></div> -->
-  <div id="toast-container"  class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <div id="toast-container" class="toast-container position-fixed end-0 p-3" style="z-index: 1200;"></div>
 
 </div>
 

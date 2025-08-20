@@ -491,11 +491,29 @@ $border-color: #21415b;
       }
     }
 
+    .form-footer {
+      float: inline-end;
+      width: 15%;
+      text-align: center;
+
+      .btn{
+        width: 100% !important;
+      }
+    }
+
     // Tab controls
     .slide-controls {
       position: relative;
       display: flex;
       margin-bottom: 1.5rem;
+
+      .login{
+        border-radius: 5px 0px 0px 5px;
+      }
+
+      .signup{
+        border-radius: 0px 5px 5px 0px;
+      }
 
       .slide {
         flex: 1;
@@ -516,7 +534,7 @@ $border-color: #21415b;
         bottom: 0;
         height: 3px;
         width: 50%;
-        background: $accent;
+        //background: $accent;
         transition: left 0.3s;
       }
     }

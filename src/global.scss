@@ -1,0 +1,7 @@
+:root { --header-height: 64px; /* прилагоди ако треба */ }
+
+#toast-container {
+  top: calc(var(--header-height) + 12px);
+  /* ако таргетираш iOS safe area: */
+  top: calc(var(--header-height) + env(safe-area-inset-top) + 12px);
+}

@@ -64,6 +64,16 @@
     "RESET_PASSWORD": "Reset Password",
     "REMEMBER_ME": "Remember Me",
 
+    "VERIFY_LINK": "Verify Link...",
+    "RESET_MIN_LENGTH": "Minimum length is 6 characters.",
+    "PASSWORD_MISMATCH": "Passwords do not match.",
+    "SET_PASSWORD": "Set Password",
+    "SAVING": "Saving...",
+    "REQUEST_NEW_LINK": "Request New Link",
+    "ENTER_EMAIL_TO_RESET": "Enter your email to reset your password",
+    "RESET_PASSWORD_LINK": "We have sent you an email with a link to reset your password.",
+    "SEND_RESET_LINK": "Send Reset Link",
+
     "SEND_RESET_CODE": "Send Code",
     "ENTER_RESET_CODE": "Enter Reset Code",
     "VERIFY_CODE": "Verify Code",

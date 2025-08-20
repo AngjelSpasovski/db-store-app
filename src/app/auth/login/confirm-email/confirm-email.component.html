@@ -1,0 +1,14 @@
+<div class="confirm-email">
+  <ng-container [ngSwitch]="state">
+    <div *ngSwitchCase="'working'">
+      <p>{{ message }}</p>
+    </div>
+    <div *ngSwitchCase="'ok'" class="text-success">
+      <p>{{ message }}</p>
+    </div>
+    <div *ngSwitchCase="'fail'" class="text-danger">
+      <p>{{ message }}</p>
+      <a routerLink="/login" [queryParams]="{ tab: 'login' }">Back to Login</a>
+    </div>
+  </ng-container>
+</div>

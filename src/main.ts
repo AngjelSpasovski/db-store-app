@@ -16,6 +16,10 @@ import { provideTranslateLoader } from './translate.providers';   // 👈 if the
 
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { LoadingInterceptor } from './app/shared/loading.interceptor.service';
+import { AuthInterceptor } from './app/auth/auth.interceptor';
+
 ModuleRegistry.registerModules([ AllCommunityModule ]);
 
 if (environment.production) {
@@ -29,5 +33,8 @@ bootstrapApplication(AppComponent, {
     provideIonicAngular(),
     provideAnimations(),
     provideTranslateLoader(),                                       // 👈 if there  is a configuration for ngx-translate
+    
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor,   multi: true },
   ]
 }).catch(err => console.error(err));

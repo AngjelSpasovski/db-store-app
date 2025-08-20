@@ -36,3 +36,11 @@ app-logout-warning {
     top: 64px;
     right: 16px;
 }
+
+#toast-container.top-0 {
+  top: 72px !important;   
+}
+#toast-container {
+  right: 12px;           
+  z-index: 1200;
+}

@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { AuthService, User  } from '../auth.service';
+import { AuthService } from '../auth.service';
 import { EmailJsService } from '../mail-server/emailjs.service';
-import { Subscription } from 'rxjs';
+import { Subscription, lastValueFrom } from 'rxjs';
+import { PdfCompressorService } from '../mail-server/pdf-compressor.service';
+import { ToastService } from '../../shared/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -45,22 +47,40 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFileName: string | null = null;
 
   errorMessage: any;
+
+  selectedFile?: File;
+  serverErrorMsg = '';
+
+  needsEmailVerify  = false;
+  lastLoginEmail    = '';
+  resendLoading     = false;
+  infoMessage       = '';
   
   private sub!: Subscription;   // Subscription for logout event
-
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private routeActive: ActivatedRoute,
     private translate: TranslateService,
     private auth: AuthService,
-    private emailJs: EmailJsService
+    private emailJs: EmailJsService,
+    private pdfCompressor: PdfCompressorService,
+    private toast: ToastService
   ) {
     this.translate.setDefaultLang('en');
     this.translate.use('en');
   }
 
   ngOnInit(): void {
+
+    // if tolken exists, redirect to user/buy-credits
+    const token = this.auth.token;                
+    if (token){                                             // Check if user is already logged in
+      this.router.navigateByUrl('/user/buy-credits');       // If logged in, redirect to user/buy-credits or appropriate page
+    } 
+
+    // Initialize forms
     this.loginForm = this.fb.group({
       email:                ['', [Validators.required, Validators.email]],
       password:             ['', [Validators.required, Validators.minLength(6)]],
@@ -124,9 +144,9 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
-   }
+  }
 
-   togglePasswordVisibility() {
+  togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
   
@@ -146,129 +166,225 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // LOGIN FORM
   onSubmitLogin() {
-    console.log('📤 onSubmitLogin fired:', this.loginForm.value);
-
     this.loginSubmitted = true;
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
+    if (this.loginForm.invalid) return;
 
     const { email, password, rememberMe } = this.loginForm.value;
+    console.log('LOGIN payload:', { email, password, rememberMe });
 
-    console.log('🔑 Calling AuthService.login with', email, password, rememberMe);
+    this.auth.signIn({ email, password }, !!rememberMe).subscribe({
+      next: (res) => {
+      this.needsEmailVerify = false;
 
-    this.auth.login(email, password, rememberMe).subscribe({
-      next: user => {
-        console.log('✅ AuthService.login succeeded, redirecting…');
-        // ✅ On successful login, navigate to User page
-        this.router.navigate(['/user']);
-      },
+      // 1) if guard is active, redirect to the original URL
+      const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
+      if (redirect) {
+        this.router.navigateByUrl(redirect);
+        this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
+        return;
+      }
+
+      const role = (res.user.role || 'user').toLowerCase();
+      switch (role) {
+        case 'superadmin':
+          this.router.navigateByUrl('/user/superadmin'); // провери да постои рута/страница
+          break;
+        case 'admin':
+          this.router.navigateByUrl('/user/admin');      // провери да постои рута/страница
+          break;
+        default:
+          this.router.navigateByUrl('/user/buy-credits');
+      }
+
+      this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
+    },
       error: err => {
-        // ❌ Display login error
-        this.errorMessage = err.message || 'Login failed';
-        alert(this.errorMessage);
+        // (3) if you are not on an auth screen, show error toast
+        if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
+          this.needsEmailVerify = true;
+          this.lastLoginEmail = email;
+          this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_SENT');
+
+          this.resendVerifyEmail(true);
+          return;
+        }
+        this.showApiErrors(err);
+      }
+    });
+  }
+
+  resendVerifyEmail(auto = false) {
+    if (!this.lastLoginEmail) return;
+
+    this.resendLoading = true;
+
+    this.auth.confirmEmailSend(this.lastLoginEmail).subscribe({
+      next: () => {
+        if (!auto) this.toast.show('Verification link sent.', true, 4000, 'top-end');
+        this.resendLoading = false;
+      },
+      error: () => {
+        if (!auto) this.toast.show('Couldn’t send link. Try again.', false, 4000, 'top-end');
+        this.resendLoading = false;
       }
     });
   }
 
   // SIGNUP FORM
-  onSubmitSignup(evt: Event) {
-    console.log('📤 onSubmitSignup fired:', this.loginForm.value);
-    // спречува default HTML submit
-    evt.preventDefault();
-  
-    // корисничката реакција
+  onSubmitSignup(e: Event) {
+    e.preventDefault();
     this.signupSubmitted = true;
-    this.signupForm.markAllAsTouched();
     if (this.signupForm.invalid) return;
-  
-    this.signupInProgress = true;
-    this.signupError = '';
-  
-    const name     = this.signupForm.value.name;
-    const email    = this.signupForm.value.email;
-    const password = this.signupForm.value.password;
-    const role     = 'user'
 
-    // Повик на AuthService.register()
-    this.auth.register(name, email, password).subscribe({
-      next: (newUser: User) => {
-        // Регистрација успешна – AuthService го додаде во sessionStorage под „users“
+    const v = this.signupForm.value;
+    const stateOrNation = v.state; // за сега исто поле
 
-        // (Опционално) Ако сакаш веднаш да најавиш корисник:
-        this.auth.login(email, password, false).subscribe({
-          next: loggedIn => {
-            this.router.navigate(['/user']);
-          },
-          error: err => {
-            // Ако логирањето веднаш по регистрацијата не е критично, може само да го прескокнеш
-            console.error('Login after register failed', err);
-            this.router.navigate(['/login'], { queryParams: { tab: 'login' } });
-          }
+    // 1) user (camelCase)
+    const user = {
+      email:       v.email,
+      companyName: v.companyName,
+      firstName:   v.name,
+      lastName:    v.surname,
+      password:    v.password,
+      consent1:    !!v.consent1,
+      consent2:    !!v.consent2,
+      consent3:    !!v.consent3,
+      consent4:    !!v.consent4,
+      consent5:    !!v.consent5,
+    };
+
+    // 2) billingDetails (camelCase + backup keys)
+    const billingDetailsCore: any = {
+      email:          v.email,
+      company:        v.companyName,
+      companyName:    v.companyName,
+      address1:       v.companyAddress,
+      address2:       v.companyAddressSecond || undefined,
+      buildingNumber: v.buildingNumber || undefined,
+      buildingnumber: v.buildingNumber || undefined,
+      zipCode:        v.zip,
+      zipcode:        v.zip,
+      city:           v.city,
+      stateCode:      stateOrNation,
+      statecode:      stateOrNation,
+      nation:         stateOrNation,
+      vatNumber:      String(v.vat ?? ''),
+      vatnumber:      String(v.vat ?? ''),
+    };
+
+    // 3) payload
+    const payload: any = {
+      user,
+      billingDetails: billingDetailsCore,
+    };
+
+    console.debug('SIGNUP payload:', payload);
+
+    // 4) Backend sign-up (JSON)
+    this.auth.signUp(payload).subscribe({
+      next: async () => {
+        const v = this.signupForm.value;
+
+        // испрати верификациски e-mail преку backend
+        this.auth.confirmEmailSend(v.email).subscribe({
+          next: () => console.log('Confirm e-mail sent'),
+          error: (e) => console.warn('Confirm e-mail send failed (ignored):', e)
         });
+
+        // (оставаме EmailJS приклучено само ако сакате подоцна)
+        await this.handleEmailStepAndGoLogin();
       },
-      error: (err: Error) => {
-        // На пример: ако е-mail веќе постои
-        this.signupError = err.message;
+      error: (err) => {
         this.signupInProgress = false;
+        this.signupError = 'Signup failed. Please try again.';
+        console.error('Signup error:', err);
+        this.showApiErrors(err);
       }
-    });
 
-    // event.target е HTMLFormElement
-    const formEl = evt.target as HTMLFormElement;
-    
-    console.log('FORM DATA:');
-    const formData = new FormData(formEl);
-    formData.forEach((value, key) => {
-      console.log(key, value);
     });
-
-    // прати го кон EmailJS
-    this.emailJs.sendWithAttachment(formEl)
-      .then(() => {
-        debugger;
-        console.log("Successful email send to emailJs");
-        //this.router.navigate(['/user']);
-      })
-      .catch(err => {
-        console.error('EmailJS error', err);
-        //this.router.navigate(['/home']);
-      })
-      .finally(() => {
-        this.signupInProgress = false;
-      });
   }
-  
 
-  onFileSelected(evt: Event) {
-    const input = evt.target as HTMLInputElement;
+  // === Email чекор + секогаш префрлање на Login ===
+  private async handleEmailStepAndGoLogin(): Promise<void> {
+    try {
+      const v = this.signupForm.value;
 
-    if (input.files && input.files.length) {
-      const file = input.files[0];
-      // Проверка: дали е PDF
-      if (file.type !== 'application/pdf') {
-        // Ако не е PDF, сетирај custom грешка
-        this.signupForm.get('file')?.setErrors({ invalidFileType: true });
-        this.selectedFileName = null;
-        // Испразни вредноста
-        this.signupForm.patchValue({ file: null });
-        return;
+      // Ако нема фајл – готово
+      if (!this.selectedFile) return;
+
+      let fileToSend = await this.prepareFileForEmail(this.selectedFile);
+
+      // EmailJS free лимит е ~50KB; ако е над – скипни attach (не блокирај UX)
+      if (fileToSend && fileToSend.size <= 48 * 1024) {
+        await lastValueFrom(this.emailJs.sendSignupAttachment(fileToSend, {
+          email:       v.email,
+          companyName: v.companyName,
+          name:        v.name,
+          surname:     v.surname,
+          phoneNumber: v.phoneNumber,
+          city:        v.city,
+          state:       v.state,
+          zip:         v.zip,
+          role:        v.role,
+          vat:         v.vat,
+        }));
+      } else {
+        console.warn('PDF over EmailJS free limit (~50KB) – skipping attachment');
+        // опција: тука можеш да повикаш template без attachment или да пратиш само meta
       }
-
-      // Ако е валиден PDF, го чуваш
-      this.selectedFileName = file.name;
-      this.signupForm.patchValue({ file });
-      this.signupForm.get('file')!.updateValueAndValidity();
-    } 
-    else {
-      // ако корисникот кликне "Cancel"
-      this.selectedFileName = null;
-      this.signupForm.patchValue({ file: null });
-      this.signupForm.get('file')!.updateValueAndValidity();
+    } catch (e) {
+      console.warn('Email step failed (ignored):', e);
+    } finally {
+      // КЛУЧНО: секогаш префрли се на Login
+      this.switchToLogin();
     }
   }
 
+  // Компресија + fallback ако „компресираниот“ е поголем од оригинал
+  private async prepareFileForEmail(file?: File): Promise<File | undefined> {
+    if (!file) return undefined;
+    try {
+      console.log('original:', file.size, 'bytes');
+      const cmp = await this.pdfCompressor.compress(file, {
+        maxBytes: 380 * 1024,
+        quality : 0.58,
+        scale   : 0.9
+      });
+      const chosen = (cmp.size < file.size) ? cmp : file;
+      console.log('chosen to send:', chosen.size, 'bytes');
+      return chosen;
+    } catch (err) {
+      console.warn('PDF compress failed, using original', err);
+      return file;
+    }
+  }
+
+  // Handle file selection for signup
+  onFileSelected(evt: Event) {
+    const input = evt.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (!isPdf) {
+      this.signupForm.get('file')?.setErrors({ invalidFileType: true });
+      this.selectedFileName = '';
+      this.selectedFile = undefined;
+      return;
+    }
+    if (file.size > maxSize) {
+      this.signupForm.get('file')?.setErrors({ fileTooLarge: true });
+      this.selectedFileName = '';
+      this.selectedFile = undefined;
+      return;
+    }
+
+    this.signupForm.get('file')?.setErrors(null);
+    this.selectedFile = file;
+    this.selectedFileName = file.name;
+  }
 
   goBackToHomePage() {
     this.resetAllForms();
@@ -311,14 +427,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       consent4: false,
       consent5: false
     });
-
-    /**
-     * * Resetting the form values to empty strings or null is important to ensure that the form is in a clean state
-     * * when the user switches between forms.
-     * * with reset() automatically clears the touched/dirty states of the controls
-     * * and sets the form to its initial state.
-     * *
-     */
   }
 
   getError(form: FormGroup, name: string): string {
@@ -344,9 +452,32 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.translate.instant('PASSWORDS_DO_NOT_MATCH');
     }
     if ((name === 'consent1' || name === 'consent2') && c.errors?.['required']) {
-      // Можеш да смислиш посебна порака или да ја искористиш FIELD_REQUIRED
       return this.translate.instant('FIELD_REQUIRED', { field: this.translate.instant(name.toUpperCase()) });
     }
     return '';
+  }
+
+  private flattenErrors(obj: any): string[] {
+    if (!obj) return [];
+    const out: string[] = [];
+    Object.entries(obj).forEach(([k, v]) => {
+      if (Array.isArray(v)) out.push(`${k}: ${v.join(', ')}`);
+      else if (typeof v === 'string') out.push(`${k}: ${v}`);
+      else if (typeof v === 'object') out.push(...this.flattenErrors(v));
+    });
+    return out;
+  }
+
+  showApiErrors(err: any) {
+    if (err?.status === 422 && err?.error?.errors) {
+      this.serverErrorMsg = this.flattenErrors(err.error.errors).join('\n');
+    } 
+    else if (err?.status === 0) {
+      this.serverErrorMsg = 'Network/CORS error: API not reachable from browser.';
+    } 
+    else {
+      this.serverErrorMsg = err?.error?.message || 'Unexpected error';
+    }
+    console.error('API error:', err, this.serverErrorMsg);
   }
 }
