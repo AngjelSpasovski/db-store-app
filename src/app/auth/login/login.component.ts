@@ -170,41 +170,43 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.loginForm.invalid) return;
 
     const { email, password, rememberMe } = this.loginForm.value;
-    console.log('LOGIN payload:', { email, password, rememberMe });
-
     this.auth.signIn({ email, password }, !!rememberMe).subscribe({
-      next: (res) => {
-      this.needsEmailVerify = false;
+      next: async (res) => {
+        this.needsEmailVerify = false;
 
-      // 1) if guard is active, redirect to the original URL
-      const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
-      if (redirect) {
-        this.router.navigateByUrl(redirect);
+        // 1) ако guard ставил redirect=..., почитувај го
+        const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
+        if (redirect) {
+          await this.router.navigateByUrl(redirect);
+          this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
+          return;
+        }
+
+        // 2) инаку рутирај по улога
+        const role = (res.user.role || 'user').toLowerCase();
+
+        // таргет рута според улога (можеш да смениш подоцна)
+        const targetByRole: Record<string, string> = {
+          superadmin: '/user/superadmin',
+          admin:      '/user/admin',
+          user:       '/user/buy-credits',
+        };
+        const target = targetByRole[role] || targetByRole['user'];
+
+        // 3) безбеден fallback ако таргет-рутата (уште) не постои
+        const ok = await this.router.navigateByUrl(target);
+        if (!ok) {
+          await this.router.navigateByUrl('/user/buy-credits');
+        }
+
         this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
-        return;
-      }
-
-      const role = (res.user.role || 'user').toLowerCase();
-      switch (role) {
-        case 'superadmin':
-          this.router.navigateByUrl('/user/superadmin'); // провери да постои рута/страница
-          break;
-        case 'admin':
-          this.router.navigateByUrl('/user/admin');      // провери да постои рута/страница
-          break;
-        default:
-          this.router.navigateByUrl('/user/buy-credits');
-      }
-
-      this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
-    },
+      },
       error: err => {
-        // (3) if you are not on an auth screen, show error toast
+        // 403 not verified → UI + авто resend
         if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
           this.needsEmailVerify = true;
           this.lastLoginEmail = email;
-          this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_SENT');
-
+          this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_MSG');
           this.resendVerifyEmail(true);
           return;
         }

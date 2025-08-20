@@ -43,6 +43,8 @@ const routes: Routes = [
 
       // ⬇️ Пример за superadmin-only:
       // { path: 'superadmin',            component: SuperAdminComponent,         canActivate: [roleGuard], data: { roles: ['superadmin'] } },
+
+      { path: '**', redirectTo: 'buy-credits' },
     ]
   }
 ];
