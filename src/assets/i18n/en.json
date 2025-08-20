@@ -74,6 +74,14 @@
     "RESET_PASSWORD_LINK": "We have sent you an email with a link to reset your password.",
     "SEND_RESET_LINK": "Send Reset Link",
 
+    "LOGIN_SUCCESS": "Signed in successfully.",
+    "EMAIL_NOT_VERIFIED_INFO": "Your email isn’t verified yet. We’ve sent you a new verification link.",
+    "NETWORK_ERROR": "Network error: API not reachable.",
+    "VALIDATION_FAILED": "Validation failed. Please check your input.",
+    "SESSION_EXPIRED": "Session expired. Please sign in again.",
+    "FORBIDDEN": "Forbidden",
+    "UNAUTHORIZED": "Incorrect email or password.",
+
     "SEND_RESET_CODE": "Send Code",
     "ENTER_RESET_CODE": "Enter Reset Code",
     "VERIFY_CODE": "Verify Code",

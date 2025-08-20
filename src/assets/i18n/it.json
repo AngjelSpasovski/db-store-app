@@ -75,6 +75,14 @@
     "RESET_PASSWORD_LINK": "Ti abbiamo inviato un'email con un link per reimpostare la password.",
     "SEND_RESET_LINK": "Invia link di reimpostazione",
 
+    "LOGIN_SUCCESS": "Accesso effettuato con successo.",
+    "EMAIL_NOT_VERIFIED_INFO": "La tua email non è ancora verificata. Ti abbiamo inviato un nuovo link di verifica.",
+    "NETWORK_ERROR": "Errore di rete: API non raggiungibile.",
+    "VALIDATION_FAILED": "Validazione fallita. Controlla i tuoi dati.",
+    "SESSION_EXPIRED": "Sessione scaduta. Effettua nuovamente l'accesso.",
+    "FORBIDDEN": "Accesso negato",
+    "UNAUTHORIZED": "Email o password errati.",
+
     "SEND_RESET_CODE": "Invia codice",
     "ENTER_RESET_CODE": "Inserisci il codice di reimpostazione",
     "VERIFY_CODE": "Verifica codice",
