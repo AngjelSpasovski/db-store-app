@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LanguageService } from './HTMLHelpers/language-selector/language.service';
 import { HeaderComponent } from './HTMLHelpers/header/header.component';
 import { LoadingBarComponent } from './shared/loading-bar.component';
-
+import { ToastService } from '../app/shared/toast.service';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +35,8 @@ export class AppComponent implements OnInit {
     public authService: AuthService,
     private translate: TranslateService,
     private languageService: LanguageService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.translate.setDefaultLang('en'); // Set default language
 
@@ -66,6 +67,12 @@ export class AppComponent implements OnInit {
   ngAfterViewInit(): void {}
 
   ngOnInit(): void {
+     // Register event listeners for online/offline status
+    window.addEventListener('offline', this.onOffline);
+    window.addEventListener('online',  this.onOnline);
+
+    // Check initial online status
+    if (!navigator.onLine) this.onOffline();
 
     // Subscribe to language changes and apply them globally
     this.languageService.language$.subscribe((lang: any) => {
@@ -84,6 +91,16 @@ export class AppComponent implements OnInit {
     }
 
   }
+
+  ngOnDestroy() {
+    // откачи слушачи (добра пракса)
+    window.removeEventListener('offline', this.onOffline);
+    window.removeEventListener('online',  this.onOnline);
+  }
+
+  private onOffline = () => this.toast.show(this.translate.instant('NETWORK_ERROR'), false, 4000, 'top-end');
+  private onOnline = () => this.toast.show(this.translate.instant('BACK_ONLINE') || 'Back online.', true, 2000, 'top-end');
+
 
   handleLogout() {
     console.log('User chose to log out');

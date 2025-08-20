@@ -1,5 +1,8 @@
+// auth.interceptor.ts
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse
+} from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -13,14 +16,24 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private toast: ToastService, private router: Router) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const base    = (environment.baseApiUrl || '').replace(/\/+$/, '');
-    const token   = localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+    const base  = (environment.baseApiUrl || '').replace(/\/+$/, '');  // normalize
+    const token = localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+
     const isAsset = /\/(assets|i18n)\//.test(req.url);
-    const isAuth  = req.url.startsWith(`${base}/auth/`);
-    const isApi   = req.url.startsWith(base);
+    const isAuth  = base && req.url.startsWith(`${base}/auth/`);
+
+    // robust API call check (works for absolute and relative bases, e.g. '/api')
+    const isApi =
+      !!base && (
+        req.url.startsWith(base) ||
+        (base.startsWith('/') && req.url.startsWith(base))
+      );
 
     const addAuth = !!token && isApi && !isAsset && !isAuth;
-    const finalReq = addAuth ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` }}) : req;
+
+    const finalReq = addAuth
+      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : req;
 
     return next.handle(finalReq).pipe(
       catchError((err: HttpErrorResponse) => {
@@ -29,12 +42,15 @@ export class AuthInterceptor implements HttpInterceptor {
           this.router.url.startsWith('/forgot-password') ||
           this.router.url.startsWith('/reset-password');
 
-        // покажи тост ако не сме на auth екрани (или ако е network error)
-        if (!isAuth && (!onAuthScreen || err.status === 0)) {
+        // 🔸 HEAVY errors => toast и на auth екрани
+        const heavyError = [0, 500, 502, 503, 504].includes(err.status) || err.status >= 500;
+
+        // покажи toast ако не е auth-рута ИЛИ ако е heavy error
+        if (!isAuth && (!onAuthScreen || heavyError)) {
           this.toast.show(this.prettyError(err), false, 6000, 'top-end');
         }
 
-        // logout/redirect if unauthorized
+        // 401 на заштитени рути → исчисти токен и пренасочи
         if (err.status === 401 && addAuth && !this.loggingOut) {
           this.loggingOut = true;
           localStorage.removeItem('auth_token');
@@ -61,6 +77,10 @@ export class AuthInterceptor implements HttpInterceptor {
     if (err.status === 404) return 'Resource not found.';
     if (err.status === 422 && err.error?.errors) return this.flatten(err.error.errors).join(' • ');
     if (err.status === 429) return 'Too many requests. Please try again later.';
+    // попрецизни 5xx
+    if (err.status === 502) return 'Upstream server error. Please try again.';
+    if (err.status === 503) return 'Service temporarily unavailable. Please try again soon.';
+    if (err.status === 504) return 'Server timeout. Please try again.';
     if (err.status >= 500)  return 'Server error. Please try again later.';
     return err.error?.message || `Error ${err.status || ''}`.trim();
   }
