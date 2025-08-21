@@ -1,43 +1,46 @@
-// auth.interceptor.ts
+// src/app/auth/auth.interceptor.ts
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';   // ⟵ осигурај се дека finalize е тука
 import { environment } from './auth.environment';
 import { ToastService } from '../shared/toast.service';
-import { LoadingBarService } from '../shared/loading-bar.service';
-
+import { HttpLoadingService } from '../shared/http-loading.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private loggingOut = false;
 
   constructor(
-    private toast: ToastService, 
+    private toast: ToastService,
     private router: Router,
-    private loader: LoadingBarService
+    private loader: HttpLoadingService,                 
+    private i18n: TranslateService
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const base  = (environment.baseApiUrl || '').replace(/\/+$/, '');  // normalize
+    const base  = (environment.baseApiUrl || '').replace(/\/+$/, '');
     const token = localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
 
     const isAsset = /\/(assets|i18n)\//.test(req.url);
     const isAuth  = base && req.url.startsWith(`${base}/auth/`);
-
-    // robust API call check (works for absolute and relative bases, e.g. '/api')
-    const isApi =
-      !!base && (
-        req.url.startsWith(base) ||
-        (base.startsWith('/') && req.url.startsWith(base))
-      );
+    const isApi   = !!base && (req.url.startsWith(base) || (base.startsWith('/') && req.url.startsWith(base)));
 
     const addAuth = !!token && isApi && !isAsset && !isAuth;
 
-    const finalReq = addAuth ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
-    
-    this.loader.start();
+    const lang = this.i18n.currentLang || this.i18n.getDefaultLang?.() || 'en';
+    const setHeaders: Record<string, string> = { 'Accept-Language': lang };
+    if (addAuth) setHeaders['Authorization'] = `Bearer ${token}`;
+
+    const finalReq = req.clone({ setHeaders });
+
+    // броиме само вистински API повици (не assets/i18n), за да нема трепкања на барот
+    const countThis = isApi && !isAsset;
+    if (countThis) { 
+      this.loader.inc();  // decrement the loader count
+    }                  
 
     return next.handle(finalReq).pipe(
       catchError((err: HttpErrorResponse) => {
@@ -46,15 +49,12 @@ export class AuthInterceptor implements HttpInterceptor {
           this.router.url.startsWith('/forgot-password') ||
           this.router.url.startsWith('/reset-password');
 
-        // 🔸 HEAVY errors => toast и на auth екрани
         const heavyError = [0, 500, 502, 503, 504].includes(err.status) || err.status >= 500;
 
-        // покажи toast ако не е auth-рута ИЛИ ако е heavy error
         if (!isAuth && (!onAuthScreen || heavyError)) {
-          this.toast.error(this.prettyError(err), { duration: 6000, position: 'top-end' });
+          this.toast.error(this.prettyError(err), { position: 'top-end', duration: 6000 });
         }
 
-        // 401 на заштитени рути → исчисти токен и пренасочи
         if (err.status === 401 && addAuth && !this.loggingOut) {
           this.loggingOut = true;
           localStorage.removeItem('auth_token');
@@ -65,12 +65,13 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return throwError(() => err);
       }),
-
-      finalize(() => this.loader.stop())
+      finalize(() => { if (countThis) this.loader.dec(); })  // decrement the loader count
     );
   }
 
   private prettyError(err: HttpErrorResponse): string {
+
+    if (!err || !err.status) return 'Unknown error occurred. Please try again later.';
     if (err.status === 0)   return 'Network error: API not reachable.';
     if (err.status === 400) return err.error?.message || 'Bad request.';
     if (err.status === 401) return 'Session expired. Please sign in again.';
@@ -83,7 +84,6 @@ export class AuthInterceptor implements HttpInterceptor {
     if (err.status === 404) return 'Resource not found.';
     if (err.status === 422 && err.error?.errors) return this.flatten(err.error.errors).join(' • ');
     if (err.status === 429) return 'Too many requests. Please try again later.';
-    // попрецизни 5xx
     if (err.status === 502) return 'Upstream server error. Please try again.';
     if (err.status === 503) return 'Service temporarily unavailable. Please try again soon.';
     if (err.status === 504) return 'Server timeout. Please try again.';

@@ -38,7 +38,8 @@ export class AppComponent implements OnInit {
     private languageService: LanguageService,
     private router: Router,
     private toast: ToastService,
-    private titles: AppTitleService
+    private titles: AppTitleService,
+    private language: LanguageService
   ) {
     this.translate.setDefaultLang('en'); // Set default language
 
@@ -70,7 +71,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
 
-     // Register event listeners for online/offline status
+    const saved = localStorage.getItem('selectedLanguage') || 'en';
+    this.languageService.set(saved);                                  // Set initial language from localStorage or default to 'en'
+
+    // Register event listeners for online/offline status
     window.addEventListener('offline', this.onOffline);
     window.addEventListener('online',  this.onOnline);
 

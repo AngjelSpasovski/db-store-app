@@ -32,11 +32,12 @@ const routes: Routes = [
       { path: 'faqs',                     component: FaqsComponent,         data: { title: 'FAQS' } },
 
       // Privacy pages (обично јавни, ама ако сакаш да останат внатре – исто ги покрива горниот roles сет)
-      { path: 'privacy-policy',           component: PrivacyPolicyComponent },
-      { path: 'terms',                    component: TermsComponent },
-      { path: 'cookies-policy',           component: CookiesPolicyComponent },
-      { path: 'refund-policy',            component: RefundPolicyComponent },
-      { path: 'service-delivery-policy',  component: ServiceDeliveryPolicyComponent },
+      { path: 'privacy-policy',          component: PrivacyPolicyComponent,          data: { title: 'PRIVACY_POLICY' } },
+      { path: 'terms',                   component: TermsComponent,                  data: { title: 'TERMS_AND_CONDITIONS' } },
+      { path: 'cookies-policy',          component: CookiesPolicyComponent,          data: { title: 'COOKIES' } },
+      { path: 'refund-policy',           component: RefundPolicyComponent,           data: { title: 'REFUND_POLICY' } },
+      { path: 'service-delivery-policy', component: ServiceDeliveryPolicyComponent,  data: { title: 'SERVICE_DELIVERY_POLICY' } },
+
 
       // ⬇️ Пример за admin-only подоцна:
       // { path: 'admin',                 component: AdminDashboardComponent,     canActivate: [roleGuard], data: { roles: ['admin','superadmin'] } },

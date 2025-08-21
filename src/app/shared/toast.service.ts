@@ -1,129 +1,82 @@
 // src/app/shared/toast.service.ts
 import { Injectable, Inject, Renderer2, RendererFactory2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
 
-type ToastType = 'success' | 'error' | 'info' | 'warning';
-type ToastPos  = 'top-center' | 'top-end' | 'bottom-end';
-
-interface ToastOpts {
-  duration?: number;
-  position?: ToastPos;
-  dedupeMs?: number;
-}
+export type ToastKind = 'success' | 'info' | 'warning' | 'error';
+export type ToastPos  = 'top-center' | 'top-end' | 'bottom-end';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  private renderer: Renderer2;
-  private lastMsg = '';
-  private lastAt  = 0;
+  private r: Renderer2;
+  private lastMsg = ''; private lastAt = 0;
 
-  constructor(
-    rendererFactory: RendererFactory2,
-    @Inject(DOCUMENT) private document: Document,
-    private t: TranslateService
-  ) {
-    this.renderer = rendererFactory.createRenderer(null, null);
+  constructor(rf: RendererFactory2, @Inject(DOCUMENT) private doc: Document) {
+    this.r = rf.createRenderer(null, null);
   }
 
-  /** NEW: кратенки */
-  success(message: string, opts: ToastOpts = {}) { this.show(message, 'success', opts); }
-  error  (message: string, opts: ToastOpts = {}) { this.show(message, 'error',   opts); }
-  info   (message: string, opts: ToastOpts = {}) { this.show(message, 'info',    opts); }
-  warn   (message: string, opts: ToastOpts = {}) { this.show(message, 'warning', opts); }
+  success(m: string, o: Partial<Opts> = {}) { this._show(m, { ...o, kind: 'success' }); }
+  info(   m: string, o: Partial<Opts> = {}) { this._show(m, { ...o, kind: 'info'    }); }
+  warn(   m: string, o: Partial<Opts> = {}) { this._show(m, { ...o, kind: 'warning' }); }
+  error(  m: string, o: Partial<Opts> = {}) { this._show(m, { ...o, kind: 'error'   }); }
 
-  /** NEW: i18n helper (ќе преведе key со params) */
-  showI18n(key: string, params?: Record<string, any>, type: ToastType = 'info', opts: ToastOpts = {}) {
-    const msg = this.t.instant(key, params);
-    this.show(msg, type, opts);
+  show(m: string, success = true, duration = 4000, position: ToastPos = 'bottom-end') {
+    this._show(m, { duration, position, kind: success ? 'success' : 'error' });
   }
 
-  /**
-   * MAIN: стандарден API (со backward-compat)
-   * show(message, 'success'|'error'|'info'|'warning', {duration, position, dedupeMs})
-   */
-  show(
+  private _show(
     message: string,
-    typeOrSuccess: ToastType | boolean = 'success',
-    optsOrDuration: ToastOpts | number = {},
-    positionLegacy?: ToastPos,
-    dedupeMsLegacy?: number
+    opts: Partial<Opts> = {}
   ) {
-    // --- Backward compat shim ---
-    let type: ToastType;
-    let opts: ToastOpts;
+    // дефолти на едно место
+    const {
+      duration = 4000,
+      position = 'bottom-end',
+      kind = 'success',
+      dedupeMs = 1200,
+    } = opts;
 
-    if (typeof typeOrSuccess === 'boolean') {
-      type = typeOrSuccess ? 'success' : 'error';
-      if (typeof optsOrDuration === 'number') {
-        opts = { duration: optsOrDuration, position: positionLegacy, dedupeMs: dedupeMsLegacy };
-      } else {
-        opts = optsOrDuration;
-      }
-    } else {
-      type = typeOrSuccess;
-      opts = (typeof optsOrDuration === 'number') ? { duration: optsOrDuration } : optsOrDuration;
-    }
-    const duration = opts?.duration ?? 4000;
-    const position = opts?.position ?? 'bottom-end';
-    const dedupeMs = opts?.dedupeMs ?? 1200;
-
-    // de-dupe
     const now = Date.now();
-    const sameAsLast = message === this.lastMsg && (now - this.lastAt) < dedupeMs;
-    if (sameAsLast) return;
-    this.lastMsg = message;
-    this.lastAt  = now;
+    if (message === this.lastMsg && (now - this.lastAt) < dedupeMs) return;
+    this.lastMsg = message; this.lastAt = now;
 
-    const container = this.document.getElementById('toast-container');
+    const container = this.doc.getElementById('toast-container');
     if (!container) return;
 
-    // позиција
-    container.className = `toast-container position-fixed ${
-      position === 'top-center' ? 'top-0 start-50 translate-middle-x'
-      : position === 'top-end'  ? 'top-0 end-0'
-      :                           'bottom-0 end-0'
-    } p-3`;
+    container.className = `toast-container position-fixed ${position === 'top-center' ? 'top-0 start-50 translate-middle-x' : position === 'top-end' ? 'top-0 end-0' : 'bottom-0 end-0' } p-3`;
 
-    // Bootstrap контекстуални бои
-    const bgClass = {
-      success: 'text-bg-success',
-      error:   'text-bg-danger',
-      info:    'text-bg-info',
-      warning: 'text-bg-warning'
-    }[type];
+    const toast = this.r.createElement('div');
+    this.r.addClass(toast, 'toast');
+    this.r.addClass(toast, 'align-items-center');
+    this.r.addClass(toast, 'border-0');
+    this.r.addClass(toast, 'show');
 
-    // (опц.) мал иконичен префикс
-    const icon = {
-      success: '✓',
-      error:   '✕',
-      info:    'ℹ',
-      warning: '⚠'
-    }[type];
+    const bg =
+      kind === 'success' ? 'text-bg-success' :
+        kind === 'info' ? 'text-bg-info' :
+          kind === 'warning' ? 'text-bg-warning' : 'text-bg-danger';
 
-    const toast = this.renderer.createElement('div');
-    this.renderer.addClass(toast, 'toast');
-    this.renderer.addClass(toast, 'align-items-center');
-    this.renderer.addClass(toast, bgClass);
-    this.renderer.addClass(toast, 'border-0');
-    this.renderer.addClass(toast, 'show');
-    this.renderer.setAttribute(toast, 'role', 'alert');
-    this.renderer.setAttribute(toast, 'aria-live', 'assertive');
-    this.renderer.setAttribute(toast, 'aria-atomic', 'true');
+    this.r.addClass(toast, bg);
+    this.r.setAttribute(toast, 'role', 'alert');
+    this.r.setAttribute(toast, 'aria-live', 'assertive');
+    this.r.setAttribute(toast, 'aria-atomic', 'true');
 
     toast.innerHTML = `
-      <div class="d-flex">
-        <div class="toast-body">
-          <span class="me-2" aria-hidden="true">${icon}</span>${message}
-        </div>
-        <button type="button"
-                class="btn-close ${type === 'warning' ? '' : 'btn-close-white'} me-2 m-auto"
-                data-bs-dismiss="toast"
-                aria-label="Close"></button>
-      </div>
-    `;
+    <div class="d-flex">
+      <div class="toast-body">${message}</div>
+      <button type="button" class="btn-close me-2 m-auto" aria-label="Close"></button>
+    </div>`;
 
-    this.renderer.appendChild(container, toast);
-    setTimeout(() => this.renderer.removeChild(container, toast), duration);
+    const btn = toast.querySelector('button');
+    btn?.addEventListener('click', () => this.r.removeChild(container, toast));
+
+    this.r.appendChild(container, toast);
+    setTimeout(() => this.r.removeChild(container, toast), duration);
   }
+}
+
+interface Opts {
+  duration: number;
+  position: ToastPos;
+  kind: ToastKind;
+  dedupeMs: number;
 }

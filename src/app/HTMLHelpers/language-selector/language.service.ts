@@ -1,35 +1,36 @@
-// language.service.ts
-import { Injectable } from '@angular/core';
+// src/app/HTMLHelpers/language-selector/language.service.ts
+import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { DOCUMENT } from '@angular/common';
+
+const STORAGE_KEY = 'selectedLanguage';
+const FALLBACK = 'en';
 
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
-  private readonly key = 'lang';
-  private readonly supported = ['en','mk','it'] as const;
-
-  private _lang$ = new BehaviorSubject<string>(this.initFromStorage());
+  private _lang$ = new BehaviorSubject<string>(localStorage.getItem(STORAGE_KEY) || FALLBACK);
   readonly language$ = this._lang$.asObservable();
 
-  constructor(private i18n: TranslateService) {
-    this.i18n.setDefaultLang('en');
-    this.i18n.use(this._lang$.value);
+  constructor(private i18n: TranslateService, @Inject(DOCUMENT) private doc: Document) {
+    this.i18n.setDefaultLang(FALLBACK);
+    this.apply(this._lang$.value);
   }
 
-  /** тековен јазик (sync getter) */
-  get current(): string { return this._lang$.value; }
-
-  /** централен сеттер за јазик (ова е твоето "setLang") */
-  set(lang: string): void {
-    if (!this.supported.includes(lang as any)) lang = 'en';
-    if (lang === this._lang$.value) return;
-
+  /** Јавно менување јазик (перзистира + аплицира) */
+  set(lang: string) {
+    if (!lang || lang === this._lang$.value) return;
+    localStorage.setItem(STORAGE_KEY, lang);
     this._lang$.next(lang);
-    localStorage.setItem(this.key, lang);
-    this.i18n.use(lang);
+    this.apply(lang);
   }
 
-  private initFromStorage(): string {
-    return localStorage.getItem(this.key) || 'en';
+  /** Тековен јазик (синхрон) */
+  current() { return this._lang$.value; }
+
+  /** Внатрешно: активирање на преводите + <html lang=".."> */
+  private apply(lang: string) {
+    this.i18n.use(lang);
+    this.doc.documentElement.lang = lang;
   }
 }

@@ -1,4 +1,4 @@
-// language-selector.component.ts
+// src/app/HTMLHelpers/language-selector/language-selector.component.ts
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,30 +13,30 @@ import { LanguageService } from './language.service';
   styleUrls: ['./language-selector.component.scss']
 })
 export class LanguageSelectorComponent {
-  selectedLanguage = 'en';
-  dropdownOpen = false;
+  public selectedLanguage: string;
+  public dropdownOpen = false;
 
-  languages = [
+  public languages = [
     { code: 'en', name: 'EN' },
     { code: 'it', name: 'IT' },
     { code: 'mk', name: 'MK' }
   ];
 
   constructor(private lang: LanguageService) {
-    this.selectedLanguage = this.lang.current; // централен извор на вистина
+    this.selectedLanguage = this.lang.current();
   }
 
   toggleDropdown() { this.dropdownOpen = !this.dropdownOpen; }
 
   changeLanguage(code: string) {
-    this.lang.set(code);           // ⬅️ овде е "setLang"
     this.selectedLanguage = code;
+    this.lang.set(code);              // ⟵ централизирано set
     this.dropdownOpen = false;
   }
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    const t = event.target as HTMLElement;
-    if (!t.closest('.custom-dropdown')) this.dropdownOpen = false;
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-dropdown')) this.dropdownOpen = false;
   }
 }
