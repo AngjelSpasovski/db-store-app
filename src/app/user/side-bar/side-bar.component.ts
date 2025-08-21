@@ -2,8 +2,11 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostLi
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common'; // for *ngFor, *ngIf, etc.
 import { TranslateModule } from '@ngx-translate/core';
-import { AuthService, User } from 'src/app/auth/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { CreditsService } from '../buy-credits/credit.service';
+import type { AuthUser } from '../../auth/auth.service';
+
+
 
 @Component({
   selector: 'app-sidebar',
@@ -30,6 +33,8 @@ export class SidebarComponent {
     return !this.isOpen; 
   }
 
+  public currentUser: AuthUser | null = null;
+
   public isMobile = window.innerWidth < 992;
 
   public currentCredits = 0;                    // ← Current credits from session storage
@@ -52,7 +57,7 @@ export class SidebarComponent {
   ngOnInit() {
 
     // init credits
-    const user: User | null = this.auth.getCurrentUser();
+    const user: AuthUser | null = this.auth.getCurrentUser();
     if (user) {
       const key = `credits_${user.email}`;
       const stored = sessionStorage.getItem(key);

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../auth.service';
@@ -36,7 +36,8 @@ export class ForgotPasswordComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private auth: AuthService,
-    private toast: ToastService
+    private toast: ToastService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -52,20 +53,37 @@ export class ForgotPasswordComponent implements OnInit {
   sendResetEmail(): void {
     if (!this.email) return;
     this.isLoading = true;
-
+    
+    // Call the service to send reset email
     this.auth.resetPasswordSend(this.email).subscribe({
       next: () => {
         this.isLoading = false;
-        this.toast.show('We sent you an email with a reset link.', true, 4000, 'top-end');
+        // info toast
+        this.toast.info(this.translate.instant('RESET_PASSWORD_LINK'), { position: 'top-end' });
       },
       error: (err) => {
         this.isLoading = false;
-        const msg = err?.error?.message || 'Failed to send reset email.';
-        this.toast.show(msg, false, 6000, 'top-end'); // ⟵ error toast
+
+        // Handle common errors
+        if (err?.status === 0) {
+          this.toast.error(this.translate.instant('TOAST.NETWORK_ERROR'), { position: 'top-end' });
+          return;
+        }
+        // If email not found, show specific message
+        if (err?.status === 404) {
+          this.toast.warn(this.translate.instant('EMAIL_NOT_FOUND'), { position: 'top-end' });
+          return;
+        }
+
+        // For other errors, show generic message
+        const msg = err?.error?.message || this.translate.instant('VALIDATION_FAILED');
+        // Show error toast
+        this.toast.error(msg, { position: 'top-end', duration: 6000 });
       }
     });
   }
 
+  // Navigate back to login
   goBackToLogin(): void {
     this.router.navigate(['/login'], { queryParams: { tab: 'login' } });
   }

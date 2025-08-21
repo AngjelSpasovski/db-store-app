@@ -37,11 +37,6 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   constructor(private translate: TranslateService, private router: Router) {
-    
-    // Initialize translation
-    this.translate.setDefaultLang('en');
-    this.translate.use('en');
-
     // Setup on navigation back to /home
     this.routerSub = this.router.events.pipe(
       filter(e => e instanceof NavigationEnd && (e as NavigationEnd).urlAfterRedirects === '/home')

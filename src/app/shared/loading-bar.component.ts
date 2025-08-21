@@ -1,6 +1,7 @@
+// src/app/shared/loading-bar.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpLoadingService } from './http-loading.service';
+import { LoadingBarService } from './loading-bar.service';
 
 @Component({
   standalone: true,
@@ -19,9 +20,9 @@ import { HttpLoadingService } from './http-loading.service';
       opacity: .9;
     }
     @keyframes indet {
-      0% { transform: translateX(-100%) scaleX(0.4); }
-      50%{ transform: translateX(0%)    scaleX(1.0); }
-      100%{transform: translateX(100%)  scaleX(0.4); }
+      0%   { transform: translateX(-100%) scaleX(0.4); }
+      50%  { transform: translateX(0%)     scaleX(1.0); }
+      100% { transform: translateX(100%)   scaleX(0.4); }
     }
   `],
   template: `
@@ -31,5 +32,5 @@ import { HttpLoadingService } from './http-loading.service';
   `
 })
 export class LoadingBarComponent {
-  constructor(public loader: HttpLoadingService) {}
+  constructor(public loader: LoadingBarService) {}
 }

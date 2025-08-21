@@ -9,6 +9,7 @@ import { LanguageService } from './HTMLHelpers/language-selector/language.servic
 import { HeaderComponent } from './HTMLHelpers/header/header.component';
 import { LoadingBarComponent } from './shared/loading-bar.component';
 import { ToastService } from '../app/shared/toast.service';
+import { AppTitleService } from './shared/app-title.service';
 
 @Component({
   selector: 'app-root',
@@ -36,7 +37,8 @@ export class AppComponent implements OnInit {
     private translate: TranslateService,
     private languageService: LanguageService,
     private router: Router,
-    private toast: ToastService
+    private toast: ToastService,
+    private titles: AppTitleService
   ) {
     this.translate.setDefaultLang('en'); // Set default language
 
@@ -57,7 +59,7 @@ export class AppComponent implements OnInit {
           this.currentView = 'home';
         }
 
-        this.isLoggedIn = this.authService.isLoggedIn;
+        this.isLoggedIn = !!this.authService.currentUser$.value;
         this.userEmail = this.authService.getLoggedInUserEmail() || '';
       }
     });
@@ -67,9 +69,19 @@ export class AppComponent implements OnInit {
   ngAfterViewInit(): void {}
 
   ngOnInit(): void {
+
      // Register event listeners for online/offline status
     window.addEventListener('offline', this.onOffline);
     window.addEventListener('online',  this.onOnline);
+
+    // Initialize app titles
+    this.titles.init();
+
+    // Check if user is logged in
+    this.isLoggedIn = !!this.authService.currentUser$.value;
+
+    // Subscribe to auth state changes
+    this.authService.isAuthed$.subscribe(v => this.isLoggedIn = v);
 
     // Check initial online status
     if (!navigator.onLine) this.onOffline();
@@ -83,21 +95,22 @@ export class AppComponent implements OnInit {
     const loggedInUser = sessionStorage.getItem('loggedInUser');
     if (loggedInUser) {
       console.log('Logged-in user detected:', loggedInUser);
-      this.authService.isLoggedIn = true;       // set isLoggedIn to true, showing logout modal
+      this.isLoggedIn = true;       // set isLoggedIn to true, showing logout modal
     }
     else {
       console.log('No logged-in user found');
-      this.authService.isLoggedIn = false;      // set isLoggedIn to false, not showing logout modal
+      this.isLoggedIn = false;      // set isLoggedIn to false, not showing logout modal
     }
 
   }
 
   ngOnDestroy() {
-    // откачи слушачи (добра пракса)
+    // Clean up event listeners
     window.removeEventListener('offline', this.onOffline);
     window.removeEventListener('online',  this.onOnline);
   }
 
+  // Handle logout confirmation
   private onOffline = () => this.toast.show(this.translate.instant('NETWORK_ERROR'), false, 4000, 'top-end');
   private onOnline = () => this.toast.show(this.translate.instant('BACK_ONLINE') || 'Back online.', true, 2000, 'top-end');
 

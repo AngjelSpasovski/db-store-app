@@ -83,6 +83,19 @@
     "FORBIDDEN": "Accesso negato",
     "UNAUTHORIZED": "Email o password errati.",
 
+    "TOAST": {
+        "NETWORK_ERROR": "Errore di rete: API non raggiungibile.",
+        "BACK_ONLINE": "Sei tornato online.",
+        "LOGIN_SUCCESS": "Accesso effettuato con successo.",
+        "UNAUTHORIZED": "Email o password errati.",
+        "FORBIDDEN": "Accesso negato.",
+        "EMAIL_NOT_VERIFIED": "La tua email non è ancora verificata. Ti abbiamo inviato un nuovo link di verifica.",
+        "NOT_FOUND": "Non trovato.",
+        "VALIDATION_FAILED": "Validazione fallita. Controlla i tuoi dati.",
+        "TOO_MANY": "Troppi tentativi di accesso. Riprova più tardi.",
+        "SERVER_ERROR": "Errore del server. Riprova più tardi."
+    },
+
     "SEND_RESET_CODE": "Invia codice",
     "ENTER_RESET_CODE": "Inserisci il codice di reimpostazione",
     "VERIFY_CODE": "Verifica codice",

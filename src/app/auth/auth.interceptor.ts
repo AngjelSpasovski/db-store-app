@@ -1,19 +1,23 @@
 // auth.interceptor.ts
 import { Injectable } from '@angular/core';
-import {
-  HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse
-} from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { environment } from './auth.environment';
 import { ToastService } from '../shared/toast.service';
+import { LoadingBarService } from '../shared/loading-bar.service';
+
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private loggingOut = false;
 
-  constructor(private toast: ToastService, private router: Router) {}
+  constructor(
+    private toast: ToastService, 
+    private router: Router,
+    private loader: LoadingBarService
+  ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const base  = (environment.baseApiUrl || '').replace(/\/+$/, '');  // normalize
@@ -31,9 +35,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const addAuth = !!token && isApi && !isAsset && !isAuth;
 
-    const finalReq = addAuth
-      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-      : req;
+    const finalReq = addAuth ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
+    
+    this.loader.start();
 
     return next.handle(finalReq).pipe(
       catchError((err: HttpErrorResponse) => {
@@ -47,7 +51,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
         // покажи toast ако не е auth-рута ИЛИ ако е heavy error
         if (!isAuth && (!onAuthScreen || heavyError)) {
-          this.toast.show(this.prettyError(err), false, 6000, 'top-end');
+          this.toast.error(this.prettyError(err), { duration: 6000, position: 'top-end' });
         }
 
         // 401 на заштитени рути → исчисти токен и пренасочи
@@ -60,7 +64,9 @@ export class AuthInterceptor implements HttpInterceptor {
         }
 
         return throwError(() => err);
-      })
+      }),
+
+      finalize(() => this.loader.stop())
     );
   }
 

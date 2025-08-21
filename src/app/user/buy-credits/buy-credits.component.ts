@@ -1,12 +1,14 @@
 import { Component, OnInit, ChangeDetectionStrategy, Renderer2, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';      // for *ngFor, *ngIf, etc.
-import { AuthService, User } from '../../auth/auth.service';
+import { AuthService } from '../../auth/auth.service';
 import { RouterModule } from '@angular/router';     // if you ever use routerLink here
 import { TranslateModule } from '@ngx-translate/core';
 import { Toast } from 'bootstrap';
 
 import { BillingService, Invoice } from '../billing/billing.service';
 import { CreditsService } from '../buy-credits/credit.service';
+
+import type { AuthUser } from '../../auth/auth.service';
 
 interface CreditPackage {
   price: string;
@@ -35,7 +37,7 @@ export class BuyCreditsComponent implements OnInit {
     { price: '3000€', credits: 15000 }
   ];
 
-  currentUser: User | null = null;
+  currentUser: AuthUser | null = null;
   currentCredits = 0;
 
   constructor(

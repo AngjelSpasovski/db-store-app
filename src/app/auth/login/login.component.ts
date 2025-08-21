@@ -67,18 +67,17 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     private emailJs: EmailJsService,
     private pdfCompressor: PdfCompressorService,
     private toast: ToastService
-  ) {
-    this.translate.setDefaultLang('en');
-    this.translate.use('en');
-  }
+  ) {}
 
   ngOnInit(): void {
 
     // if tolken exists, redirect to user/buy-credits
-    const token = this.auth.token;                
-    if (token){                                             // Check if user is already logged in
-      this.router.navigateByUrl('/user/buy-credits');       // If logged in, redirect to user/buy-credits or appropriate page
-    } 
+    const token = this.auth.token;
+    const role  = this.auth.currentUser$.value?.role?.toLowerCase();
+    if (token && role) {
+      const target = role === 'superadmin' ? '/user/superadmin' : role === 'admin' ? '/user/admin' : '/user/buy-credits';
+      this.router.navigateByUrl(target);
+    }
 
     // Initialize forms
     this.loginForm = this.fb.group({
@@ -135,8 +134,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     this.activeForm = 'login';
     this.resetAllForms();
 
-    this.sub = this.auth.logoutEvent.subscribe(() => {
-      this.resetAllForms();
+    this.sub = this.auth.isAuthed$.subscribe(isAuthed => {
+      if (!isAuthed) {
+        this.resetAllForms();
+      }
     });
   }
 
@@ -171,58 +172,67 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const { email, password, rememberMe } = this.loginForm.value;
 
-    this.auth.signIn({ email, password }, !!rememberMe).subscribe({
-      next: (res) => {
-        // 1) ако guard поставил redirect, почитувај го
-        const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
-        if (redirect) {
-          this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
-          this.router.navigateByUrl(redirect);
-          return;
-        }
+  this.auth.signIn({ email, password }, !!rememberMe).subscribe({
+    next: (res) => {
+      this.needsEmailVerify = false;
 
-        // 2) инаку рутирај по улога
-        const role = (res.user.role || 'user').toLowerCase();
-        if (role === 'superadmin') {
-          this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
-          this.router.navigateByUrl('/user/buy-credits'); // или специјална /superadmin страница кога ќе ја додадеме
-        } 
-        else if (role === 'admin') {
-          this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
-          this.router.navigateByUrl('/user/buy-credits'); // или /user/admin кога ќе ја додадеме
-        } 
-        else {
-          this.toast.show(this.translate.instant('LOGIN_SUCCESS'), true, 2500, 'top-end');
-          this.router.navigateByUrl('/user/buy-credits');
-        }
-      },
-      error: (err) => {
-        // 403 not verified → UI порака + auto-resend
-        if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
-          this.needsEmailVerify = true;
-          this.lastLoginEmail = email;
-          this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_INFO');
-          this.resendVerifyEmail(true);
-          return;
-        }
-        this.showApiErrors(err);
+      // 1) respect redirect
+      const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
+      if (redirect) {
+        this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
+        this.router.navigateByUrl(redirect);
+        return;
       }
-    });
+
+      // 2) role-based route
+      const role = (res.user.role || 'user').toLowerCase();
+      switch (role) {
+        case 'superadmin':
+          this.router.navigateByUrl('/user/superadmin');
+          break;
+        case 'admin':
+          this.router.navigateByUrl('/user/admin');
+          break;
+        default:
+          this.router.navigateByUrl('/user/buy-credits');
+      }
+      this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
+    },
+    error: err => {
+      // 403 not verified → UI + инфо-тост
+      if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
+        this.needsEmailVerify = true;
+        this.lastLoginEmail = email;
+        this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_INFO');
+        this.toast.info(this.translate.instant('EMAIL_NOT_VERIFIED_INFO'), { position: 'top-end' });
+        this.resendVerifyEmail(true);
+        return;
+      }
+
+      // останати грешки (login екран сме, па прикажи експлицитно тост)
+      const msg =
+        err?.status === 0 ? this.translate.instant('TOAST.NETWORK_ERROR') :
+        err?.status === 401 ? this.translate.instant('UNAUTHORIZED') :
+        err?.error?.message || this.translate.instant('VALIDATION_FAILED');
+
+      this.toast.error(msg, { position: 'top-end' });
+    }
+  });
+
   }
 
   resendVerifyEmail(auto = false) {
     if (!this.lastLoginEmail) return;
-
     this.resendLoading = true;
 
     this.auth.confirmEmailSend(this.lastLoginEmail).subscribe({
       next: () => {
-        if (!auto) this.toast.show('Verification link sent.', true, 4000, 'top-end');
         this.resendLoading = false;
+        if (!auto) this.toast.info(this.translate.instant('EMAIL_NOT_VERIFIED_INFO'), { position: 'top-end' });
       },
       error: () => {
-        if (!auto) this.toast.show('Couldn’t send link. Try again.', false, 4000, 'top-end');
         this.resendLoading = false;
+        if (!auto) this.toast.error(this.translate.instant('TOAST.SERVER_ERROR'), { position: 'top-end' });
       }
     });
   }
@@ -280,24 +290,31 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     // 4) Backend sign-up (JSON)
     this.auth.signUp(payload).subscribe({
       next: async () => {
+        // побарај backend да прати верификациски е-мејл
         const v = this.signupForm.value;
-
-        // испрати верификациски e-mail преку backend
         this.auth.confirmEmailSend(v.email).subscribe({
           next: () => console.log('Confirm e-mail sent'),
           error: (e) => console.warn('Confirm e-mail send failed (ignored):', e)
         });
 
-        // (оставаме EmailJS приклучено само ако сакате подоцна)
+        // 🔔 инфо-тост: кажи му на корисникот што следува
+        this.toast.info(this.translate.instant('EMAIL_NOT_VERIFIED_INFO'), { position: 'top-end' });
+
         await this.handleEmailStepAndGoLogin();
       },
       error: (err) => {
         this.signupInProgress = false;
-        this.signupError = 'Signup failed. Please try again.';
-        console.error('Signup error:', err);
-        this.showApiErrors(err);
-      }
+        // човечка порака за тост
+        const msg =
+          err?.status === 0 ? this.translate.instant('TOAST.NETWORK_ERROR') :
+          err?.status === 422 && err?.error?.errors
+            ? this.flattenErrors(err.error.errors).join(' • ')
+            : (err?.error?.message || this.translate.instant('TOAST.SERVER_ERROR'));
 
+        this.toast.error(msg, { position: 'top-end' });
+        this.signupError = msg;         // ако ти треба и под формата
+        this.showApiErrors(err);        // (опционално) ако сакаше и старото поведение
+      }
     });
   }
 
@@ -360,21 +377,24 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     const file = input.files?.[0];
+    
     if (!file) return;
 
     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    
+    const maxSize = 5 * 1024 * 1024;
+
     if (!isPdf) {
       this.signupForm.get('file')?.setErrors({ invalidFileType: true });
       this.selectedFileName = '';
       this.selectedFile = undefined;
+      this.toast.warn(this.translate.instant('ONLY_PDF'), { position: 'top-end' });
       return;
     }
     if (file.size > maxSize) {
       this.signupForm.get('file')?.setErrors({ fileTooLarge: true });
       this.selectedFileName = '';
       this.selectedFile = undefined;
+      this.toast.warn('Max size is 5MB.', { position: 'top-end' });
       return;
     }
 
@@ -470,11 +490,13 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       this.serverErrorMsg = this.flattenErrors(err.error.errors).join('\n');
     } 
     else if (err?.status === 0) {
-      this.serverErrorMsg = 'Network/CORS error: API not reachable from browser.';
+      this.serverErrorMsg = this.translate.instant('TOAST.NETWORK_ERROR');
     } 
     else {
-      this.serverErrorMsg = err?.error?.message || 'Unexpected error';
+      this.serverErrorMsg = err?.error?.message || this.translate.instant('TOAST.SERVER_ERROR');
     }
     console.error('API error:', err, this.serverErrorMsg);
+    this.toast.error(this.serverErrorMsg, { position: 'top-end' });  // 🔔 тост
   }
+
 }

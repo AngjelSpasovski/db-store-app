@@ -82,6 +82,19 @@
     "FORBIDDEN": "Forbidden",
     "UNAUTHORIZED": "Incorrect email or password.",
 
+    "TOAST": {
+        "NETWORK_ERROR": "Network error: API not reachable.",
+        "BACK_ONLINE": "Back online.",
+        "LOGIN_SUCCESS": "Signed in successfully.",
+        "UNAUTHORIZED": "Session expired. Please sign in again.",
+        "FORBIDDEN": "Forbidden",
+        "EMAIL_NOT_VERIFIED": "Email not verified. Check your inbox.",
+        "NOT_FOUND": "Resource not found.",
+        "VALIDATION_FAILED": "Validation failed. Please check your input.",
+        "TOO_MANY": "Too many requests. Please try again later.",
+        "SERVER_ERROR": "Server error. Please try again later."
+    },
+
     "SEND_RESET_CODE": "Send Code",
     "ENTER_RESET_CODE": "Enter Reset Code",
     "VERIFY_CODE": "Verify Code",

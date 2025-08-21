@@ -29,10 +29,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private auth: AuthService,
     private translate: TranslateService
-  ) {
-    this.translate.setDefaultLang('en');
-    this.translate.use('en');
-  }
+  ) {}
 
   ngOnInit(): void {
     // 1) следи го URL-от и поставувај viewMode
