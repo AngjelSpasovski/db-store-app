@@ -104,8 +104,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       companyAddress:       ['',    Validators.required],
       companyAddressSecond: [''],
       
-      phoneNumber:          ['',    [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      vat:                  ['',    [Validators.required, Validators.pattern(/^\w{11}$/)]],
+      phoneNumber:          ['',    [Validators.required, Validators.pattern(/^\d{9,15}$/)]],   // 9–15 цифри
+      vat:                  ['',    [Validators.required, Validators.pattern(/^\d{11}$/)]],     // IT: точно 11 цифри
   
       // 1c. Column 3
       city:                 ['',    Validators.required],
@@ -242,7 +242,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   onSubmitSignup(e: Event) {
     e.preventDefault();
     this.signupSubmitted = true;
-    if (this.signupForm.invalid) return;
+    if (this.signupForm.invalid) {
+      this.markAllAsTouched(this.signupForm);
+      return;
+    }
 
     const v = this.signupForm.value;
     const stateOrNation = v.state; // за сега исто поле
@@ -429,6 +432,24 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     fc?.updateValueAndValidity({ onlySelf: true });
   }
 
+  clearSelectedFile(input: HTMLInputElement) {
+    const fc = this.signupForm.get('file');
+
+    this.selectedFile = undefined;
+    this.selectedFileName = '';
+
+    // исчисти form control-от без да форсираш грешка веднаш
+    fc?.reset();                 // value -> null, validators остануваат
+    fc?.setErrors(null);
+    fc?.markAsPristine();
+    fc?.markAsUntouched();
+    fc?.updateValueAndValidity({ onlySelf: true });
+
+    // дозволи повторно да го изберат истиот фајл
+    if (input) input.value = '';
+  }
+
+
   goBackToHomePage() {
     this.resetAllForms();
     this.router.navigate(['/home']);
@@ -523,6 +544,14 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     console.error('API error:', err, this.serverErrorMsg);
     this.toast.error(this.serverErrorMsg, { position: 'top-end' });  // 🔔 тост
+  }
+
+  private markAllAsTouched(group: FormGroup) {
+    Object.values(group.controls).forEach(c => {
+      // @ts-ignore
+      if (c.controls) this.markAllAsTouched(c as FormGroup);
+      c.markAsTouched();
+    });
   }
 
 }

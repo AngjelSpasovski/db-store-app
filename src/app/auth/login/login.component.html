@@ -62,6 +62,7 @@
                  formControlName="email"
                  placeholder=" "
                  autocomplete="username"
+                 [attr.aria-invalid]="loginSubmitted && loginForm.get('email')?.invalid ? 'true' : null"
                  [attr.aria-describedby]="loginSubmitted && loginForm.get('email')?.invalid ? 'loginEmailErr' : null"
                  [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('email')?.invalid}" />
           <label for="loginEmail">{{ 'EMAIL' | translate }}</label>
@@ -80,6 +81,7 @@
                  formControlName="password"
                  placeholder=" "
                  autocomplete="current-password"
+                 [attr.aria-invalid]="loginSubmitted && loginForm.get('password')?.invalid ? 'true' : null"
                  [attr.aria-describedby]="loginSubmitted && loginForm.get('password')?.invalid ? 'loginPassErr' : null"
                  [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('password')?.invalid}" />
           <label for="loginPass">{{ 'PASSWORD' | translate }}</label>
@@ -101,7 +103,8 @@
         <!-- Forgot + Remember -->
         <div class="d-flex justify-content-between align-items-center mb-3">
           <a [routerLink]="['/forgot-password']"
-             (click)="resetAllForms()"
+             (click)="resetAllForms()
+"
              class="forgot-password-link text-decoration-none">
             {{ 'FORGOT_PASSWORD' | translate }}
           </a>
@@ -146,9 +149,14 @@
                      name="from_email"
                      placeholder=" "
                      autocomplete="email"
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('email')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('email')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('email')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('email')?.invalid ? 'suEmailErr' : null" />
               <label for="suEmail">{{ 'EMAIL' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'email') }}</div>
+              <div id="suEmailErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('email')?.invalid">
+                {{ getError(signupForm,'email') }}
+              </div>
             </div>
 
             <!-- Name -->
@@ -159,9 +167,14 @@
                      formControlName="name"
                      name="from_name"
                      placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('name')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('name')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('name')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('name')?.invalid ? 'suNameErr' : null" />
               <label for="suName">{{ 'NAME' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'name') }}</div>
+              <div id="suNameErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('name')?.invalid">
+                {{ getError(signupForm,'name') }}
+              </div>
             </div>
 
             <!-- Surname -->
@@ -171,9 +184,14 @@
                      class="form-control"
                      formControlName="surname"
                      placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('surname')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('surname')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('surname')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('surname')?.invalid ? 'suSurnameErr' : null" />
               <label for="suSurname">{{ 'SURNAME' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'surname') }}</div>
+              <div id="suSurnameErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('surname')?.invalid">
+                {{ getError(signupForm,'surname') }}
+              </div>
             </div>
 
             <!-- Password -->
@@ -184,7 +202,9 @@
                      formControlName="password"
                      placeholder=" "
                      autocomplete="new-password"
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('password')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('password')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('password')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('password')?.invalid ? 'suPassErr' : null" />
               <label for="suPass">{{ 'PASSWORD' | translate }}</label>
               <button *ngIf="!(signupSubmitted && signupForm.get('password')?.invalid)"
                       class="toggle-password"
@@ -192,7 +212,8 @@
                       (click)="togglePasswordVisibility()">
                 <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
               </button>
-              <div class="invalid-feedback" *ngIf="signupSubmitted && signupForm.get('password')?.invalid">
+              <div id="suPassErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('password')?.invalid">
                 {{ getError(signupForm, 'password') }}
               </div>
             </div>
@@ -205,7 +226,9 @@
                      formControlName="confirmPassword"
                      placeholder=" "
                      autocomplete="new-password"
-                     [ngClass]="{'is-invalid': signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch'])}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch'])}"
+                     [attr.aria-invalid]="signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch']) ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch']) ? 'suConfirmErr' : null" />
               <label for="suConfirm">{{ 'CONFIRM_PASSWORD' | translate }}</label>
               <button *ngIf="!(signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch']))"
                       class="toggle-password"
@@ -213,7 +236,7 @@
                       (click)="toggleConfirmPasswordVisibility()">
                 <fa-icon [icon]="showConfirmPassword ? faEyeSlash : faEye"></fa-icon>
               </button>
-              <div class="invalid-feedback"
+              <div id="suConfirmErr" class="invalid-feedback"
                    *ngIf="signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch'])">
                 {{ getError(signupForm, 'confirmPassword') }}
               </div>
@@ -225,43 +248,68 @@
             <div class="form-floating mb-1">
               <input type="text" id="suCompany" class="form-control"
                      formControlName="companyName" placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyName')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyName')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('companyName')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('companyName')?.invalid ? 'suCompanyErr' : null" />
               <label for="suCompany">{{ 'COMPANY_NAME' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'companyName') }}</div>
+              <div id="suCompanyErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('companyName')?.invalid">
+                {{ getError(signupForm,'companyName') }}
+              </div>
             </div>
 
             <div class="form-floating mb-1">
               <input type="text" id="suPhone" class="form-control"
                      formControlName="phoneNumber" placeholder=" "
                      inputmode="numeric"
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('phoneNumber')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('phoneNumber')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('phoneNumber')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('phoneNumber')?.invalid ? 'suPhoneErr' : null" />
               <label for="suPhone">{{ 'PHONE_NUMBER' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'phoneNumber') }}</div>
+              <div id="suPhoneErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('phoneNumber')?.invalid">
+                {{ getError(signupForm,'phoneNumber') }}
+              </div>
             </div>
 
             <div class="form-floating mb-1">
               <input type="text" id="suVat" class="form-control"
                      formControlName="vat" placeholder=" "
                      inputmode="numeric"
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('vat')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('vat')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('vat')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('vat')?.invalid ? 'suVatErr' : null" />
               <label for="suVat">{{ 'VAT_NUMBER' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'vat') }}</div>
+              <div id="suVatErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('vat')?.invalid">
+                {{ getError(signupForm,'vat') }}
+              </div>
             </div>
 
             <div class="form-floating mb-1">
               <input type="text" id="suAddress" class="form-control"
                      formControlName="companyAddress" placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddress')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddress')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('companyAddress')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('companyAddress')?.invalid ? 'suAddressErr' : null" />
               <label for="suAddress">{{ 'COMPANY_ADDRESS' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'companyAddress') }}</div>
+              <div id="suAddressErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('companyAddress')?.invalid">
+                {{ getError(signupForm,'companyAddress') }}
+              </div>
             </div>
 
             <div class="form-floating mb-1">
               <input type="text" id="suAddressSecond" class="form-control"
                      formControlName="companyAddressSecond" placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddressSecond')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddressSecond')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('companyAddressSecond')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('companyAddressSecond')?.invalid ? 'suAddress2Err' : null" />
               <label for="suAddressSecond">{{ 'COMPANY_ADDRESS_SECOND' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'companyAddressSecond') }}</div>
+              <div id="suAddress2Err" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('companyAddressSecond')?.invalid">
+                {{ getError(signupForm,'companyAddressSecond') }}
+              </div>
             </div>
           </div>
 
@@ -270,25 +318,40 @@
             <div class="form-floating mb-1">
               <input type="text" id="suCity" class="form-control"
                      formControlName="city" placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('city')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('city')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('city')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('city')?.invalid ? 'suCityErr' : null" />
               <label for="suCity">{{ 'CITY' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'city') }}</div>
+              <div id="suCityErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('city')?.invalid">
+                {{ getError(signupForm,'city') }}
+              </div>
             </div>
 
             <div class="form-floating mb-1">
               <input type="text" id="suState" class="form-control"
                      formControlName="state" placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('state')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('state')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('state')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('state')?.invalid ? 'suStateErr' : null" />
               <label for="suState">{{ 'STATE' | translate}}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'state') }}</div>
+              <div id="suStateErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('state')?.invalid">
+                {{ getError(signupForm,'state') }}
+              </div>
             </div>
 
             <div class="form-floating mb-1">
               <input type="text" id="suZip" class="form-control"
                      formControlName="zip" placeholder=" "
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('zip')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('zip')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('zip')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('zip')?.invalid ? 'suZipErr' : null" />
               <label for="suZip">{{ 'ZIP_CODE' | translate }}</label>
-              <div class="invalid-feedback">{{ getError(signupForm,'zip') }}</div>
+              <div id="suZipErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('zip')?.invalid">
+                {{ getError(signupForm,'zip') }}
+              </div>
             </div>
 
             <!-- Role (floating select) -->
@@ -296,7 +359,9 @@
               <select id="suRole"
                       class="form-select"
                       formControlName="role"
-                      [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('role')?.invalid}">
+                      [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('role')?.invalid}"
+                      [attr.aria-invalid]="signupSubmitted && signupForm.get('role')?.invalid ? 'true' : null"
+                      [attr.aria-describedby]="signupSubmitted && signupForm.get('role')?.invalid ? 'suRoleErr' : null">
                 <option value="" disabled>{{ 'ROLE_IN_COMPANY' | translate }}</option>
                 <option value="Owner">{{ 'OWNER' | translate }}</option>
                 <option value="Marketing Manager">{{ 'MARKETING_MANAGER' | translate }}</option>
@@ -305,8 +370,8 @@
                 <option value="Sales">{{ 'SALES' | translate }}</option>
                 <option value="Other">{{ 'OTHER' | translate }}</option>
               </select>
-              <!-- <label for="suRole">{{ 'ROLE_IN_COMPANY' | translate }}</label> -->
-              <div class="invalid-feedback d-block">
+              <div id="suRoleErr" class="invalid-feedback"
+                   *ngIf="signupSubmitted && signupForm.get('role')?.invalid">
                 {{ getError(signupForm,'role') }}
               </div>
             </div>
@@ -314,33 +379,48 @@
             <!-- File upload -->
             <div class="mb-1">
               <div class="file-upload-wrapper">
+                <!-- Browse button -->
                 <label for="fileInput" class="file-upload-btn">
                   {{ 'CHOOSE_FILE' | translate }}
                 </label>
 
+                <!-- Readonly filename -->
                 <input type="text"
-                       class="file-upload-filename form-control"
-                       [value]="selectedFileName || ('NO_FILE_CHOSEN' | translate)"
-                       title="{{ selectedFileName }}"
-                       readonly
-                       [ngClass]="{ 'is-invalid': signupSubmitted && signupForm.get('file')?.invalid }" />
+                      class="file-upload-filename form-control"
+                      [value]="selectedFileName || ('NO_FILE_CHOSEN' | translate)"
+                      title="{{ selectedFileName }}"
+                      readonly
+                      [ngClass]="{ 'is-invalid': signupSubmitted && signupForm.get('file')?.invalid }" />
 
+                <!-- Clear button (видливо само кога има фајл) -->
+                <button type="button"
+                        class="file-clear-btn"
+                        *ngIf="selectedFileName"
+                        (click)="clearSelectedFile(fileInput)"
+                        [attr.aria-label]="'REMOVE_FILE' | translate">
+                  &times;
+                </button>
+
+                <!-- Hidden file input -->
                 <input type="file"
-                       id="fileInput"
-                       hidden
-                       accept="application/pdf"
-                       (change)="onFileSelected($event)" />
+                      id="fileInput"
+                      hidden
+                      accept="application/pdf"
+                      (change)="onFileSelected($event)"
+                      #fileInput />
               </div>
 
+              <!-- Validation messages -->
               <div *ngIf="signupSubmitted && signupForm.get('file')?.hasError('required')"
-                   class="invalid-feedback d-block text-right">
+                  class="invalid-feedback d-block text-right">
                 {{ getError(signupForm, 'file') }}
               </div>
               <div *ngIf="signupSubmitted && signupForm.get('file')?.hasError('invalidFileType')"
-                   class="invalid-feedback d-block text-right">
+                  class="invalid-feedback d-block text-right">
                 {{ 'ONLY_PDF' | translate }}
               </div>
             </div>
+
           </div>
         </div>
 
@@ -351,17 +431,20 @@
             <div class="form-check">
               <input type="checkbox" id="privacyPolicy" class="form-check-input"
                      formControlName="privacyPolicy"
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('privacyPolicy')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('privacyPolicy')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('privacyPolicy')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('privacyPolicy')?.invalid ? 'privacyPolicyErr' : null" />
               <label class="form-check-label" for="privacyPolicy">
                 {{ 'ACCEPT_TERMS_1' | translate }}
-                <a href="../../../assets/privacy/privacy-policy-it.pdf"
+                <a href="../../../assets/privacy/privacy-policy/privacy-policy-IT.pdf"
                    target="_blank"
                    rel="noopener noreferrer">
                   {{ 'PRIVACY_POLICY' | translate }}
                 </a>
               </label>
             </div>
-            <div *ngIf="signupSubmitted && signupForm.get('privacyPolicy')?.invalid"
+            <div id="privacyPolicyErr"
+                 *ngIf="signupSubmitted && signupForm.get('privacyPolicy')?.invalid"
                  class="invalid-feedback d-block"
                  style="text-align: left;">
               {{ 'PRIVACY_POLICY_REQUIRED' | translate }}
@@ -370,12 +453,15 @@
             <div class="form-check">
               <input type="checkbox" id="consent1" class="form-check-input"
                      formControlName="consent1"
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent1')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent1')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('consent1')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('consent1')?.invalid ? 'consent1Err' : null" />
               <label class="form-check-label" for="consent1">
                 {{ 'ACCEPT_TERMS_2' | translate }}
               </label>
             </div>
-            <div *ngIf="signupSubmitted && signupForm.get('consent1')?.invalid"
+            <div id="consent1Err"
+                 *ngIf="signupSubmitted && signupForm.get('consent1')?.invalid"
                  class="invalid-feedback d-block"
                  style="text-align: left;">
               {{ getError(signupForm, 'consent1') }}
@@ -384,12 +470,15 @@
             <div class="form-check mt-2">
               <input type="checkbox" id="consent2" class="form-check-input"
                      formControlName="consent2"
-                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent2')?.invalid}" />
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent2')?.invalid}"
+                     [attr.aria-invalid]="signupSubmitted && signupForm.get('consent2')?.invalid ? 'true' : null"
+                     [attr.aria-describedby]="signupSubmitted && signupForm.get('consent2')?.invalid ? 'consent2Err' : null" />
               <label class="form-check-label" for="consent2">
                 {{ 'ACCEPT_TERMS_3' | translate }}
               </label>
             </div>
-            <div *ngIf="signupSubmitted && signupForm.get('consent2')?.invalid"
+            <div id="consent2Err"
+                 *ngIf="signupSubmitted && signupForm.get('consent2')?.invalid"
                  class="invalid-feedback d-block"
                  style="text-align: left;">
               {{ getError(signupForm, 'consent2') }}
