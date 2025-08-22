@@ -1,16 +1,12 @@
-// login.component.scss
-// near top of the file, after your imports
 @use 'sass:color';
 
 $input-border: rgba(255,255,255,0.7);
 $input-radius: 0.375rem;
 $input-padding: 0.5rem 0.75rem;
+$accent: #0d6efd;          // единствена дефиниција
 $text-light: #fff;
 
-// Colors (import from your theme if you like)
 $dark-bg:    rgba(0,0,0,0.6);
-$accent:     #007bff;
-$text-light: #fff;
 $break-sm:   576px;
 
 $text-color-light: #cfc1c1;
@@ -25,13 +21,8 @@ $btn-layer-4: #0073e6;
 
 $border-color: #21415b;
 
-// $login-background-color: rgb(7 16 22 / 85%);
-
 .login-component {
-  // full viewport height so we can center vertically
   min-height: 95vh;
-
-  // background image/pattern if you have one:
   background: url('../../../assets/images/night.jpg') no-repeat center/cover;
 
   .login-wrapper {
@@ -40,11 +31,10 @@ $border-color: #21415b;
     padding: 2rem 1.5rem;
     max-width: 800px;
     width: 90%;
-    margin: 2rem auto;              // vertical spacing on very small screens
+    margin: 2rem auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     color: $text-light;
 
-    // “Back” button
     .back-btn {
       background: transparent;
       border: none;
@@ -55,34 +45,16 @@ $border-color: #21415b;
       margin-bottom: 1rem;
       padding: 0;
 
-      fa-icon {
-        margin-right: 0.25rem;
-      }
+      fa-icon { margin-right: 0.25rem; }
     }
 
-    .form-footer {
-      text-align: right;
-      margin-top: .5rem;
-
-      .btn { 
-        min-width: 9rem; 
-      }
-    }
-
-
-    // Tab controls
     .slide-controls {
       position: relative;
       display: flex;
       margin-bottom: 1.5rem;
 
-      .login{
-        border-radius: 5px 0px 0px 5px;
-      }
-
-      .signup{
-        border-radius: 0px 5px 5px 0px;
-      }
+      .login  { border-radius: 5px 0 0 5px; }
+      .signup { border-radius: 0 5px 5px 0; }
 
       .slide {
         flex: 1;
@@ -98,42 +70,31 @@ $border-color: #21415b;
           color: #fff;
         }
       }
+
       .slider-tab {
         position: absolute;
         bottom: 0;
         height: 3px;
         width: 50%;
-        //background: $accent;
         transition: left 0.3s;
       }
     }
 
-    // Floating labels
     .form-floating {
       position: relative;
       margin-bottom: 1rem;
 
-      input.form-control, .form-select {
+      input.form-control,
+      .form-select {
         background: transparent;
         color: #fff;
         border: 1px solid $border-color;
 
-        &.is-invalid {
-          border-color: #dc3545;
-        }
-
-        .form-select option {
-          background: $btn-layer-1;
-          color: $text-light;
-        }
-
-        label { 
-          color: rgba(255,255,255,.7); 
-        }
+        &.is-invalid { border-color: #dc3545; }
       }
-      label {
-        color: rgba(255,255,255,0.7);
-      }
+
+      label { color: rgba(255,255,255,0.7); }
+
       .toggle-password {
         position: absolute;
         top: 50%;
@@ -144,9 +105,14 @@ $border-color: #21415b;
         color: rgba(255,255,255,0.7);
         cursor: pointer;
       }
+
+      // Dropdown options
+      .form-select option {
+        background: $btn-layer-1 !important;
+        color: $text-light !important;
+      }
     }
 
-    // Button row
     .d-flex.justify-content-between {
       margin-bottom: 1.5rem;
 
@@ -156,6 +122,7 @@ $border-color: #21415b;
         font-size: 0.85rem;
         cursor: pointer;
       }
+
       .form-check {
         display: flex !important;
         align-items: center !important;
@@ -163,10 +130,7 @@ $border-color: #21415b;
         input { margin-top: 0.15rem; }
         label { font-size: 0.85rem; color: #fff; }
 
-          .form-check-input{
-            cursor: pointer;
-            margin-right: 5px;
-          }
+        .form-check-input { cursor: pointer; margin-right: 5px; }
       }
     }
 
@@ -175,10 +139,6 @@ $border-color: #21415b;
       padding: 2%;
     }
 
-    // Style all selects to look like your text fields
-    /* -------------------------------------------------- */
-    /* Custom dropdown arrow styling for select */
-    /* -------------------------------------------------- */
     select {
       height: 100%;
       width: 100%;
@@ -187,27 +147,19 @@ $border-color: #21415b;
       border: 1px solid $border-color !important;
       border-radius: 5px;
       color: $text-color-light !important;
-
-      option{
-        background: $btn-layer-1 !important;
-        color: $text-color-light !important;
-      }
     }
 
     select:focus {
       border-color: $btn-layer-4;
       box-shadow: 0 0 0 .2rem rgba($btn-layer-4, .25);
     }
-    /* -------------------------------------------------- */
 
     .file-upload-wrapper {
       display: flex;
       align-items: center;
       width: 100%;
 
-      .text-right{
-        text-align: right;
-      }
+      .text-right { text-align: right; }
 
       .file-upload-btn {
         flex-shrink: 0;
@@ -232,44 +184,38 @@ $border-color: #21415b;
         font-size: x-small;
       }
 
-      .invalid-feedback {
-        display: block;
-        margin-top: .375rem;
-      }
+      .invalid-feedback { display: block; margin-top: .375rem; }
 
-      /* При фокус врз скриениот file input да се стилува иреданто */
       input[type="file"]:focus + .file-upload-btn,
       input[type="file"]:focus + .file-upload-btn + .file-upload-filename {
         border-color: $btn-layer-4;
         box-shadow: 0 0 0 .2rem rgba($btn-layer-4, .25);
       }
 
-      .is-invalid ~ .invalid-feedback {
-        display: block;
-      }
+      .is-invalid ~ .invalid-feedback { display: block; }
     }
 
+    .form-footer {
+      text-align: right;
+      margin-top: .5rem;
 
-    // Media query tweaks for small screens
+      .btn { min-width: 9rem; }
+    }
+
     @media (max-width: $break-sm) {
-      .login-wrapper {
-        padding: 1.5rem 1rem;
-        margin: 1rem auto;
-      }
+      .login-wrapper { padding: 1.5rem 1rem; margin: 1rem auto; }
+
       .slide-controls {
         flex-direction: column;
 
         .slide {
           width: 100%;
           margin-bottom: 0.5rem;
-          // Remove any focus outlines if you like:
           &:focus { outline: none; box-shadow: none; }
         }
       }
-      .slider-tab {
-        background: transparent !important;
-      }
+
+      .slider-tab { background: transparent !important; }
     }
   }
-  
 }

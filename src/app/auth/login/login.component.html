@@ -9,25 +9,33 @@
 
     <!-- Tabs -->
     <div class="slide-controls">
-      <button class="slide login" (click)="switchToLogin()" [ngClass]="{'active-tab': activeForm==='login'}">
+      <button class="slide login"
+              (click)="switchToLogin()"
+              [ngClass]="{'active-tab': activeForm==='login'}">
         {{ 'LOGIN' | translate }}
       </button>
-      <button class="slide signup" (click)="switchToSignup()" [ngClass]="{'active-tab': activeForm==='signup'}">
+
+      <button class="slide signup"
+              (click)="switchToSignup()"
+              [ngClass]="{'active-tab': activeForm==='signup'}">
         {{ 'SIGNUP' | translate }}
       </button>
+
       <div class="slider-tab" [ngStyle]="{'left': activeForm==='login'? '0%' : '50%'}"></div>
     </div>
 
     <div class="form-inner">
 
-      <!-- LOGIN FORM -->
-      <form *ngIf="activeForm==='login'" [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
+      <!-- ======================= LOGIN ======================= -->
+      <form *ngIf="activeForm==='login'"
+            [formGroup]="loginForm"
+            (ngSubmit)="onSubmitLogin()">
 
-
-        <!-- Email not verified note + resend -->
-        <div *ngIf="needsEmailVerify" class="alert alert-warning d-flex justify-content-between align-items-center gap-2 mb-3">
+        <!-- Email not verified -->
+        <div *ngIf="needsEmailVerify"
+             class="alert alert-warning d-flex justify-content-between align-items-center gap-2 mb-3">
           <div>
-            {{ infoMessage || 'Your email is not verified. Please check your inbox.' }}
+            {{ infoMessage || ('EMAIL_NOT_VERIFIED_INFO' | translate) }}
           </div>
 
           <button type="button"
@@ -35,113 +43,153 @@
                   [disabled]="resendLoading"
                   (click)="resendVerifyEmail()">
             <span *ngIf="!resendLoading">{{ 'RESEND_VERIFICATION' | translate }}</span>
-            <span *ngIf="resendLoading">{{ 'SENDING_VERIFICATION' | translate }}</span>
+            <span *ngIf="resendLoading">{{ 'SENDING' | translate }}</span>
           </button>
         </div>
 
-        <!-- Any other server-side error (422, 0, etc.) -->
+        <!-- Other server-side error -->
         <div *ngIf="!needsEmailVerify && serverErrorMsg"
-            class="alert alert-danger mb-3"
-            style="white-space: pre-line">
+             class="alert alert-danger mb-3"
+             style="white-space: pre-line">
           {{ serverErrorMsg }}
         </div>
 
         <!-- Email -->
         <div class="form-floating mb-1">
-          <input  type="email" id="loginEmail" class="form-control" 
-                  formControlName="email"  placeholder=" "
-                  autocomplete="username"
-                  [attr.aria-describedby]="loginSubmitted && loginForm.get('email')?.invalid ? 'loginEmailErr' : null"
-                  [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('email')?.invalid}" />
-
+          <input type="email"
+                 id="loginEmail"
+                 class="form-control"
+                 formControlName="email"
+                 placeholder=" "
+                 autocomplete="username"
+                 [attr.aria-describedby]="loginSubmitted && loginForm.get('email')?.invalid ? 'loginEmailErr' : null"
+                 [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('email')?.invalid}" />
           <label for="loginEmail">{{ 'EMAIL' | translate }}</label>
-          <div class="invalid-feedback" *ngIf="loginSubmitted && loginForm.get('email')?.invalid">
+          <div id="loginEmailErr"
+               class="invalid-feedback"
+               *ngIf="loginSubmitted && loginForm.get('email')?.invalid">
             {{ getError(loginForm,'email') }}
           </div>
         </div>
 
         <!-- Password -->
         <div class="form-floating mb-1 position-relative">
-          <input
-            [type]="showPassword?'text':'password'" id="loginPass" class="form-control"
-            formControlName="password"  placeholder=" "
-            [attr.aria-describedby]="loginSubmitted && loginForm.get('password')?.invalid ? 'loginPassErr' : null"
-            [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('password')?.invalid}"/>
-
+          <input [type]="showPassword ? 'text' : 'password'"
+                 id="loginPass"
+                 class="form-control"
+                 formControlName="password"
+                 placeholder=" "
+                 autocomplete="current-password"
+                 [attr.aria-describedby]="loginSubmitted && loginForm.get('password')?.invalid ? 'loginPassErr' : null"
+                 [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('password')?.invalid}" />
           <label for="loginPass">{{ 'PASSWORD' | translate }}</label>
-          <button *ngIf="! (loginSubmitted && loginForm.get('password')?.invalid)" 
-                  class="toggle-password" 
-                  type="button" 
+
+          <button *ngIf="!(loginSubmitted && loginForm.get('password')?.invalid)"
+                  class="toggle-password"
+                  type="button"
                   (click)="togglePasswordVisibility()">
-            <fa-icon [icon]="showPassword? faEyeSlash : faEye"></fa-icon>
+            <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
           </button>
-          <div class="invalid-feedback" *ngIf="loginSubmitted && loginForm.get('password')?.invalid">
+
+          <div id="loginPassErr"
+               class="invalid-feedback"
+               *ngIf="loginSubmitted && loginForm.get('password')?.invalid">
             {{ getError(loginForm,'password') }}
           </div>
         </div>
 
-        <!-- Forgot & Remember Wrapper-->
+        <!-- Forgot + Remember -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <!-- Forgot Password -->
-          <a (click)="goToForgotPassword()" class="forgot-password-link text-decoration-none">{{ 'FORGOT_PASSWORD' | translate }}</a>
-          <!-- Remember Me -->
+          <a [routerLink]="['/forgot-password']"
+             (click)="resetAllForms()"
+             class="forgot-password-link text-decoration-none">
+            {{ 'FORGOT_PASSWORD' | translate }}
+          </a>
+
           <div class="form-check">
-            <input id="rememberMe" type="checkbox" class="form-check-input" formControlName="rememberMe"/>
+            <input id="rememberMe"
+                   type="checkbox"
+                   class="form-check-input"
+                   formControlName="rememberMe" />
             <label for="rememberMe" class="form-check-label">{{ 'REMEMBER_ME' | translate }}</label>
           </div>
         </div>
 
+        <!-- Submit -->
         <button type="submit"
                 class="btn btn-primary w-100 mt-2"
-                [disabled]="loginForm.invalid">
+                [disabled]="loginForm.invalid || isSubmittingLogin"
+                [attr.aria-busy]="isSubmittingLogin ? 'true' : null">
           {{ 'LOGIN' | translate }}
+          <span *ngIf="isSubmittingLogin"
+                class="spinner-border spinner-border-sm ms-2"
+                role="status"
+                aria-hidden="true"></span>
         </button>
-
       </form>
 
-      <!-- SIGNUP FORM -->
-      <form *ngIf="activeForm==='signup'" [formGroup]="signupForm" (ngSubmit)="onSubmitSignup($event)" novalidate>
+      <!-- ======================= SIGNUP ======================= -->
+      <form *ngIf="activeForm==='signup'"
+            [formGroup]="signupForm"
+            (ngSubmit)="onSubmitSignup($event)"
+            novalidate>
 
         <div class="row signup-columns">
-          <!-- === COL 1 === -->
+          <!-- COL 1 -->
           <div class="col-md-4">
             <!-- Email -->
             <div class="form-floating mb-1">
-              <input type="email" id="suEmail" class="form-control"
-                    formControlName="email" name="from_email" placeholder=" "
-                    autocomplete="username"
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('email')?.invalid}" />
+              <input type="email"
+                     id="suEmail"
+                     class="form-control"
+                     formControlName="email"
+                     name="from_email"
+                     placeholder=" "
+                     autocomplete="email"
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('email')?.invalid}" />
               <label for="suEmail">{{ 'EMAIL' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'email') }}</div>
             </div>
 
             <!-- Name -->
             <div class="form-floating mb-1">
-              <input type="text" id="suName" class="form-control"
-                    formControlName="name" name="from_name" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('name')?.invalid}" />
+              <input type="text"
+                     id="suName"
+                     class="form-control"
+                     formControlName="name"
+                     name="from_name"
+                     placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('name')?.invalid}" />
               <label for="suName">{{ 'NAME' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'name') }}</div>
             </div>
 
             <!-- Surname -->
             <div class="form-floating mb-1">
-              <input type="text" id="suSurname" class="form-control"
-                    formControlName="surname" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('surname')?.invalid}" />
+              <input type="text"
+                     id="suSurname"
+                     class="form-control"
+                     formControlName="surname"
+                     placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('surname')?.invalid}" />
               <label for="suSurname">{{ 'SURNAME' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'surname') }}</div>
             </div>
 
             <!-- Password -->
             <div class="form-floating mb-1 position-relative">
-              <input [type]="showPassword ? 'text' : 'password'" id="suPass" class="form-control" 
-                      formControlName="password" placeholder=" " 
-                      autocomplete="current-password"
-                      [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('password')?.invalid}" />
+              <input [type]="showPassword ? 'text' : 'password'"
+                     id="suPass"
+                     class="form-control"
+                     formControlName="password"
+                     placeholder=" "
+                     autocomplete="new-password"
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('password')?.invalid}" />
               <label for="suPass">{{ 'PASSWORD' | translate }}</label>
-              <button *ngIf="! (signupSubmitted && signupForm.get('password')?.invalid)" class="toggle-password" type="button"
-                (click)="togglePasswordVisibility()">
+              <button *ngIf="!(signupSubmitted && signupForm.get('password')?.invalid)"
+                      class="toggle-password"
+                      type="button"
+                      (click)="togglePasswordVisibility()">
                 <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
               </button>
               <div class="invalid-feedback" *ngIf="signupSubmitted && signupForm.get('password')?.invalid">
@@ -151,104 +199,102 @@
 
             <!-- Confirm Password -->
             <div class="form-floating mb-1 position-relative">
-              <input [type]="showConfirmPassword ? 'text' : 'password'" id="suConfirm" class="form-control"
-                formControlName="confirmPassword" placeholder=" " [ngClass]="{'is-invalid': signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch'])}" />
+              <input [type]="showConfirmPassword ? 'text' : 'password'"
+                     id="suConfirm"
+                     class="form-control"
+                     formControlName="confirmPassword"
+                     placeholder=" "
+                     autocomplete="new-password"
+                     [ngClass]="{'is-invalid': signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch'])}" />
               <label for="suConfirm">{{ 'CONFIRM_PASSWORD' | translate }}</label>
-              <button *ngIf="! (signupSubmitted &&
-                  (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch']))" class="toggle-password"
-                type="button" (click)="toggleConfirmPasswordVisibility()">
+              <button *ngIf="!(signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch']))"
+                      class="toggle-password"
+                      type="button"
+                      (click)="toggleConfirmPasswordVisibility()">
                 <fa-icon [icon]="showConfirmPassword ? faEyeSlash : faEye"></fa-icon>
               </button>
-              <div class="invalid-feedback" *ngIf="signupSubmitted &&
-                  (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch'])">
+              <div class="invalid-feedback"
+                   *ngIf="signupSubmitted && (signupForm.get('confirmPassword')?.invalid || signupForm.errors?.['mismatch'])">
                 {{ getError(signupForm, 'confirmPassword') }}
               </div>
             </div>
           </div>
 
-          <!-- === COL 2 === -->
+          <!-- COL 2 -->
           <div class="col-md-4">
-            <!-- Company Name -->
             <div class="form-floating mb-1">
               <input type="text" id="suCompany" class="form-control"
-                    formControlName="companyName" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyName')?.invalid}" />
+                     formControlName="companyName" placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyName')?.invalid}" />
               <label for="suCompany">{{ 'COMPANY_NAME' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'companyName') }}</div>
             </div>
 
-            <!-- Phone Number -->
             <div class="form-floating mb-1">
               <input type="text" id="suPhone" class="form-control"
-                    formControlName="phoneNumber" placeholder=" "
-                    inputmode="numeric"
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('phoneNumber')?.invalid}" />
+                     formControlName="phoneNumber" placeholder=" "
+                     inputmode="numeric"
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('phoneNumber')?.invalid}" />
               <label for="suPhone">{{ 'PHONE_NUMBER' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'phoneNumber') }}</div>
             </div>
 
-            <!-- VAT Number -->
             <div class="form-floating mb-1">
               <input type="text" id="suVat" class="form-control"
-                    formControlName="vat" placeholder=" "
-                    inputmode="numeric"
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('vat')?.invalid}" />
+                     formControlName="vat" placeholder=" "
+                     inputmode="numeric"
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('vat')?.invalid}" />
               <label for="suVat">{{ 'VAT_NUMBER' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'vat') }}</div>
             </div>
 
-            <!-- Company Address -->
             <div class="form-floating mb-1">
               <input type="text" id="suAddress" class="form-control"
-                    formControlName="companyAddress" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddress')?.invalid}" />
+                     formControlName="companyAddress" placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddress')?.invalid}" />
               <label for="suAddress">{{ 'COMPANY_ADDRESS' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'companyAddress') }}</div>
             </div>
 
-            <!-- Company Address Second -->
             <div class="form-floating mb-1">
               <input type="text" id="suAddressSecond" class="form-control"
-                    formControlName="companyAddressSecond" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddressSecond')?.invalid}" />
+                     formControlName="companyAddressSecond" placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('companyAddressSecond')?.invalid}" />
               <label for="suAddressSecond">{{ 'COMPANY_ADDRESS_SECOND' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'companyAddressSecond') }}</div>
             </div>
-
           </div>
 
-          <!-- === COL 3 === -->
+          <!-- COL 3 -->
           <div class="col-md-4">
-            <!-- City -->
             <div class="form-floating mb-1">
               <input type="text" id="suCity" class="form-control"
-                    formControlName="city" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('city')?.invalid}" />
+                     formControlName="city" placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('city')?.invalid}" />
               <label for="suCity">{{ 'CITY' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'city') }}</div>
             </div>
 
-            <!-- State -->
             <div class="form-floating mb-1">
               <input type="text" id="suState" class="form-control"
-                    formControlName="state" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('state')?.invalid}" />
+                     formControlName="state" placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('state')?.invalid}" />
               <label for="suState">{{ 'STATE' | translate}}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'state') }}</div>
             </div>
 
-            <!-- Zip -->
             <div class="form-floating mb-1">
               <input type="text" id="suZip" class="form-control"
-                    formControlName="zip" placeholder=" "
-                    [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('zip')?.invalid}" />
+                     formControlName="zip" placeholder=" "
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('zip')?.invalid}" />
               <label for="suZip">{{ 'ZIP_CODE' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'zip') }}</div>
             </div>
 
-            <!-- Role -->
+            <!-- Role (floating select) -->
             <div class="form-floating mb-1">
-              <select id="suRole" class="form-select"
+              <select id="suRole"
+                      class="form-select"
                       formControlName="role"
                       [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('role')?.invalid}">
                 <option value="" disabled>{{ 'ROLE_IN_COMPANY' | translate }}</option>
@@ -259,7 +305,7 @@
                 <option value="Sales">{{ 'SALES' | translate }}</option>
                 <option value="Other">{{ 'OTHER' | translate }}</option>
               </select>
-              <!-- <label for="suRole">{{ 'ROLE_IN_COMPANY' | translate }}</label> -->
+              <label for="suRole">{{ 'ROLE_IN_COMPANY' | translate }}</label>
               <div class="invalid-feedback d-block">
                 {{ getError(signupForm,'role') }}
               </div>
@@ -268,99 +314,104 @@
             <!-- File upload -->
             <div class="mb-1">
               <div class="file-upload-wrapper">
-                <!-- 1) Label-копчето -->
                 <label for="fileInput" class="file-upload-btn">
                   {{ 'CHOOSE_FILE' | translate }}
                 </label>
 
-                <!-- 2) Неработното поле со името на фајлот -->
-                <input type="text" title="{{ selectedFileName }}" class="file-upload-filename form-control"
-                  [value]="selectedFileName || ('NO_FILE_CHOSEN' | translate)" readonly
-                  [ngClass]="{ 'is-invalid': signupSubmitted && signupForm.get('file')?.invalid }" />
+                <input type="text"
+                       class="file-upload-filename form-control"
+                       [value]="selectedFileName || ('NO_FILE_CHOSEN' | translate)"
+                       title="{{ selectedFileName }}"
+                       readonly
+                       [ngClass]="{ 'is-invalid': signupSubmitted && signupForm.get('file')?.invalid }" />
 
-                <!-- 3) Скриениот file input -->
-                <!--    Додадовме accept=".pdf" за да може да се избира само PDF    -->
-                <input type="file" id="fileInput" hidden accept="application/pdf" (change)="onFileSelected($event)" />
+                <input type="file"
+                       id="fileInput"
+                       hidden
+                       accept="application/pdf"
+                       (change)="onFileSelected($event)" />
               </div>
 
-              <!-- 4) Validation message под wrapper-от -->
               <div *ngIf="signupSubmitted && signupForm.get('file')?.hasError('required')"
-                class="invalid-feedback d-block text-right">
+                   class="invalid-feedback d-block text-right">
                 {{ getError(signupForm, 'file') }}
               </div>
               <div *ngIf="signupSubmitted && signupForm.get('file')?.hasError('invalidFileType')"
-                class="invalid-feedback d-block text-right">
+                   class="invalid-feedback d-block text-right">
                 {{ 'ONLY_PDF' | translate }}
               </div>
             </div>
-
           </div>
         </div>
 
-
-        <!-- === Почеток на новата секција за consents (разделено во два стуба) === -->
+        <!-- Consents -->
         <div class="mb-3 consents-wrapper">
-        
-          <!-- Лев стуб со задолжителни чек‐бокси -->
+          <!-- Left (required) -->
           <div class="consents-column left-consents">
             <div class="form-check">
-              <input type="checkbox" id="privacyPolicy" class="form-check-input" formControlName="privacyPolicy"
-                [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('privacyPolicy')?.invalid}" />
+              <input type="checkbox" id="privacyPolicy" class="form-check-input"
+                     formControlName="privacyPolicy"
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('privacyPolicy')?.invalid}" />
               <label class="form-check-label" for="privacyPolicy">
-                {{ 'ACCEPT_TERMS_1' | translate }}<a href="../../../assets/privacy/privacy-policy/privacy-policy-IT.pdf" target="_blank" rel="noopener noreferrer"> {{ 'PRIVACY_POLICY' | translate }}</a>
+                {{ 'ACCEPT_TERMS_1' | translate }}
+                <a href="../../../assets/privacy/privacy-policy-it.pdf"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                  {{ 'PRIVACY_POLICY' | translate }}
+                </a>
               </label>
             </div>
-            <div *ngIf="signupSubmitted && signupForm.get('privacyPolicy')?.invalid" class="invalid-feedback d-block"
-              style="text-align: left;">
+            <div *ngIf="signupSubmitted && signupForm.get('privacyPolicy')?.invalid"
+                 class="invalid-feedback d-block"
+                 style="text-align: left;">
               {{ 'PRIVACY_POLICY_REQUIRED' | translate }}
             </div>
-        
-            <!-- Consent #1 (задолжителен) -->
+
             <div class="form-check">
-              <input type="checkbox" id="consent1" class="form-check-input" formControlName="consent1"
-                [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent1')?.invalid}" />
+              <input type="checkbox" id="consent1" class="form-check-input"
+                     formControlName="consent1"
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent1')?.invalid}" />
               <label class="form-check-label" for="consent1">
                 {{ 'ACCEPT_TERMS_2' | translate }}
               </label>
             </div>
-            <div *ngIf="signupSubmitted && signupForm.get('consent1')?.invalid" class="invalid-feedback d-block"
-              style="text-align: left;">
+            <div *ngIf="signupSubmitted && signupForm.get('consent1')?.invalid"
+                 class="invalid-feedback d-block"
+                 style="text-align: left;">
               {{ getError(signupForm, 'consent1') }}
             </div>
-        
-            <!-- Consent #2 (задолжителен) -->
+
             <div class="form-check mt-2">
-              <input type="checkbox" id="consent2" class="form-check-input" formControlName="consent2"
-                [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent2')?.invalid}" />
+              <input type="checkbox" id="consent2" class="form-check-input"
+                     formControlName="consent2"
+                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('consent2')?.invalid}" />
               <label class="form-check-label" for="consent2">
                 {{ 'ACCEPT_TERMS_3' | translate }}
               </label>
             </div>
-            <div *ngIf="signupSubmitted && signupForm.get('consent2')?.invalid" class="invalid-feedback d-block"
-              style="text-align: left;">
+            <div *ngIf="signupSubmitted && signupForm.get('consent2')?.invalid"
+                 class="invalid-feedback d-block"
+                 style="text-align: left;">
               {{ getError(signupForm, 'consent2') }}
             </div>
           </div>
-        
-          <!-- Десен стуб со опционални чек‐бокси -->
+
+          <!-- Right (optional) -->
           <div class="consents-column right-consents">
-            <!-- Consent #3 (опционален) -->
             <div class="form-check">
               <input type="checkbox" id="consent3" class="form-check-input" formControlName="consent3" />
               <label class="form-check-label" for="consent3">
                 {{ 'ACCEPT_TERMS_4' | translate }}
               </label>
             </div>
-        
-            <!-- Consent #4 (опционален) -->
+
             <div class="form-check mt-2">
               <input type="checkbox" id="consent4" class="form-check-input" formControlName="consent4" />
               <label class="form-check-label" for="consent4">
                 {{ 'ACCEPT_TERMS_5' | translate }}
               </label>
             </div>
-        
-            <!-- Consent #5 (опционален) -->
+
             <div class="form-check mt-2">
               <input type="checkbox" id="consent5" class="form-check-input" formControlName="consent5" />
               <label class="form-check-label" for="consent5">
@@ -369,16 +420,15 @@
             </div>
           </div>
         </div>
-        <!-- === Крај на делот за consents === -->
 
-        <!-- Submit Button -->
-         
-        <button type="submit" class="btn btn-primary w-100 mt-2">  <!-- [disabled]="signupForm.invalid" -->
-          {{ 'SIGNUP' | translate }}
-        </button>
-        
+        <!-- Submit -->
+        <div class="form-footer">
+          <button type="submit" class="btn btn-primary">
+            {{ 'SIGNUP' | translate }}
+          </button>
+        </div>
       </form>
-    </div>
 
+    </div>
   </div>
 </div>

@@ -10,6 +10,7 @@ import { EmailJsService } from '../mail-server/emailjs.service';
 import { Subscription, lastValueFrom } from 'rxjs';
 import { PdfCompressorService } from '../mail-server/pdf-compressor.service';
 import { ToastService } from '../../shared/toast.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,8 @@ import { ToastService } from '../../shared/toast.service';
     CommonModule,
     ReactiveFormsModule,
     TranslateModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    RouterModule           
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -55,6 +57,9 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   lastLoginEmail    = '';
   resendLoading     = false;
   infoMessage       = '';
+
+  isSubmittingLogin = false;
+
   
   private sub!: Subscription;   // Subscription for logout event
 
@@ -171,55 +176,51 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.loginForm.invalid) return;
 
     const { email, password, rememberMe } = this.loginForm.value;
+    this.isSubmittingLogin = true; // ⟵ старт
 
-  this.auth.signIn({ email, password }, !!rememberMe).subscribe({
-    next: (res) => {
-      this.needsEmailVerify = false;
+    this.auth.signIn({ email, password }, !!rememberMe).subscribe({
+      next: (res) => {
+        this.needsEmailVerify = false;
 
-      // 1) respect redirect
-      const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
-      if (redirect) {
+        const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
+        if (redirect) {
+          this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
+          this.isSubmittingLogin = false; // ⟵ стоп
+          this.router.navigateByUrl(redirect);
+          return;
+        }
+
+        const role = (res.user.role || 'user').toLowerCase();
+        switch (role) {
+          case 'superadmin': this.router.navigateByUrl('/user/superadmin'); break;
+          case 'admin':      this.router.navigateByUrl('/user/admin');      break;
+          default:           this.router.navigateByUrl('/user/buy-credits');
+        }
         this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-        this.router.navigateByUrl(redirect);
-        return;
+        this.isSubmittingLogin = false; // ⟵ стоп
+      },
+      error: err => {
+        if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
+          this.needsEmailVerify = true;
+          this.lastLoginEmail = email;
+          this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_INFO');
+          this.toast.info(this.translate.instant('EMAIL_NOT_VERIFIED_INFO'), { position: 'top-end' });
+          this.isSubmittingLogin = false; // ⟵ стоп
+          this.resendVerifyEmail(true);
+          return;
+        }
+
+        const msg =
+          err?.status === 0   ? this.translate.instant('TOAST.NETWORK_ERROR') :
+          err?.status === 401 ? this.translate.instant('UNAUTHORIZED') :
+          err?.error?.message || this.translate.instant('VALIDATION_FAILED');
+
+        this.toast.error(msg, { position: 'top-end' });
+        this.isSubmittingLogin = false; // ⟵ стоп
       }
-
-      // 2) role-based route
-      const role = (res.user.role || 'user').toLowerCase();
-      switch (role) {
-        case 'superadmin':
-          this.router.navigateByUrl('/user/superadmin');
-          break;
-        case 'admin':
-          this.router.navigateByUrl('/user/admin');
-          break;
-        default:
-          this.router.navigateByUrl('/user/buy-credits');
-      }
-      this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-    },
-    error: err => {
-      // 403 not verified → UI + инфо-тост
-      if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
-        this.needsEmailVerify = true;
-        this.lastLoginEmail = email;
-        this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_INFO');
-        this.toast.info(this.translate.instant('EMAIL_NOT_VERIFIED_INFO'), { position: 'top-end' });
-        this.resendVerifyEmail(true);
-        return;
-      }
-
-      // останати грешки (login екран сме, па прикажи експлицитно тост)
-      const msg =
-        err?.status === 0 ? this.translate.instant('TOAST.NETWORK_ERROR') :
-        err?.status === 401 ? this.translate.instant('UNAUTHORIZED') :
-        err?.error?.message || this.translate.instant('VALIDATION_FAILED');
-
-      this.toast.error(msg, { position: 'top-end' });
-    }
-  });
-
+    });
   }
+
 
   resendVerifyEmail(auto = false) {
     if (!this.lastLoginEmail) return;
