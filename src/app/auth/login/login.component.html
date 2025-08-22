@@ -305,7 +305,7 @@
                 <option value="Sales">{{ 'SALES' | translate }}</option>
                 <option value="Other">{{ 'OTHER' | translate }}</option>
               </select>
-              <label for="suRole">{{ 'ROLE_IN_COMPANY' | translate }}</label>
+              <!-- <label for="suRole">{{ 'ROLE_IN_COMPANY' | translate }}</label> -->
               <div class="invalid-feedback d-block">
                 {{ getError(signupForm,'role') }}
               </div>
@@ -422,11 +422,9 @@
         </div>
 
         <!-- Submit -->
-        <div class="form-footer">
-          <button type="submit" class="btn btn-primary">
-            {{ 'SIGNUP' | translate }}
-          </button>
-        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-2">
+          {{ 'SIGNUP' | translate }}
+        </button>
       </form>
 
     </div>

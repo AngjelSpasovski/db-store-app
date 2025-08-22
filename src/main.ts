@@ -8,13 +8,14 @@ import { environment } from './environments/environment';
 import { provideRouter } from '@angular/router';
 import { appRoutes } from './app/app.routes';
 
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { provideTranslateLoader } from './translate.providers';   // 👈 if there  is a configuration for ngx-translate
 
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoadingInterceptor } from './app/shared/loading.interceptor.service';
@@ -29,7 +30,7 @@ if (environment.production) {
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(appRoutes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptorsFromDi()),
     provideIonicAngular(),
     provideAnimations(),
     provideTranslateLoader(),                                       // 👈 if there  is a configuration for ngx-translate

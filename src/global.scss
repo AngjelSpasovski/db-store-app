@@ -5,3 +5,5 @@
   /* ако таргетираш iOS safe area: */
   top: calc(var(--header-height) + env(safe-area-inset-top) + 12px);
 }
+
+#toast-container .toast { margin-top: .5rem; }

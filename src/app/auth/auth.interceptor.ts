@@ -5,10 +5,9 @@ import {
 } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { environment } from './auth.environment';
 import { ToastService } from '../shared/toast.service';
-import { HttpLoadingService } from '../shared/http-loading.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
@@ -18,7 +17,6 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private toast: ToastService,
     private router: Router,
-    private loader: HttpLoadingService,
     private i18n: TranslateService
   ) {}
 
@@ -32,17 +30,14 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const addAuth = !!token && isApi && !isAsset && !isAuth;
 
-    // Language header (постави само ако не постои)
-    const lang = this.i18n.currentLang || this.i18n.getDefaultLang() || 'en';
-    const setHeaders: Record<string, string> = {};
-    if (!req.headers.has('Accept-Language')) setHeaders['Accept-Language'] = lang;
-    if (addAuth) setHeaders['Authorization'] = `Bearer ${token}`;
-
-    const finalReq = Object.keys(setHeaders).length ? req.clone({ setHeaders }) : req;
-
-    // број само вистински API повици (не assets/i18n) за loading bar
-    const countThis = isApi && !isAsset;
-    if (countThis) this.loader.inc(); // ← increment (фикс на коментар)
+    // секогаш праќај јазик за API (не за assets)
+    let finalReq = req;
+    if (!isAsset) {
+      const lang = (this.i18n.currentLang || this.i18n.getDefaultLang() || 'en').toLowerCase();
+      const setHeaders: Record<string, string> = { 'Accept-Language': lang };
+      if (addAuth) setHeaders['Authorization'] = `Bearer ${token}`;
+      finalReq = req.clone({ setHeaders });
+    }
 
     return next.handle(finalReq).pipe(
       catchError((err: HttpErrorResponse) => {
@@ -66,13 +61,11 @@ export class AuthInterceptor implements HttpInterceptor {
         }
 
         return throwError(() => err);
-      }),
-      finalize(() => { if (countThis) this.loader.dec(); })
+      })
     );
   }
 
   private prettyError(err: HttpErrorResponse): string {
-    // Ако сакаш i18n, замени ги текстовите со this.i18n.instant('TOAST.KEY')
     if (!err || !err.status) return 'Unknown error occurred. Please try again later.';
     if (err.status === 0)   return 'Network error: API not reachable.';
     if (err.status === 400) return err.error?.message || 'Bad request.';
@@ -82,8 +75,8 @@ export class AuthInterceptor implements HttpInterceptor {
       return m.includes('not verified') ? 'Email not verified. Check your inbox.' : (err.error?.message || 'Forbidden');
     }
     if (err.status === 404) return 'Resource not found.';
-    if (err.status === 408) return 'Request timeout. Please try again.';         
-    if (err.status === 413) return 'Payload too large.';                         
+    if (err.status === 408) return 'Request timeout. Please try again.';
+    if (err.status === 413) return 'Payload too large.';
     if (err.status === 422 && err.error?.errors) return this.flatten(err.error.errors).join(' • ');
     if (err.status === 429) return 'Too many requests. Please try again later.';
     if (err.status === 502) return 'Upstream server error. Please try again.';

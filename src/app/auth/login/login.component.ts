@@ -377,31 +377,56 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   // Handle file selection for signup
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
-    const file = input.files?.[0];
-    
-    if (!file) return;
+    const file  = input.files?.[0] || null;
+    const fc    = this.signupForm.get('file');
 
-    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-    const maxSize = 5 * 1024 * 1024;
-
-    if (!isPdf) {
-      this.signupForm.get('file')?.setErrors({ invalidFileType: true });
-      this.selectedFileName = '';
+    // ако нема ништо избрано → ресетирај form control
+    if (!file) {
       this.selectedFile = undefined;
+      this.selectedFileName = '';
+      fc?.reset();               // ќе активира required
+      return;
+    }
+
+    const isPdf   = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    // тип
+    if (!isPdf) {
+      this.selectedFile = undefined;
+      this.selectedFileName = '';
+      fc?.setValue(null);
+      fc?.setErrors({ invalidFileType: true });
+      fc?.markAsTouched();
+      fc?.updateValueAndValidity({ onlySelf: true });
+      input.value = ''; // дозволи повторен избор на ист фајл
       this.toast.warn(this.translate.instant('ONLY_PDF'), { position: 'top-end' });
       return;
     }
+
+    // големина
     if (file.size > maxSize) {
-      this.signupForm.get('file')?.setErrors({ fileTooLarge: true });
-      this.selectedFileName = '';
       this.selectedFile = undefined;
+      this.selectedFileName = '';
+      fc?.setValue(null);
+      fc?.setErrors({ fileTooLarge: true });
+      fc?.markAsTouched();
+      fc?.updateValueAndValidity({ onlySelf: true });
+      input.value = '';
       this.toast.warn('Max size is 5MB.', { position: 'top-end' });
       return;
     }
 
-    this.signupForm.get('file')?.setErrors(null);
+    // валиден избор → зачувај и „помини“ required
     this.selectedFile = file;
     this.selectedFileName = file.name;
+
+    // доволно е да сетираш било која truthy вредност (file или file.name)
+    fc?.setValue(file.name);
+    fc?.setErrors(null);
+    fc?.markAsDirty();
+    fc?.markAsTouched();
+    fc?.updateValueAndValidity({ onlySelf: true });
   }
 
   goBackToHomePage() {
