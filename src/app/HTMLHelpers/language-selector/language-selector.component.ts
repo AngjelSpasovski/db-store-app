@@ -1,4 +1,3 @@
-// src/app/HTMLHelpers/language-selector/language-selector.component.ts
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,24 +12,23 @@ import { LanguageService } from './language.service';
   styleUrls: ['./language-selector.component.scss']
 })
 export class LanguageSelectorComponent {
-  public selectedLanguage: string;
-  public dropdownOpen = false;
+  dropdownOpen = false;
 
-  public languages = [
+  languages = [
     { code: 'en', name: 'EN' },
     { code: 'it', name: 'IT' },
     { code: 'mk', name: 'MK' }
   ];
 
-  constructor(private lang: LanguageService) {
-    this.selectedLanguage = this.lang.current();
-  }
+  constructor(private langSvc: LanguageService) {}
+
+  /** секогаш ја читаме моменталната вредност од сервисот */
+  get selectedLanguage() { return this.langSvc.current(); }
 
   toggleDropdown() { this.dropdownOpen = !this.dropdownOpen; }
 
-  changeLanguage(code: string) {
-    this.selectedLanguage = code;
-    this.lang.set(code);              // ⟵ централизирано set
+  changeLanguage(lang: string) {
+    this.langSvc.set(lang);      // ← перзистира + i18n.use + <html lang>
     this.dropdownOpen = false;
   }
 

@@ -2,7 +2,7 @@
   <div class="custom-dropdown" (click)="toggleDropdown()">
     <div class="selected-option">
       <img [src]="'assets/flags/' + selectedLanguage + '.jpg'" class="flag-icon" />
-      {{ selectedLanguage.toUpperCase() }}
+      {{ selectedLanguage | uppercase }}
     </div>
     <div class="dropdown-options" *ngIf="dropdownOpen">
       <div *ngFor="let lang of languages" class="dropdown-item" (click)="changeLanguage(lang.code)">
