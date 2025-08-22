@@ -463,10 +463,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.translate.instant('PATTERN_INVALID');
     }
     if (name === 'file' && c.errors?.['invalidFileType']) {
-      return 'Only PDF files are allowed.';
+      return this.translate.instant('ONLY_PDF');
     }
     if (name === 'confirmPassword' && form.errors?.['mismatch']) {
-      return this.translate.instant('PASSWORDS_DO_NOT_MATCH');
+      return this.translate.instant('PASSWORD_MISMATCH');
     }
     if ((name === 'consent1' || name === 'consent2') && c.errors?.['required']) {
       return this.translate.instant('FIELD_REQUIRED', { field: this.translate.instant(name.toUpperCase()) });

@@ -1,433 +1,3 @@
-// $text-color-light: #cfc1c1;
-// $text-color-dark: #000;
-
-// $focus-color: #1a75ff;
-// $error-color: #ff0000;
-
-// $btn-layer-1: #003366;
-// $btn-layer-2: #00509e;
-// $btn-layer-4: #0073e6;
-
-// $border-color: #21415b;
-
-// $login-background-color: rgb(7 16 22 / 85%);
-
-// .login-component {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   height: 100vh;
-//   background: url('../../../assets/images/night.jpg') no-repeat center/cover;
-//   position: relative;
-
-//   &::after {
-//     content: '';
-//     position: absolute;
-//     inset: 0;
-//     background: rgba(0,0,0,0.5);
-//     z-index: 1;
-//   }
-
-//   .login-wrapper {
-//     position: relative;
-//     z-index: 2;
-//     background: $login-background-color;
-//     color: $text-color-light;
-//     padding: 1rem;
-//     border-radius: 15px;
-//     width: 100%;
-//     max-width: 750px;
-//     box-shadow: 0 2px 14px $btn-layer-1;
-//   }
-// }
-
-// /* Tabs */
-// .slide-controls {
-//   display: flex;
-//   position: relative;
-//   border: 1px solid $border-color;
-//   border-radius: 10px;
-//   margin-bottom: 1rem;
-
-//   .slide {
-//     flex: 1;
-//     text-align: center;
-//     padding: .5rem;
-//     background: transparent;
-//     color: $text-color-light;
-//     cursor: pointer;
-//     z-index: 2;
-//     border: none;
-
-//     &.active-tab {
-//       color: $text-color-dark;
-//       font-weight: 600;
-//       border: none;
-//     }
-//   }
-
-//   .slider-tab {
-//     position: absolute;
-//     top: 0; left: 0;
-//     width: 50%; height: 100%;
-//     background: linear-gradient(to right, $btn-layer-1, $btn-layer-4);
-//     border-radius: 10px;
-//     transition: left .3s ease;
-//     z-index: 1;
-//   }
-// }
-
-// .invalid-feedback {
-//   color: $error-color;
-//   background: transparent !important;
-//   text-align: end;
-//   font-size: x-small;
-// }
-
-// /* Two-column layout for signup */
-// .signup-columns {
-//   display: flex;
-//   flex-wrap: wrap;
-
-//   .col-md-6 {
-//     flex: 1 1 calc(50% - 1rem);
-//   }
-
-//   .file-upload-wrapper {
-//     display: flex;
-//     align-items: center;
-//     width: 100%;
-
-//     .text-right{
-//       text-align: right;
-//     }
-
-//     .file-upload-btn {
-//       flex-shrink: 0;
-//       background: $border-color;
-//       border: 1px solid $border-color;
-//       border-radius: 5px 1px 1px 5px;
-//       color: $text-color-light;
-//       padding: 16px;
-//       cursor: pointer;
-//       font-size: 1rem;
-//       text-align: center;
-//     }
-
-//     .file-upload-filename {
-//       flex: 1;
-//       background: transparent;
-//       border: 1px solid $border-color;
-//       border-left: none;
-//       border-radius: 0 5px 5px 0;
-//       color: $text-color-light;
-//       padding: 13px;
-//       font-size: 1rem;
-//     }
-
-//     .invalid-feedback {
-//       display: block;
-//       margin-top: .375rem;
-//     }
-
-//     /* При фокус врз скриениот file input да се стилува иреданто */
-//     input[type="file"]:focus + .file-upload-btn,
-//     input[type="file"]:focus + .file-upload-btn + .file-upload-filename {
-//       border-color: $btn-layer-4;
-//       box-shadow: 0 0 0 .2rem rgba($btn-layer-4, .25);
-//     }
-
-//     .is-invalid ~ .invalid-feedback {
-//       display: block;
-//     }
-//   }
-
-// }
-
-// /* Floating labels + invalid feedback */
-// .form-floating {
-//   background: transparent !important;
-
-//   input, .form-select {
-//     background: transparent !important;
-//     color: $text-color-light !important;
-//     border: 1px solid $border-color !important;
-//   }
-
-//   label {
-//     color: $text-color-light !important;
-//     background: transparent !important;
-//     font-size: 0.9rem;
-//   }
-
-//   .is-invalid + label {
-//     //color: $error-color !important;
-//     background: transparent !important;
-//   }
-
-//   .form-control:focus~label::after {
-//     background-color:  transparent !important;
-//   }
-
-//   .form-control:not(:placeholder-shown)~label::after {
-//     background-color:  transparent !important;
-//   }
-
-//   /* -------------------------------------------------- */
-//   /* Custom dropdown arrow styling for select */
-//   /* -------------------------------------------------- */
-//   select {
-//     height: 100%;
-//     width: 100%;
-//     padding: 1rem;
-//     background-color: transparent;
-//     border-radius: 5px;
-//     border: 1px solid $border-color  !important;
-//     color: $text-color-light !important;
-
-//     option{
-//       background: $btn-layer-1 !important;
-//       color: $text-color-light !important;
-//     }
-//   }
-
-//   select:focus {
-//     border-color: $btn-layer-4;
-//     box-shadow: 0 0 0 .2rem rgba($btn-layer-4, .25);
-//   }
-//   /* -------------------------------------------------- */
-// }
-
-// .extras-wrap{
-//   display: flex;
-//   justify-content: space-between;
-
-//   > div {
-//     min-width: 200px;
-//   }
-
-//   .extra-field{
-//     width: 48%;
-
-//     .form-select {
-//       background: transparent !important;
-//       color: $text-color-light !important;
-//       border: 1px solid $border-color  !important;
-
-//       option{
-//         background: $btn-layer-1 !important;
-//         color: $text-color-light !important;
-//       }
-//     }
-
-//     input{
-//       background-color: transparent;
-//       color: $text-color-light;
-//       border: 1px solid $border-color  !important;
-//     }
-
-//     label {
-//       color: $text-color-light !important;
-//     }
-
-//     .is-invalid + label {
-//       color: $error-color !important;
-//     }
-
-//     .form-control:focus~label::after {
-//       background-color:  #362c2c !important;
-//     }
-
-//     .upload-wrapper {
-//       flex-wrap: nowrap;
-//       border: 1px solid $border-color;
-//       border-radius: 5px;
-//       height: 4dvh;
-
-//       .search-file{
-//         height: 100%;
-//         width: 26%;
-//         border: 1px solid $border-color;
-//         border-radius: 5px 0px 0px 5px;
-//         background: $btn-layer-1;
-//         font-size: x-small;
-//       }
-
-//       .file-name {
-//         font-size: 0.9rem;
-//         white-space: nowrap;
-//         overflow: hidden;
-//         text-overflow: ellipsis;
-//         max-width: 200px; // adjust as needed
-//       }
-//     }
-
-//   }
-// }
-
-// .form-check {
-//   display: flex;
-//   align-items: center;
-//   gap: 0.5rem;
-//   margin: 1rem 0;
-
-//   position: relative;   /* за invalid-feedback да се позиционира */
-
-//   input[type="checkbox"] {
-//     width: 1.25rem;
-//     height: 1.25rem;
-//     border-radius: 5px;
-//     border: 1px solid $border-color !important;
-//   }
-
-//   label {
-//     color: $text-color-light !important;
-//   }
-
-//   .form-check-input.is-invalid {
-//     border-color: $error-color !important;
-//   }
-
-//   .form-check-input.is-invalid:focus {
-//     border-color: $error-color !important;
-//     box-shadow: 0 0 0 .2rem rgba($error-color, .25);
-//   }
-
-//   .invalid-feedback:empty {
-//     display: none;
-//   }
-// }
-
-
-// /* Input-group override for phone */
-// .input-group .form-control.is-invalid + .invalid-feedback {
-//   display: block;
-// }
-
-// .input-group .form-control {
-//   border-radius: 0px 5px 5px 0px !important;
-// }
-
-
-// .input-group .form-control.is-invalid {
-//   border-color: $error-color;
-//   color: $text-color-light !important;
-// }
-
-// .input-group .form-control.is-invalid:focus {
-//   border-color: $error-color;
-//   box-shadow: 0 0 0 .2rem rgba($error-color, .25);
-// }
-
-// .input-group .form-control:focus {
-//   border-color: $btn-layer-4;
-//   box-shadow: 0 0 0 .2rem rgba($btn-layer-4, .25);
-// }
-
-// .input-group-text {
-//   background: $btn-layer-1 !important;
-//   color: $text-color-light !important;
-//   border: 1px solid $border-color !important;
-//   border-radius: 0.5rem;
-//   font-size: x-small;
-// }
-
-
-// /* Toggle-eye */
-// .toggle-password {
-//   position: absolute;
-//   top: 50%;
-//   right: .75rem;
-//   transform: translateY(-50%);
-//   background: none;
-//   border: none;
-//   color: $text-color-light;
-//   cursor: pointer;
-//   z-index: 3;
-//   &:hover {
-//     color: $text-color-light;
-//   }
-// }
-
-// /* Footer */
-// .form-footer {
-//   text-align: right;
-//   margin-top: 0.5rem;
-//   .btn { padding: .75rem 1.5rem; }
-// }
-
-// /* Back button */
-// .back-btn {
-//   background: none;
-//   border: none;
-//   color: $btn-layer-4;
-//   margin-bottom: 1rem;
-//   display: flex;
-//   align-items: center;
-//   gap: .5rem;
-// }
-
-// /* Forgot link */
-// .forgot-password-link {
-//   color: $focus-color;
-//   cursor: pointer;
-//   &:hover {
-//     color: $btn-layer-2;
-//     text-decoration: underline;
-//   }
-// }
-
-// .consents-wrapper {
-//   display: flex;
-//   justify-content: space-between;
-//   gap: 1rem;
-
-//   /* Ако треба да ги прикажете label-ите поточно */
-//   .form-check {
-//     display: flex;
-//     align-items: flex-start;
-//     gap: 0.5rem;
-//     position: relative;
-//     margin-bottom: 0.5rem;
-
-//     label {
-//       /* За да се „повлече“ малку текстот спроти чек‐боксот */
-//       line-height: 1.4;
-//       font-size: xx-small;
-//     }
-
-//     .form-check-input.is-invalid {
-//       border-color: $error-color !important;
-//     }
-
-//     .invalid-feedback {
-//       position: absolute;
-//       bottom: -1.2rem; /* малку под чек‐боксот */
-//       left: 0;
-//       font-size: 0.75rem;
-//     }
-//   }
-
-//   .consents-column {
-//     width: 48%;
-//   }
-// }
-
-// /* Responsive */
-// @media (max-width: 768px) {
-//   .signup-columns .col-md-6 {
-//     flex: 1 1 100%;
-//   }
-//   .login-wrapper {
-//     padding: 1rem;
-//   }
-//   .extras-wrap {
-//     flex-direction: column;
-//     > div { margin-bottom: 1rem; }
-//   }
-// }
-
-
 // login.component.scss
 // near top of the file, after your imports
 @use 'sass:color';
@@ -435,7 +5,6 @@
 $input-border: rgba(255,255,255,0.7);
 $input-radius: 0.375rem;
 $input-padding: 0.5rem 0.75rem;
-$accent: #007bff;
 $text-light: #fff;
 
 // Colors (import from your theme if you like)
@@ -492,14 +61,14 @@ $border-color: #21415b;
     }
 
     .form-footer {
-      float: inline-end;
-      width: 15%;
-      text-align: center;
+      text-align: right;
+      margin-top: .5rem;
 
-      .btn{
-        width: 100% !important;
+      .btn { 
+        min-width: 9rem; 
       }
     }
+
 
     // Tab controls
     .slide-controls {
@@ -544,13 +113,22 @@ $border-color: #21415b;
       position: relative;
       margin-bottom: 1rem;
 
-      input.form-control {
+      input.form-control, .form-select {
         background: transparent;
         color: #fff;
-        border: 1px solid rgba(255,255,255,0.5);
+        border: 1px solid $border-color;
 
         &.is-invalid {
           border-color: #dc3545;
+        }
+
+        .form-select option {
+          background: $btn-layer-1;
+          color: $text-light;
+        }
+
+        label { 
+          color: rgba(255,255,255,.7); 
         }
       }
       label {
@@ -606,6 +184,7 @@ $border-color: #21415b;
       width: 100%;
       padding: 1rem;
       background-color: transparent;
+      border: 1px solid $border-color !important;
       border-radius: 5px;
       color: $text-color-light !important;
 

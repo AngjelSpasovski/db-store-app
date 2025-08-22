@@ -34,8 +34,8 @@
                   class="btn btn-sm btn-outline-dark"
                   [disabled]="resendLoading"
                   (click)="resendVerifyEmail()">
-            <span *ngIf="!resendLoading">Resend verification email</span>
-            <span *ngIf="resendLoading">Sending…</span>
+            <span *ngIf="!resendLoading">{{ 'RESEND_VERIFICATION' | translate }}</span>
+            <span *ngIf="resendLoading">{{ 'SENDING_VERIFICATION' | translate }}</span>
           </button>
         </div>
 
@@ -46,15 +46,15 @@
           {{ serverErrorMsg }}
         </div>
 
-
-
         <!-- Email -->
         <div class="form-floating mb-1">
-          
-          <input type="email" id="loginEmail" class="form-control" formControlName="email"  placeholder=" "
-            [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('email')?.invalid}" autocomplete="off"/>
-          <label for="loginEmail">{{ 'EMAIL' | translate }}</label>
+          <input  type="email" id="loginEmail" class="form-control" 
+                  formControlName="email"  placeholder=" "
+                  autocomplete="username"
+                  [attr.aria-describedby]="loginSubmitted && loginForm.get('email')?.invalid ? 'loginEmailErr' : null"
+                  [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('email')?.invalid}" />
 
+          <label for="loginEmail">{{ 'EMAIL' | translate }}</label>
           <div class="invalid-feedback" *ngIf="loginSubmitted && loginForm.get('email')?.invalid">
             {{ getError(loginForm,'email') }}
           </div>
@@ -63,13 +63,11 @@
         <!-- Password -->
         <div class="form-floating mb-1 position-relative">
           <input
-            [type]="showPassword?'text':'password'"
-            id="loginPass"
-            class="form-control"
-            formControlName="password"
-            placeholder=" "
-            [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('password')?.invalid}"
-          />
+            [type]="showPassword?'text':'password'" id="loginPass" class="form-control"
+            formControlName="password"  placeholder=" "
+            [attr.aria-describedby]="loginSubmitted && loginForm.get('password')?.invalid ? 'loginPassErr' : null"
+            [ngClass]="{'is-invalid': loginSubmitted && loginForm.get('password')?.invalid}"/>
+
           <label for="loginPass">{{ 'PASSWORD' | translate }}</label>
           <button *ngIf="! (loginSubmitted && loginForm.get('password')?.invalid)" 
                   class="toggle-password" 
@@ -93,6 +91,12 @@
           </div>
         </div>
 
+        <button type="submit"
+                class="btn btn-primary w-100 mt-2"
+                [disabled]="loginForm.invalid">
+          {{ 'LOGIN' | translate }}
+        </button>
+
       </form>
 
       <!-- SIGNUP FORM -->
@@ -105,6 +109,7 @@
             <div class="form-floating mb-1">
               <input type="email" id="suEmail" class="form-control"
                     formControlName="email" name="from_email" placeholder=" "
+                    autocomplete="username"
                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('email')?.invalid}" />
               <label for="suEmail">{{ 'EMAIL' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'email') }}</div>
@@ -130,8 +135,10 @@
 
             <!-- Password -->
             <div class="form-floating mb-1 position-relative">
-              <input [type]="showPassword ? 'text' : 'password'" id="suPass" class="form-control" formControlName="password"
-                placeholder=" " [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('password')?.invalid}" />
+              <input [type]="showPassword ? 'text' : 'password'" id="suPass" class="form-control" 
+                      formControlName="password" placeholder=" " 
+                      autocomplete="current-password"
+                      [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('password')?.invalid}" />
               <label for="suPass">{{ 'PASSWORD' | translate }}</label>
               <button *ngIf="! (signupSubmitted && signupForm.get('password')?.invalid)" class="toggle-password" type="button"
                 (click)="togglePasswordVisibility()">
@@ -172,8 +179,9 @@
 
             <!-- Phone Number -->
             <div class="form-floating mb-1">
-              <input type="number" id="suPhone" class="form-control"
+              <input type="text" id="suPhone" class="form-control"
                     formControlName="phoneNumber" placeholder=" "
+                    inputmode="numeric"
                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('phoneNumber')?.invalid}" />
               <label for="suPhone">{{ 'PHONE_NUMBER' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'phoneNumber') }}</div>
@@ -181,8 +189,9 @@
 
             <!-- VAT Number -->
             <div class="form-floating mb-1">
-              <input type="number" id="suVat" class="form-control"
+              <input type="text" id="suVat" class="form-control"
                     formControlName="vat" placeholder=" "
+                    inputmode="numeric"
                     [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('vat')?.invalid}" />
               <label for="suVat">{{ 'VAT_NUMBER' | translate }}</label>
               <div class="invalid-feedback">{{ getError(signupForm,'vat') }}</div>
@@ -239,8 +248,10 @@
 
             <!-- Role -->
             <div class="form-floating mb-1">
-              <select id="suRole" formControlName="role"  [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('role')?.invalid}">
-                <option value="" disabled selected>* {{ 'ROLE_IN_COMPANY' | translate }} *</option>
+              <select id="suRole" class="form-select"
+                      formControlName="role"
+                      [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('role')?.invalid}">
+                <option value="" disabled>{{ 'ROLE_IN_COMPANY' | translate }}</option>
                 <option value="Owner">{{ 'OWNER' | translate }}</option>
                 <option value="Marketing Manager">{{ 'MARKETING_MANAGER' | translate }}</option>
                 <option value="Manager">{{ 'MANAGER' | translate }}</option>
@@ -248,8 +259,8 @@
                 <option value="Sales">{{ 'SALES' | translate }}</option>
                 <option value="Other">{{ 'OTHER' | translate }}</option>
               </select>
-
-              <div class="invalid-feedback">
+              <!-- <label for="suRole">{{ 'ROLE_IN_COMPANY' | translate }}</label> -->
+              <div class="invalid-feedback d-block">
                 {{ getError(signupForm,'role') }}
               </div>
             </div>
@@ -296,10 +307,7 @@
               <input type="checkbox" id="privacyPolicy" class="form-check-input" formControlName="privacyPolicy"
                 [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('privacyPolicy')?.invalid}" />
               <label class="form-check-label" for="privacyPolicy">
-                {{ 'ACCEPT_TERMS_1' | translate }}
-                <a href="../../../assets/privacy/privacy-policy-it.pdf" target="_blank">
-                  {{ 'PRIVACY_POLICY' | translate }}
-                </a>
+                {{ 'ACCEPT_TERMS_1' | translate }}<a href="../../../assets/privacy/privacy-policy/privacy-policy-IT.pdf" target="_blank" rel="noopener noreferrer"> {{ 'PRIVACY_POLICY' | translate }}</a>
               </label>
             </div>
             <div *ngIf="signupSubmitted && signupForm.get('privacyPolicy')?.invalid" class="invalid-feedback d-block"
@@ -364,21 +372,12 @@
         <!-- === Крај на делот за consents === -->
 
         <!-- Submit Button -->
-        <div class="form-footer">
-          <button type="submit" class="btn btn-primary">
-            {{ 'SIGNUP' | translate }}
-          </button>
-        </div>
+         
+        <button type="submit" class="btn btn-primary w-100 mt-2">  <!-- [disabled]="signupForm.invalid" -->
+          {{ 'SIGNUP' | translate }}
+        </button>
         
       </form>
-    </div>
-
-    <!-- FOOTER with unified Submit -->
-    <div class="form-footer">
-      <button type="button" class="btn btn-primary"
-       *ngIf="activeForm==='login'" (click)="onSubmitLogin()">
-        {{ 'LOGIN' | translate }}
-      </button>
     </div>
 
   </div>

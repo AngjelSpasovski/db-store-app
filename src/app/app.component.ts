@@ -26,7 +26,7 @@ import { AppTitleService } from './shared/app-title.service';
 })
 export class AppComponent implements OnInit {
 
-  public currentView: 'home' | 'login' | 'forgot-password' | 'user' = 'home';
+  public currentView: 'home' | 'login' | 'forgot-password' |'reset-password' | 'user' = 'home';
   public userEmail: string = '';
   public isLoggedIn: boolean = false;
 
@@ -41,7 +41,8 @@ export class AppComponent implements OnInit {
     private titles: AppTitleService,
     private language: LanguageService
   ) {
-    this.translate.setDefaultLang('en'); // Set default language
+    // Set default language for ngx-translate
+    this.translate.setDefaultLang('en'); 
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -52,6 +53,9 @@ export class AppComponent implements OnInit {
         }
         else if (url.includes('/forgot-password')) {
           this.currentView = 'forgot-password';
+        }
+        else if (url.includes('/reset-password')) {
+          this.currentView = 'reset-password';
         }
         else if (url.includes('/user')) {
           this.currentView = 'user';

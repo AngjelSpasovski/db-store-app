@@ -1,9 +1,10 @@
 <header class="app-header"
         [ngClass]="{
-          'header-home': viewMode === 'home',
-          'header-login': viewMode === 'login',
-          'header-forgot': viewMode === 'forgot-password',
-          'header-user': viewMode === 'user'
+          'header-home':    viewMode === 'home',
+          'header-login':   viewMode === 'login',
+          'header-forgot':  viewMode === 'forgot-password',
+          'header-reset':   viewMode === 'reset-password',
+          'header-user':    viewMode === 'user'
         }">
 
   <!-- HOME VIEW NAVIGATION BAR -->
@@ -41,7 +42,7 @@
   </nav>
 
   <!-- LOGIN / FORGOT-PASSWORD VIEW -->
-  <div *ngIf="viewMode === 'login' || viewMode === 'forgot-password'" class="navbar navbar-expand-lg navbar-light w-100 login-nav bg-dark">
+  <div *ngIf="viewMode === 'login' || viewMode === 'forgot-password' || viewMode === 'reset-password'" class="navbar navbar-expand-lg navbar-light w-100 login-nav bg-dark">
     <div class="container-fluid">
       
       <a class="navbar-brand">

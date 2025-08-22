@@ -96,6 +96,12 @@
         "SERVER_ERROR": "Грешка на серверот: Ве молиме обидете се повторно подоцна."
     },
 
+    "CONFIRM_EMAIL": "Потврди е-пошта",
+    "RESEND_VERIFICATION": "Испрати повторно верификација",
+    "VERIFICATION_SENT": "Е-поштата за верификација е испратена.",
+    "SENDING_VERIFICATION": "Испраќање ...",
+    "COOKIES_POLICY": "Политика за колачиња",
+
     "SEND_RESET_CODE": "Испрати код",
     "ENTER_RESET_CODE": "Внесете го кодот за ресетирање",
     "VERIFY_CODE": "Потврди код",

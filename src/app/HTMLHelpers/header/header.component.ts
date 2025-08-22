@@ -18,7 +18,7 @@ import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 export class HeaderComponent implements OnInit, OnDestroy {
   faSignOutAlt = faSignOutAlt;
 
-  @Input() viewMode: 'home' | 'login' | 'forgot-password' | 'user' = 'home';
+  @Input() viewMode: 'home' | 'login' | 'forgot-password' |'reset-password' | 'user' = 'home';
   @Input() isLoggedIn = false;
   @Input() userEmail = '';
 
@@ -39,6 +39,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         const url: string = e.urlAfterRedirects || e.url;
         if (url.includes('/login')) {               this.viewMode = 'login'; }
         else if (url.includes('/forgot-password')){ this.viewMode = 'forgot-password'; }
+        else if (url.includes('/reset-password')){  this.viewMode = 'reset-password'; }
         else if (url.includes('/user')){            this.viewMode = 'user'; }
         else  {                                     this.viewMode = 'home'; }
       });

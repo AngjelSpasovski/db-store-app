@@ -50,10 +50,13 @@ export class AppTitleService {
   }
 
   private setTitle(main: string) {
-    const safe = (main || '').trim();
-    const finalTitle = safe ? `${safe}${this.sep}${this.appName}` : this.appName;
-    this.title.setTitle(finalTitle);
-  }
+  const safe = (main || '').trim();
+  const isKey = /^[A-Z0-9_.-]+$/.test(safe);        // ако личи на i18n key
+  const show  = isKey ? this.i18n.instant(safe) : safe;
+  const finalTitle = show ? `${show}${this.sep}${this.appName}` : this.appName;
+  this.title.setTitle(finalTitle);
+}
+
 
   private getDeepest(s: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
     let cur = s;

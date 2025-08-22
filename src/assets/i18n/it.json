@@ -96,6 +96,12 @@
         "SERVER_ERROR": "Errore del server. Riprova più tardi."
     },
 
+    "CONFIRM_EMAIL": "Conferma email",
+    "RESEND_VERIFICATION": "Invia nuovamente la verifica",
+    "VERIFICATION_SENT": "Email di verifica inviata.",
+    "SENDING_VERIFICATION": "Invio in corso ...",
+    "COOKIES_POLICY": "Politica sui cookie",
+
     "SEND_RESET_CODE": "Invia codice",
     "ENTER_RESET_CODE": "Inserisci il codice di reimpostazione",
     "VERIFY_CODE": "Verifica codice",

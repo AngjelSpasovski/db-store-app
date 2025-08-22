@@ -95,6 +95,12 @@
         "SERVER_ERROR": "Server error. Please try again later."
     },
 
+    "CONFIRM_EMAIL": "Confirm Email",
+    "RESEND_VERIFICATION": "Resend Verification",
+    "VERIFICATION_SENT": "Verification email sent.",
+    "SENDING_VERIFICATION": "Sending ...",
+    "COOKIES_POLICY": "Cookies Policy",
+
     "SEND_RESET_CODE": "Send Code",
     "ENTER_RESET_CODE": "Enter Reset Code",
     "VERIFY_CODE": "Verify Code",
