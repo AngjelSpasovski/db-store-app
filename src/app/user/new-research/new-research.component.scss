@@ -13,13 +13,28 @@ $card-header-bg: #2a3443;
 $card-button-bg: #42526a;
 $card-price-color: #658eb6;
 
+$card-header-bg:    #2a3443;
+$card-button-bg:    #42526a;
+$border-color:      color.adjust($darker, $lightness: 20%);
+
 .new-research {
-  height: 81vh;
-  overflow-y: auto;
-  background: $dark;
-  border-radius: 0.5rem;
-  padding: 2rem;
-  box-shadow: 0 2px 8px $darker;
+    /* Theme tokens */
+    --bg-0: #0f1216;
+    --bg-1: #141922;
+    --bg-2: #1b212b;
+    --text-0: #e9eef6;
+    --text-1: #c7cfda;
+    --muted: #99a3b3;
+    --border: rgba(255, 255, 255, .08);
+    --brand: #0d6efd;
+    --danger: #dc3545;
+
+  // height: 81vh;
+  // overflow-y: auto;
+  // background: $dark;
+  // border-radius: 0.5rem;
+  // padding: 2rem;
+  // box-shadow: 0 2px 8px $darker;
 
   .inner-title {
     font-size: 1.5rem;
@@ -28,7 +43,7 @@ $card-price-color: #658eb6;
     color: $light;
   }
 
-  .form-label { font-weight: 600; }
+  .form-label { font-weight: 600; float: right; }
   .list-group { margin-top: 2rem; }
 
   &-toast-container {
@@ -38,9 +53,20 @@ $card-price-color: #658eb6;
   .input-group {
     // 1) Make the text field dark & rounded on the right
     .form-control {
-      background: #495057;
-      color:      $light;
-      border:     1px solid color.adjust($darker, $lightness: 20%);
+      background: $darker;
+      height: 2.75rem;
+      background: $darker;
+      border: 1px solid $border-color;
+      border-radius: 0.5rem;
+      color: $light;
+      &::placeholder {
+        color: color.adjust($light, $lightness: -40%);
+      }
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba($card-button-bg, 0.25);
+        border-color: $card-button-bg;
+      }
+
       // remove the right-side radius so it meets the button cleanly
       border-top-right-radius:   0;
       border-bottom-right-radius: 0;

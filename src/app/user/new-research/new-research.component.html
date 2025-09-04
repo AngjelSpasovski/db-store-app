@@ -1,16 +1,18 @@
 <section class="container new-research p-4">
 
-  <h3 class="inner-title mb-3">{{ 'SEARCH_PERSON' | translate }} </h3>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">{{ 'SEARCH_PERSON' | translate }}</h3>
+  </div>
 
   <!-- Search Form -->
   <form [formGroup]="searchForm" (ngSubmit)="submit()">
 
-    <div class="container mb-3">
+    <div class="mb-3">
 
       <label for="id" class="form-label">{{ 'PERSONAL_ID_NUMBER' | translate }}  ----- ({{ 'VALID_TEST_SEARCH_CASES' | translate }}: '12345678910', '10020030040', '20030040050')</label>
       
       <div class="input-group">
-        <input id="id" type="text" class="form-control" formControlName="id" placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}" />
+        <input id="id" type="search" class="form-control" formControlName="id" placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}" />
         <button type="submit" class="btn btn-primary" [disabled]="searchForm.invalid">{{ 'SEARCH' | translate }}</button>
       </div>
       <div *ngIf="searchForm.get('id')?.invalid && searchForm.get('id')?.touched" class="text-danger small">{{ 'ID_MUST_BE_11_DIGITS' | translate }}</div>
