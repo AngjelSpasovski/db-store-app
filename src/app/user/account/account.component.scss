@@ -1,0 +1,159 @@
+/* ───────────────── Account page scope ───────────────── */
+.account-page {
+    /* Theme tokens */
+    --bg-0: #0f1216;
+    --bg-1: #141922;
+    --bg-2: #1b212b;
+    --text-0: #e9eef6;
+    --text-1: #c7cfda;
+    --muted: #99a3b3;
+    --border: rgba(255, 255, 255, .08);
+    --brand: #0d6efd;
+    --danger: #dc3545;
+
+    /* Page title */
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    /* Dark cards */
+    .acc-card {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, .22);
+        overflow: hidden;
+        color: var(--muted);
+
+        .card-header {
+            background: rgba(255, 255, 255, .04);
+            border-bottom: 1px solid var(--border);
+            color: var(--text-1);
+            font-weight: 600;
+            padding: .65rem .9rem;
+        }
+
+        .card-body {
+            padding: .9rem;
+        }
+    }
+
+    /* Label + value (view mode) */
+    .label {
+        font-size: .8rem;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: inline-block;
+        min-width: 120px;
+        margin-right: .75rem;
+    }
+
+    .value {
+        color: var(--text-0);
+        font-weight: 500;
+    }
+
+    /* Inputs – dark, compact */
+    .form-label {
+        color: var(--text-1);
+    }
+
+    .form-control {
+        background: #12161c;
+        color: var(--text-0);
+        border: 1px solid var(--border);
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, .35);
+    }
+
+    .form-control:focus {
+        background: #151a21;
+        color: #fff;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .12);
+    }
+
+    /* Password eye */
+    .input-wrap {
+        position: relative;
+    }
+
+    .toggle-eye {
+        position: absolute;
+        top: 50%;
+        right: .6rem;
+        transform: translateY(-50%);
+        background: transparent;
+        border: 0;
+        padding: 0;
+        color: rgba(255, 255, 255, .65);
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .toggle-eye:hover,
+    .toggle-eye:focus-visible {
+        color: #fff;
+        outline: none;
+    }
+
+    /* Validation */
+    .is-invalid,
+    .ng-invalid.ng-touched.form-control {
+        border-color: var(--danger) !important;
+    }
+
+    .invalid {
+        color: #f28b82;
+    }
+
+    /* Credits */
+    .credits-number {
+        font-size: 2.8rem;
+        font-weight: 800;
+        letter-spacing: .5px;
+    }
+
+    /* Packages list */
+    .package-row {
+        background: rgba(255, 255, 255, .02);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: .4rem;
+        padding: .75rem .9rem;
+    }
+
+    /* Actions */
+    .btn-outline-light {
+        --bs-btn-color: var(--text-1);
+        --bs-btn-border-color: var(--border);
+        --bs-btn-hover-bg: rgba(255, 255, 255, .08);
+        --bs-btn-hover-border-color: var(--border);
+    }
+
+    .btn:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+    }
+
+    /* Keep heights aligned on the first row */
+    .row.g-3>[class*="col-"] .acc-card {
+        height: 100%;
+    }
+
+    /* Small screens */
+    @media (max-width: 768px) {
+        .label {
+            min-width: 96px;
+        }
+
+        .btn-sm {
+            padding: .35rem .6rem;
+        }
+    }
+}

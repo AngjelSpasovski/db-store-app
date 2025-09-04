@@ -6,7 +6,7 @@ import { AuthService } from '../../auth/auth.service';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-header',
@@ -16,13 +16,14 @@ import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
   imports: [CommonModule, LanguageSelectorComponent, FontAwesomeModule, TranslateModule]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  faSignOutAlt = faSignOutAlt;
+  // icons
+  public faSignOutAlt = faSignOutAlt;
 
   @Input() viewMode: 'home' | 'login' | 'forgot-password' |'reset-password' | 'user' = 'home';
   @Input() isLoggedIn = false;
   @Input() userEmail = '';
 
-  showSettingsMenu = false;
+  public showSettingsMenu = false;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -71,4 +72,5 @@ export class HeaderComponent implements OnInit, OnDestroy {
     evt.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
 }

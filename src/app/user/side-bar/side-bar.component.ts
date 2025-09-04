@@ -44,8 +44,8 @@ export class SidebarComponent {
     { label: 'BUY_CREDITS', icon: '🛒', route: '/user/buy-credits' },
     { label: 'SEARCH',      icon: '🔍', route: '/user/new-research' },
     { label: 'BILLING',     icon: '💳', route: '/user/billing' },
-//  { label: 'HISTORY',     icon: '📜', route: '/user/history' },
     { label: 'FAQS',        icon: '❓', route: '/user/faqs' },
+    { label: 'ACCOUNT',     icon: '👤', route: '/user/account' },
     // …
   ];
 

@@ -14,6 +14,8 @@ import { HistoryComponent } from './history/history.component';
 import { BillingComponent } from './billing/billing.component';
 import { FaqsComponent } from './faqs/faqs.component';
 
+import { AccountComponent } from './account/account.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -29,7 +31,8 @@ import { FaqsComponent } from './faqs/faqs.component';
     NewResearchComponent,
     HistoryComponent,
     BillingComponent,
-    FaqsComponent
+    FaqsComponent,
+    AccountComponent   
   ]
 })
 export class UserModule {}

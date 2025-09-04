@@ -96,6 +96,22 @@ $header-total-height-margin: 70px; // Adjusted for larger header
     }
   }
 
+  .sidebar__menu li a:hover {
+    background: rgba(255, 255, 255, .06);
+    border-radius: 4px;
+  }
+
+  .sidebar__menu li.active a {
+    background: linear-gradient(135deg, #00509e, #0a66c2);
+    color: #fff;
+  }
+
+  /* малку попрегледни икони */
+  .sidebar__menu .icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
   /* Mobile off-canvas */
   @media (max-width: 991px) {
     &.open   { transform: translateX(0); }

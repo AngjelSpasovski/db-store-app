@@ -12,6 +12,7 @@ import { TermsComponent } from './PRIVACY/terms/terms.component';
 import { CookiesPolicyComponent } from './PRIVACY/cookies-policy/cookies-policy.component';
 import { RefundPolicyComponent } from './PRIVACY/refund-policy/refund-policy.component';
 import { ServiceDeliveryPolicyComponent } from './PRIVACY/service-delivery-policy/service-delivery-policy.component';
+import { AccountComponent } from './account/account.component';
 import { roleGuard } from '../auth/role.guard';
 
 
@@ -37,6 +38,9 @@ const routes: Routes = [
       { path: 'cookies-policy',          component: CookiesPolicyComponent,          data: { title: 'COOKIES' } },
       { path: 'refund-policy',           component: RefundPolicyComponent,           data: { title: 'REFUND_POLICY' } },
       { path: 'service-delivery-policy', component: ServiceDeliveryPolicyComponent,  data: { title: 'SERVICE_DELIVERY_POLICY' } },
+
+      // account page
+      { path: 'account',                 component: AccountComponent,                data: { title: 'ACCOUNT',        roles: ['user','admin','superadmin'] } },
 
 
       // ⬇️ Пример за admin-only подоцна:
