@@ -1,23 +1,25 @@
-<section class="container buy-credits p-4 ">
+<section class="container credits-page py-3">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">{{ 'BUY_CREDITS_TITLE' | translate}} </h3>
+    <h3 class="m-0">{{ 'BUY_CREDITS_TITLE' | translate }}</h3>
   </div>
- 
 
-  <!-- Grid of cards -->
   <div class="card-grid">
     <div class="container-fluid px-0 h-100 overflow-auto">
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
         <div class="col" *ngFor="let pkg of creditPackages; trackBy: trackByCredits">
-          <div class="card credit-card">
-
-            <div class="card-header text-white">
+          <div class="card acc-card credit-card h-100">
+            <div class="card-header">
               {{ pkg.credits | number }} {{ 'CREDITS' | translate }}
             </div>
 
-            <div class="card-body text-center text-white">
-              <p class="price display-6 mb-4">{{ pkg.price }}</p>
-              <button type="button" class="btn btn-lg w-100" (click)="purchase(pkg)">{{ 'BUY_NOW' | translate}}<i class="bi bi-cart-plus ms-2"></i></button>
+            <div class="card-body text-center">
+              <!-- ако pkg.price е број, користи currency pipe; ако е стринг '199€', остави само {{ pkg.price }} -->
+              <div class="price display-6 mb-3">
+                {{ pkg.price }}
+              </div>
+              <button type="button" class="btn w-100 btn-buy" (click)="purchase(pkg)">
+                {{ 'BUY_NOW' | translate }} <i class="bi bi-cart-plus ms-2"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -25,4 +27,3 @@
     </div>
   </div>
 </section>
-

@@ -9,7 +9,9 @@
     --muted: #99a3b3;
     --border: rgba(255, 255, 255, .08);
     --brand: #0d6efd;
+    --brand-2:#495662;
     --danger: #dc3545;
+    
 
     /* Page title */
     .page-title {
@@ -139,6 +141,27 @@
     .btn:disabled {
         opacity: .6;
         cursor: not-allowed;
+    }
+
+    .btn-buy {
+        font-weight: 600;
+        letter-spacing: .2px;
+
+        /* основна состојба */
+        --bs-btn-bg: var(--brand-2);
+        --bs-btn-border-color: var(--brand-2);
+        --bs-btn-color: var(--text-0);
+
+        /* само текстот да побелува на hover/focus */
+        transition: color .18s ease;
+    }
+    .btn-buy:hover,
+    .btn-buy:focus-visible {
+        color: #fff;
+        /* bg останува ист, затоа НЕ ставаме --bs-btn-hover-bg различен */
+        --bs-btn-bg: var(--brand-2);
+        --bs-btn-border-color: var(--brand-2);
+        outline: none;
     }
 
     /* Keep heights aligned on the first row */
