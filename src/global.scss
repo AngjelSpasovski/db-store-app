@@ -1,4 +1,13 @@
-:root { --header-height: 64px; /* прилагоди ако треба */ }
+/* ============ Global button design system ============ */
+:root { 
+  --header-height: 64px;  /* прилагоди ако треба */ 
+
+  --brand-1: #0d6efd;    /* primary */
+  --brand-2: #495662;    /* neutral CTA (buy) */
+  --text-0:  #e9eef6;
+  --border:  rgba(255,255,255,.12);
+  --focus:   rgba(13,110,253,.25);
+}
 
 #toast-container {
   top: calc(var(--header-height) + 12px);
@@ -7,3 +16,49 @@
 }
 
 #toast-container .toast { margin-top: .5rem; }
+
+/* Base for all app buttons (keeps Bootstrap behavior) */
+.btn-app{
+  font-weight: 600;
+  letter-spacing: .2px;
+  --bs-btn-border-width: 1px;
+  --bs-btn-color: var(--text-0);
+  --bs-btn-bg: var(--btn-bg, var(--brand-2));
+  --bs-btn-border-color: var(--btn-border, var(--brand-2));
+  --bs-btn-hover-bg: var(--btn-bg-hover, var(--btn-bg));
+  --bs-btn-hover-border-color: var(--btn-border-hover, var(--btn-border));
+  --bs-btn-disabled-opacity: .6;
+  box-shadow: none;
+}
+.btn-app:focus-visible{ box-shadow: 0 0 0 .2rem var(--focus); outline: 0; }
+
+/* Variants */
+.btn-buy{ /* identical look on Account & Buy Credits */
+  --btn-bg: var(--brand-2);
+  --btn-border: var(--brand-2);
+  --btn-bg-hover: var(--brand-2); /* bg не се менува */
+  color: var(--text-0);
+  transition: color .18s ease;
+}
+.btn-buy:hover,
+.btn-buy:focus-visible{ color: #fff; }
+
+/* Optional extras you can reuse anywhere */
+.btn-primary-app{
+  --btn-bg: var(--brand-1);
+  --btn-border: var(--brand-1);
+  /* keep hover bg same for consistency in dark UIs */
+  --btn-bg-hover: var(--brand-1);
+}
+
+.btn-ghost{
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--border);
+  --bs-btn-hover-bg: rgba(255,255,255,.08);
+  --bs-btn-hover-border-color: var(--border);
+  color: var(--text-0);
+}
+
+/* Sizes (if you need them) */
+.btn-app-sm{ padding: .35rem .6rem; font-size: .875rem; }
+.btn-app-lg{ padding: .6rem 1rem;   font-size: 1rem;    }
