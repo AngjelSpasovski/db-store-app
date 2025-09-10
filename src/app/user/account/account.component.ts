@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors, FormGroup } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -10,6 +11,7 @@ import { startWith } from 'rxjs';
 
 import { UserService, UserDetailsDTO } from '../user.service';
 import { ToastService } from '../../shared/toast.service';
+import { CreditsService } from '../buy-credits/credit.service';
 
 @Component({
   selector: 'app-account',
@@ -19,7 +21,8 @@ import { ToastService } from '../../shared/toast.service';
     RouterModule,
     DatePipe,
     ReactiveFormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    TranslateModule
   ],
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss']
@@ -36,13 +39,16 @@ export class AccountComponent implements OnInit {
   editMode = false;
 
   data: UserDetailsDTO | null = null;
-  credits = 0;
   form!: FormGroup; // non-null
+
+  public credits$ = this.creditsSvc.credits$;    // ← Observable на кредити
 
   constructor(
     private api: UserService,
     private toast: ToastService,
-    private fb: FormBuilder
+    private translate: TranslateService,
+    private fb: FormBuilder,
+    private creditsSvc: CreditsService
   ) { }
 
   ngOnInit(): void {
@@ -140,7 +146,9 @@ cancelEdit() {
       .subscribe({
         next: d => {
           this.data = d;
-          this.api.getCredits().subscribe(r => this.credits = r.credits);
+          debugger;
+          this.credits$ = this.creditsSvc.credits$;
+          console.log(this.credits$);
         },
         error: () => this.toast.error('Failed to load account details', { position: 'top-end' })
       });

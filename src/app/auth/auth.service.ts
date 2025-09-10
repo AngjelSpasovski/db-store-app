@@ -167,20 +167,4 @@ export class AuthService {
     const raw = localStorage.getItem(USER_KEY) ?? sessionStorage.getItem(USER_KEY);
     try { return raw ? (JSON.parse(raw) as AuthUser) : null; } catch { return null; }
   }
-
-  /* =======================
-   * LEGACY (deprecated) MOCK CODE — keep commented until UI миграцијата е завршена
-   * =======================
-   *
-   * interface User { id:number; name:string; email:string; password:string; role:string; }
-   * private usersKey = 'users';
-   *
-   * private getUsers(): User[] { ... }
-   * private saveUsers(users: User[]): void { ... }
-   * register(name: string, email: string, password: string) { ... }
-   * login(email: string, password: string, rememberMe: boolean) { ... }
-   * generateResetCode(email: string) { ... }
-   * verifyResetCode(email: string, code: string) { ... }
-   * updateUserPassword(email: string, newPassword: string) { ... }
-   */
 }

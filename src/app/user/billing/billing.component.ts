@@ -1,125 +1,96 @@
-
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }  from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AgGridModule }  from 'ag-grid-angular';
-import { BillingService, Invoice } from '../billing/billing.service';;
-
-import { SearchHistoryService, SearchRecord } from '../new-research/new-search-history.service';
-
-// Importing themes from ag-Grid
+import { AgGridModule } from 'ag-grid-angular';
 import { themeAlpine } from 'ag-grid-community';
+import { BillingService, Invoice } from './billing.service';
 
 @Component({
   selector: 'app-billing',
+  standalone: true,
   templateUrl: './billing.component.html',
   styleUrls: ['./billing.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    TranslateModule,
-    AgGridModule
-  ]
+  imports: [CommonModule, TranslateModule, AgGridModule],
 })
-export class BillingComponent  implements OnInit {
-
-  records: SearchRecord[] = [];
-  filterId = '';
-  sortField: 'id' | 'timestamp' = 'timestamp';
-  sortAsc = false;
-
-  // ag-Grid config
+export class BillingComponent implements OnInit {
   columnDefs: any[] = [];
   defaultColDef = { sortable: true, filter: true, resizable: true, flex: 1 };
   rowData: any[] = [];
 
-   public theme = themeAlpine.withParams({
-      
-    backgroundColor: '#343a40',           // main background color
-    foregroundColor: '#e0e0e0',            // optional: grid text color
-
-    headerBackgroundColor: '#495057',   // header background color
-    headerTextColor: '#ffffff',         // header text color
-    borderColor: 'black',             // border color for cells
-    textColor: '#ffffff',               // main text color
-    cellTextColor: '#ffffff',           // cell text color
-    
-
-    accentColor: 'blue',           // accent color for buttons, etc. 
-    headerHeight: 50,                 // header height
-    rowHeight: 40,                    // row height
-    fontFamily: 'Roboto, sans-serif', // font family & size
-    fontSize: '14px'                  // font size
+  // Dark theme params (усогласено со останатиот UI)
+  public theme = themeAlpine.withParams({
+    backgroundColor: '#1b212b',                         // main background color
+    foregroundColor: '#e9eef6',                         // optional: grid text color
+    headerBackgroundColor: '#2a303a',                   // header background color
+    headerTextColor: '#c7cfda',                         // header text color
+    textColor: '#e9eef6',                               // border color for cells
+    cellTextColor: '#e9eef6',                           // cell text color
+    borderColor: 'rgba(255,255,255,.08)',               // border color for cells
+    rowHeight: 40,                                        // default row height
+    headerHeight: 48,                                     // header height
+    fontFamily: 'Inter, system-ui, Roboto, sans-serif',   // font family
+    fontSize: '14px',                                     // font size
+    accentColor: '#0d6efd',                             // accent color, e.g. for selected rows
   });
 
   constructor(
-    private historySvc: SearchHistoryService,
     private billingSvc: BillingService,
-    private translate: TranslateService) {}
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
-    this.records = this.historySvc.getAll();
+    this.agGridInit();
+  }
 
-    // fetch raw invoices
+  public agGridInit() {
     const invoices: Invoice[] = this.billingSvc.getAll();
 
-    // map into rowData
-    this.rowData = invoices.map(inv => ({
-      id:        inv.id,
+    // map -> grid rows
+    this.rowData = invoices.map((inv) => ({
+      id: inv.id,
       timestamp: new Date(inv.timestamp),
-      success:   inv.credits > 0,     // or however you flag success
+      credits: inv.credits,
+      amount: inv.amount,
+      success: inv.credits > 0,
     }));
 
-        // define columns, using instant translations
     this.columnDefs = [
       {
-        field:      'id',
-        headerName: this.translate.instant('ID_NUMBER')
+        field: 'id',
+        headerName: this.translate.instant('ID_NUMBER'),
+        minWidth: 240,
       },
-
       {
-        field:      'timestamp',
+        field: 'timestamp',
         headerName: this.translate.instant('TIMESTAMP'),
-        filter:     'agDateColumnFilter',
-        valueFormatter: (params: { value: { toLocaleString: () => any; }; }) =>
-          params.value ? params.value.toLocaleString() : ''
+        filter: 'agDateColumnFilter',
+        valueFormatter: (p: any) => (p.value ? p.value.toLocaleString() : ''),
+        sort: 'desc',
+        minWidth: 190,
       },
-
       {
-        field:      'success',
+        field: 'credits',
+        headerName: this.translate.instant('CREDITS'),
+        minWidth: 120,
+      },
+      {
+        field: 'amount',
+        headerName: this.translate.instant('AMOUNT'),
+        valueFormatter: (p: any) =>
+          p.value == null ? '' : `${p.value.toFixed(0)} €`,
+        minWidth: 120,
+      },
+      {
+        field: 'success',
         headerName: this.translate.instant('STATUS'),
-        cellRenderer: (params: { value: any; }) => {
-          const ok = params.value;
-          const text = ok
-            ? this.translate.instant('SUCCESS')
-            : this.translate.instant('FAILED');
+        minWidth: 120,
+        cellRenderer: (p: any) => {
+          const ok = !!p.value;
+          const text = ok ? this.translate.instant('SUCCESS') : this.translate.instant('FAILED');
           const cls = ok ? 'badge bg-success' : 'badge bg-danger';
           return `<span class="${cls}">${text}</span>`;
-        }
+        },
       }
     ];
-
   }
-
-  get displayedRecords(): SearchRecord[] {
-
-    let list = this.records.filter(r => r.id.includes(this.filterId));
-
-    list = list.sort((a, b) => {
-      const aVal = a[this.sortField];
-      const bVal = b[this.sortField];
-      return this.sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-    });
-    return list;
-  }
-
-  toggleSort(field: 'id' | 'timestamp') {
-    if (this.sortField === field) {
-      this.sortAsc = !this.sortAsc;
-    } else {
-      this.sortField = field;
-      this.sortAsc = true;
-    }
-  }
-  
 }

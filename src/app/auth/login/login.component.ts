@@ -327,7 +327,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       const v = this.signupForm.value;
 
-      // Ако нема фајл – готово
+      // Ако нема фајл
       if (!this.selectedFile) return;
 
       let fileToSend = await this.prepareFileForEmail(this.selectedFile);

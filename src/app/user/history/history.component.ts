@@ -29,31 +29,29 @@ export class HistoryComponent  implements OnInit {
   sortField: 'id' | 'timestamp' = 'timestamp';
   sortAsc = false;
 
+  // Dark theme params (усогласено со останатиот UI)
+  public theme = themeAlpine.withParams({
+    backgroundColor: '#1b212b',                         // main background color
+    foregroundColor: '#e9eef6',                         // optional: grid text color
+    headerBackgroundColor: '#2a303a',                   // header background color
+    headerTextColor: '#c7cfda',                         // header text color
+    textColor: '#e9eef6',                               // border color for cells
+    cellTextColor: '#e9eef6',                           // cell text color
+    borderColor: 'rgba(255,255,255,.08)',               // border color for cells
+    rowHeight: 40,                                        // default row height
+    headerHeight: 48,                                     // header height
+    fontFamily: 'Inter, system-ui, Roboto, sans-serif',   // font family
+    fontSize: '14px',                                     // font size
+    accentColor: '#0d6efd',                             // accent color, e.g. for selected rows
+  });
+
+
   // ag-Grid config
   columnDefs: any[] = [];
   defaultColDef = { sortable: true, filter: true, resizable: true, flex: 1 };
   rowData: SearchRecord[] = [];
 
   private sub!: Subscription;
-
-   public theme = themeAlpine.withParams({
-      
-    backgroundColor: '#343a40',             // main background color
-    foregroundColor: '#e0e0e0',             // optional: grid text color
-
-    headerBackgroundColor: '#495057',       // header background color
-    headerTextColor: '#ffffff',             // header text color
-    borderColor: 'black',                   // border color for cells
-    textColor: '#ffffff',                   // main text color
-    cellTextColor: '#ffffff',               // cell text color
-    
-
-    accentColor: 'blue',                    // accent color for buttons, etc. 
-    headerHeight: 50,                       // header height
-    rowHeight: 40,                          // row height
-    fontFamily: 'Roboto, sans-serif',       // font family & size
-    fontSize: '14px'                        // font size
-  });
 
   constructor(
     private historySvc: SearchHistoryService,

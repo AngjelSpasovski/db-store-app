@@ -29,13 +29,6 @@ $border-color:      color.adjust($darker, $lightness: 20%);
     --brand: #0d6efd;
     --danger: #dc3545;
 
-  // height: 81vh;
-  // overflow-y: auto;
-  // background: $dark;
-  // border-radius: 0.5rem;
-  // padding: 2rem;
-  // box-shadow: 0 2px 8px $darker;
-
   .inner-title {
     font-size: 1.5rem;
     font-weight: 600;
@@ -78,4 +71,13 @@ $border-color:      color.adjust($darker, $lightness: 20%);
       border-bottom-left-radius: 0;
     }
   }
+}
+
+/* ag-Grid fine-tune */
+:host ::ng-deep .ag-theme-alpine {
+  .ag-header { background-color: #2a303a; }
+  .ag-header-cell-label { color: var(--text-1); font-weight: 600; }
+  .ag-row.ag-row-hover { background-color: #2a303a !important; }
+  .ag-row-selected { background-color: rgba(13,110,253,.18) !important; }
+  .ag-cell-focus { outline: 2px solid #0d6efd; }
 }
