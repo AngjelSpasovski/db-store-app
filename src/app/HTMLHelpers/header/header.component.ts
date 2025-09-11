@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -24,6 +24,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @Input() userEmail = '';
 
   public showSettingsMenu = false;
+
+  public isUserNavOpen = false;
+  public isHomeNavOpen = false;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -59,10 +63,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  toggleSettings(): void {
-    this.showSettingsMenu = !this.showSettingsMenu;
-  }
-
   logout(): void {
     this.showSettingsMenu = false;
     this.auth.logout(); // ова веќе редиректира кон /login?tab=login
@@ -71,6 +71,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
   scrollToSection(id: string, evt: Event) {
     evt.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  toggleSettings(): void {
+    this.showSettingsMenu = !this.showSettingsMenu;
+  }
+  
+  toggleUserNav() { this.isUserNavOpen = !this.isUserNavOpen; }
+  closeUserNav() { this.isUserNavOpen = false; }
+
+  toggleHomeNav() { this.isHomeNavOpen = !this.isHomeNavOpen; }
+  closeHomeNav() { this.isHomeNavOpen = false; }
+
+  // Затвори dropdown и нав кога кликнуваш надвор
+  @HostListener('document:click')
+  onDocClick() {
+    this.showSettingsMenu = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc() {
+    this.showSettingsMenu = false;
+    this.isUserNavOpen = false;
   }
 
 }

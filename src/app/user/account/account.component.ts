@@ -7,11 +7,11 @@ import { finalize } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { startWith } from 'rxjs';
-
-
+import { AuthService } from 'src/app/auth/auth.service';
 import { UserService, UserDetailsDTO } from '../user.service';
 import { ToastService } from '../../shared/toast.service';
 import { CreditsService } from '../buy-credits/credit.service';
+import type { AuthUser } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-account',
@@ -41,9 +41,12 @@ export class AccountComponent implements OnInit {
   data: UserDetailsDTO | null = null;
   form!: FormGroup; // non-null
 
-  public credits$ = this.creditsSvc.credits$;    // ← Observable на кредити
+  public currentUser: AuthUser | null = null;
+  public currentCredits = 0;                      // ← Current credits from session storage
+  public credits$ = this.creditsSvc.credits$;     // ← Observable на кредити
 
   constructor(
+    private auth: AuthService,
     private api: UserService,
     private toast: ToastService,
     private translate: TranslateService,
@@ -53,6 +56,14 @@ export class AccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.refresh();
+
+    // init credits
+    const user: AuthUser | null = this.auth.getCurrentUser();
+    if (user) {
+      const key = `credits_${user.email}`;
+      const stored = sessionStorage.getItem(key);
+      this.currentCredits = stored ? +stored : 0;
+    }
   }
 
   enableEdit() {
@@ -146,7 +157,6 @@ cancelEdit() {
       .subscribe({
         next: d => {
           this.data = d;
-          debugger;
           this.credits$ = this.creditsSvc.credits$;
           console.log(this.credits$);
         },

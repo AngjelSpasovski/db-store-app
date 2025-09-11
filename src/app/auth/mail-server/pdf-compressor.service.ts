@@ -13,7 +13,6 @@ export class PdfCompressorService {
     if (this.workerReady) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = `${document.baseURI}assets/pdf.worker.min.mjs`;
-    debugger;
     this.workerReady = true;
   }
 

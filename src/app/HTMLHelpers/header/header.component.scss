@@ -1,4 +1,6 @@
 .app-header {
+  --chip-width: 132px;
+
   width: 100%;
   position: sticky;
   top: 0;
@@ -7,14 +9,14 @@
 
   .navbar {
     padding: 0.75rem 1.5rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 
-    .user-nav{
+    .language-selector { margin-left: 0; }
+
+    /* (стар селектор) ако не го користиш веќе, избриши го слободно */
+    .user-nav {
       justify-content: flex-end;
-
-      .user-home{
-        padding: 7px;
-      }
+      .user-home { padding: 7px; }
     }
 
     .navbar-brand {
@@ -22,23 +24,28 @@
       color: gray;
       cursor: pointer;
 
-      .brand-logo {
-        height: 32px;
-        vertical-align: middle;
-      }
+      .brand-logo { height: 32px; vertical-align: middle; }
     }
 
-    .navbar-toggler-icon {
-      background-color: rgb(81 73 70);
+    .loged-as {
+      font-size: xx-small;
+      margin: 0px 5px;
+      color: gray;
     }
+
+    .email-style {
+      font-family: emoji;
+      font-weight: lighter;
+      font-style: italic;
+    }
+
+    /* користиме navbar-dark, па нема потреба од боење на иконата */
+    /* .navbar-toggler-icon { background-color: rgb(81 73 70); } */
 
     .nav-link {
       color: gray;
       transition: color 0.3s ease;
-      &:hover {
-        color: #007bff;
-      }
-
+      &:hover { color: #007bff; }
       &.active {
         font-weight: bold;
         color: #007bff;
@@ -46,82 +53,102 @@
       }
     }
 
-    .dropdown-toggle {
-      color: #fff;
-      background-color: #007bff;
-      border: none;
+    .dropdown-toggle { color: #fff; background-color: #007bff; border: none; }
+    .dropdown-menu { min-width: 180px; font-size: 0.9rem; }
+    .language-selector { margin-left: auto; }
+
+    /* Позадина/spacing кога е отворено мобилното мени */
+    #userNavbarContent.collapse.show {
+      background: #212529;
+      padding: .5rem 0; /* малку потесно од претходно */
+      border-top: 1px solid rgba(255,255,255,.06);
     }
 
-    .dropdown-menu {
-      min-width: 180px;
-      font-size: 0.9rem;
+    /* Toggler – почист изглед */
+    .navbar-toggler {
+      padding: .25rem .5rem;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: .5rem;
+      background: transparent;
+      z-index: 1050; /* секогаш над менито */
     }
-
-    .language-selector {
-      margin-left: auto;
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 .2rem rgba(255,255,255,.18);
     }
   }
 
+  /* Листа во collapse: мобилен колона, десктоп ред */
+  .user-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    width: 100%;
 
-  .settings-container {
-      position: relative;      // contained to its flex parent
-      z-index: 1;              // ensure it sits below the navbar toggler
-
-    .settings-btn {
+    > .nav-item {
       display: flex;
       align-items: center;
-      background-color: transparent;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: gray;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
-      cursor: pointer;
-
-      &:hover {
-        background-color: rgba(255,255,255,0.1);
-      }
     }
-
-    .settings-menu {
-      position: absolute;
-      right: 0;
-      top: 100%;
-      margin-top: 0.25rem;
-      background: #fff;
-      border: 1px solid rgba(0,0,0,0.15);
-      border-radius: 0.25rem;
-      list-style: none;
-      padding: 0.5rem 0;
-      min-width: 180px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      z-index: 200;
-
-      li {
-        a {
-          display: flex;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          color: #333;
-          text-decoration: none;
-
-          fa-icon {
-            margin-right: 0.5rem;
-          }
-
-          &:hover {
-            background-color: rgba(0,0,0,0.05);
-          }
-        }
-      }
+  }
+  @media (min-width: 992px) {
+    .user-nav-list {
+      flex-direction: row;
+      align-items: center;
+      gap: .75rem;
+      width: auto;
     }
   }
 
-  .navbar-toggler {
-  z-index: 1050;    // higher than your collapsed menu
-}
+  /* Емаил: да не се расплинува и да е визуелно порамнет */
+  .email-truncate {
+    display: inline-block;
+    max-width: 420px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    margin-bottom: .25rem; /* чисто одделување на мобилен */
+  }
+  @media (min-width: 992px) {
+    .email-truncate {
+      max-width: 420px; /* прилагоди по желба */
+      margin-bottom: 0;
+    }
 
-.user-nav {         // the <div class="collapse navbar-collapse">
-  z-index: 1000;    // below the toggler
-}
+    app-language-selector button,
+    .logout-btn {
+      min-width: var(--chip-width);
+      height: 40px;
+    }
+  }
 
+  /* Logout копче – унифицирана висина со language копчето */
+  .logout-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #e9ecef;
+    padding: 0 .8rem;
+    border-radius: .6rem;
+    line-height: 1;
+    transition: background .2s ease, border-color .2s ease;
+
+    &:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.35); }
+  }
+
+  /* На мобилен – контроли полна ширина, убава вертикална линија */
+  @media (max-width: 991.98px) {
+    app-language-selector,
+    .logout-btn {
+      width: 100%;
+    }
+    /* ако внатре во language селекторот има <button>, уедначи висина */
+    app-language-selector button { height: 42px; width: 100%; justify-content: center; }
+    .logout-btn { justify-content: center; }
+  }
+
+  /* z-index (ако го користиш .user-nav нека остане под toggler) */
+  .user-nav { z-index: 1000; }
 }

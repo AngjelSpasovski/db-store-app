@@ -71,8 +71,6 @@ export class BuyCreditsComponent implements OnInit {
   async purchase(pkg: CreditPackage): Promise<void> {
     
     setTimeout(() => {
-      debugger;
-
       const now = new Date();
       const invoice: Invoice = {
         id: `INV-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}-${now.getTime()}`,

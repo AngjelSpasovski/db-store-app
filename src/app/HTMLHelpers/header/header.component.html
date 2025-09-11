@@ -8,7 +8,8 @@
         }">
 
   <!-- HOME VIEW NAVIGATION BAR -->
-  <nav *ngIf="viewMode === 'home'" class="navbar navbar-expand-lg navbar-light w-100 home-nav bg-dark">
+   
+  <nav *ngIf="viewMode === 'home'" class="navbar navbar-expand-lg navbar-dark w-100 home-nav bg-dark">
     <div class="container-fluid">
 
       <a class="navbar-brand" href="#home" (click)="scrollToSection('home', $event)">
@@ -17,11 +18,11 @@
         DBStore
       </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#homeNavbarContent">
+      <button class="navbar-toggler" type="button" (click)="toggleHomeNav()">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="homeNavbarContent">
+      <div class="navbar-collapse collapse" [class.show]="isHomeNavOpen" id="homeNavbarContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item"><a class="nav-link" href="#home"      (click)="scrollToSection('home',     $event)">{{ 'HOME' | translate }}</a></li>
           <li class="nav-item"><a class="nav-link" href="#about"        (click)="scrollToSection('about',       $event)">{{ 'ABOUT' | translate }}</a></li>
@@ -42,80 +43,65 @@
   </nav>
 
   <!-- LOGIN / FORGOT-PASSWORD VIEW -->
-  <div *ngIf="viewMode === 'login' || viewMode === 'forgot-password' || viewMode === 'reset-password'" class="navbar navbar-expand-lg navbar-light w-100 login-nav bg-dark">
-    <div class="container-fluid">
-      
-      <a class="navbar-brand">
-        <!-- LOGO -->
-        <!-- <img src="../../../assets/images/dbstore-transparent-full.png" alt="DBStore Logo" class="brand-logo"> -->
-        DBStore
-      </a>
+  <div *ngIf="viewMode === 'login' || viewMode === 'forgot-password' || viewMode === 'reset-password'" 
+      class="navbar navbar-expand-lg navbar-dark w-100 login-nav bg-dark">
+    <div class="" style="display: flex; justify-content: space-between; width: inherit;">
 
-      <app-language-selector></app-language-selector>
+         <a class="navbar-brand">
+          <!-- LOGO -->
+          <!-- <img src="../../../assets/images/dbstore-transparent-full.png" alt="DBStore Logo" class="brand-logo"> -->
+          DBStore
+        </a>
+
+      
+      <div class="language-selector">
+        <app-language-selector></app-language-selector>
+      </div>
+
+      
     </div>
   </div>
 
   <!-- USER VIEW -->
-  <div *ngIf="viewMode === 'user'" class="navbar navbar-expand-lg navbar-light w-100 bg-dark">
-
+  <nav *ngIf="viewMode === 'user'" class="navbar navbar-expand-lg navbar-dark w-100 bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand">
-        <!-- LOGO -->
-        <!-- <img src="../../../assets/images/dbstore-transparent-full.png" alt="DBStore Logo" class="brand-logo"> -->
-        DBStore
-      </a>
+      <a class="navbar-brand">DBStore</a>
 
-      <button class="navbar-toggler" 
-              type="button" 
-              data-bs-toggle="collapse" 
-              data-bs-target="#userNavbarContent"
-              aria-controls="userNavbarContent" 
-              aria-expanded="false" 
-              aria-label="Toggle navigation"
-              (click)="$event.stopPropagation()">
+      <!-- Angular-only toggler -->
+      <button class="navbar-toggler"
+              type="button"
+              (click)="isUserNavOpen = !isUserNavOpen"
+              [attr.aria-expanded]="isUserNavOpen">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div id="userNavbarContent"
-          class="collapse navbar-collapse">
+          class="navbar-collapse collapse"
+          [class.show]="isUserNavOpen">
 
-        <!-- left-side nav items (if you had any) would go in a ul.navbar-nav here -->
-        <div class="navbar-nav me-auto"></div>
+        <ul class="navbar-nav ms-auto align-items-lg-center user-nav-list">
+          <li class="nav-item">
+            <p class="navbar-text text-white me-lg-3 email-truncate">
+              <span class="loged-as">{{ 'LOGGEDIN_AS' | translate }}:</span> <span class="email-style">{{ userEmail }}</span>
+            </p>
+          </li>
 
-        <!-- RIGHT-SIDE CONTROLS -->
-        <div class="d-flex align-items-center ms-auto">
-          <!-- show logged in label -->
-          <div class="user-home text-white me-3">
-            {{ 'LOGGEDIN_AS' | translate}}: {{ userEmail }}
-          </div>
+          <li class="nav-item">
+            <app-language-selector class="language-selector"></app-language-selector>
+          </li>
 
-          <!-- language selector -->
-          <app-language-selector class="me-2"></app-language-selector>
-
-          <!-- settings button/menu -->
-          <div *ngIf="isLoggedIn" class="settings-container">
-            <button class="btn btn-outline-light settings-btn"
-                    (click)="toggleSettings()">
-              <i class="fas fa-user-cog"></i>
-              {{ 'SETTINGS' | translate }}
-              <i class="fas"
-                [ngClass]="showSettingsMenu ? 'fa-chevron-up' : 'fa-chevron-down'"
-                style="margin-left: .25rem"></i>
+          <li class="nav-item">
+            <button class="btn logout-btn" (click)="logout(); isUserNavOpen=false">
+              <fa-icon [icon]="faSignOutAlt"></fa-icon> {{ 'LOGOUT' | translate }}
             </button>
-            <ul *ngIf="showSettingsMenu" class="settings-menu">
-              <hr>
-              <li>
-                <a (click)="logout()" class="dropdown-item">
-                  <fa-icon [icon]="faSignOutAlt"></fa-icon>
-                  {{ 'LOGOUT' | translate }}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+          </li>
+        </ul>
 
+      </div>
     </div>
-  </div>
+  </nav>
+
+
+
 
 </header>

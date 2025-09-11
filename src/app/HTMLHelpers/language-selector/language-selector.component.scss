@@ -9,7 +9,7 @@
   align-items: center;
   text-decoration: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 4px;
+  border-radius: 10px;
   color: #cfc1c1;
   cursor: pointer;
 
@@ -23,7 +23,7 @@
     display: flex;
     justify-content: center;
     cursor: pointer;
-    padding: 5px;
+    padding: 10px;
     font-size: 14px;
     font-weight: bold;
   }
@@ -34,7 +34,7 @@
   }
 
   .flag-icon {
-    width: 35px;
+    width: 37px;
     height: auto;
     margin-right: 10px;
   }
