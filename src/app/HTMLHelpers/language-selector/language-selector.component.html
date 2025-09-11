@@ -1,14 +1,21 @@
 <div class="language-selector">
-  <div class="custom-dropdown" (click)="toggleDropdown()">
-    <div class="selected-option">
+  
+  <div class="custom-dropdown" (click)="$event.stopPropagation()">
+    <!-- Отвора/затвора само преку избраната опција -->
+    <div class="selected-option"
+         (click)="toggleDropdown(); $event.stopPropagation()">
       <img [src]="'assets/flags/' + selectedLanguage + '.jpg'" class="flag-icon" />
       {{ selectedLanguage | uppercase }}
-    </div>
+  </div>
+
     <div class="dropdown-options" *ngIf="dropdownOpen">
-      <div *ngFor="let lang of languages" class="dropdown-item" (click)="changeLanguage(lang.code)">
+      <button type="button"
+              *ngFor="let lang of languages"
+              class="dropdown-item"
+              (click)="changeLanguage(lang.code); $event.stopPropagation()">
         <img [src]="'assets/flags/' + lang.code + '.jpg'" class="flag-icon" />
         {{ lang.name }}
-      </div>
+      </button>
     </div>
   </div>
 </div>

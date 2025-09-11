@@ -37,4 +37,8 @@ export class LanguageSelectorComponent {
     const target = event.target as HTMLElement;
     if (!target.closest('.custom-dropdown')) this.dropdownOpen = false;
   }
+
+  @HostListener('document:keydown.escape')
+  onEsc() { this.dropdownOpen = false; } 
+  
 }

@@ -158,28 +158,7 @@
         </div>
       </div>
 
-      <!-- Billing details -->
-      <div class="col-12">
-        <div class="card acc-card">
-          <div class="card-header">Billing details</div>
-          <div class="card-body">
-            <ng-container *ngIf="d.billingDetails as b; else noBill">
-              <div class="row">
-                <div class="col-md-4"><strong>Company:</strong> {{ b.companyName }}</div>
-                <div class="col-md-4"><strong>Email:</strong> {{ b.email }}</div>
-                <div class="col-md-4"><strong>VAT:</strong> {{ b.vatNumber || '—' }}</div>
-                <div class="col-md-6 mt-2"><strong>Address 1:</strong> {{ b.address1 }}</div>
-                <div class="col-md-6 mt-2"><strong>Address 2:</strong> {{ b.address2 || '—' }}</div>
-                <div class="col-md-3 mt-2"><strong>City:</strong> {{ b.city }}</div>
-                <div class="col-md-3 mt-2"><strong>State:</strong> {{ b.stateCode }}</div>
-                <div class="col-md-3 mt-2"><strong>Zip:</strong> {{ b.zipcode }}</div>
-                <div class="col-md-3 mt-2"><strong>Nation:</strong> {{ b.nation }}</div>
-              </div>
-            </ng-container>
-            <ng-template #noBill><span class="">No billing details yet.</span></ng-template>
-          </div>
-        </div>
-      </div>
+
     </div>
   </ng-container>
 </div>
