@@ -244,22 +244,22 @@
     "FAQS_ANSWER_2": "On the Search page, enter a valid ID and click Search to reveal the Download button.",
 
     "FAQS_QUESTION_3": "What happens if I search and the ID does not exist?",
-    "FAQS_ANSWER_3": "You receive an alert that the ID was not found and lose 1 credit.",
+    "FAQS_ANSWER_3": "You receive an notify that the ID was not found.",
 
     "FAQS_QUESTION_4": "Where can I see my past searches?",
     "FAQS_ANSWER_4": "Visit the History page via the sidebar for a full table of attempts.",
 
-    "FAQS_QUESTION_5": "How does the database matching service work?",
-    "FAQS_ANSWER_5": "Our system scans our partners' databases to find the offers that best suit your needs. Once found, we provide you with a personalized list of the best available opportunities.",
+    "FAQS_QUESTION_5": "Are the results accurate?",
+    "FAQS_ANSWER_5": "Yes, the data is obtained from verified sources and is regularly updated to ensure accuracy and reliability.",
 
     "FAQS_QUESTION_6": "Is my data safe?",
     "FAQS_ANSWER_6": "Absolutely! We protect your privacy and use your data only to provide you with the best service. We do not sell or share your information with unauthorized third parties.",
 
-    "FAQS_QUESTION_7": "How long does it take to get the results?",
-    "FAQS_ANSWER_7": "After registering and entering your preferences, our system processes the data in a few minutes and sends you the best offers available in real time.",
+    "FAQS_QUESTION_7": "How long does it take to display the results?",
+    "FAQS_ANSWER_7": "The search takes only a few seconds. The system is optimized for fast and accurate display of results.",
 
-    "FAQS_QUESTION_8": "Can I update my preferences?",
-    "FAQS_ANSWER_8": "Yes! You can change your preferences at any time by accessing your profile. This way you will always receive offers in line with your interests.",
+    "FAQS_QUESTION_8": "Do I need to create a profile?",
+    "FAQS_ANSWER_8": "Yes. In order to perform searches, you need to create a profile with your company information. This allows the system to verify the validity of the user and provide access to the contact database.",
 
     "FAQS_QUESTION_9": "Can I delete my account at any time?",
     "FAQS_ANSWER_9": "Yes, you can request deletion of your account at any time from your profile settings or by contacting our support. Once deleted, all your data will be removed in accordance with our privacy policy.",

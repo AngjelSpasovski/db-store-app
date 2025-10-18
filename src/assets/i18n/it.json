@@ -244,22 +244,22 @@
     "FAQS_ANSWER_2": "Nella pagina Cerca, inserisci un ID valido e clicca su Cerca per visualizzare il pulsante Scarica.",
 
     "FAQS_QUESTION_3": "Cosa succede se effettuo una ricerca e l'ID non esiste?",
-    "FAQS_ANSWER_3": "Ricevi un avviso che l'ID non è stato trovato e perdi 1 credito.",
+    "FAQS_ANSWER_3": "Ricevi un avviso che l'ID non è stato trovato.",
 
     "FAQS_QUESTION_4": "Dove posso vedere le mie ricerche passate?",
     "FAQS_ANSWER_4": "Per una tabella completa dei tentativi, visita la pagina Cronologia tramite la barra laterale.",
 
-    "FAQS_QUESTION_5": "Come funziona il servizio di matching database?",
-    "FAQS_ANSWER_5": "Il nostro sistema analizza i database dei nostri partner per trovare le offerte più adatte alle tue esigenze. Una volta trovate, ti forniamo un elenco personalizzato con le migliori opportunità disponibili.",
+    "FAQS_QUESTION_5": "I risultati sono accurati?",
+    "FAQS_ANSWER_5": "Sì, i dati provengono da fonti verificate e vengono aggiornati regolarmente per garantirne l'accuratezza e l'affidabilità.",
 
     "FAQS_QUESTION_6": "I miei dati sono al sicuro?",
     "FAQS_ANSWER_6": "Assolutamente! Proteggiamo la tua privacy e utilizziamo i tuoi dati solo per offrirti il miglior servizio. Non vendiamo né condividiamo le tue informazioni con terze parti non autorizzate.",
 
-    "FAQS_QUESTION_7": "Quanto tempo ci vuole per ricevere i risultati?",
-    "FAQS_ANSWER_7": "Dopo la registrazione e l’inserimento delle tue preferenze, il nostro sistema elabora i dati in pochi minuti e ti invia le migliori offerte disponibili in tempo reale.",
+    "FAQS_QUESTION_7": "Quanto tempo ci vuole per visualizzare i risultati?",
+    "FAQS_ANSWER_7": "La ricerca richiede solo pochi secondi. Il sistema è ottimizzato per una visualizzazione rapida e accurata dei risultati.",
 
-    "FAQS_QUESTION_8": "Posso aggiornare le mie preferenze?",
-    "FAQS_ANSWER_8": "Sì! Puoi modificare le tue preferenze in qualsiasi momento accedendo al tuo profilo. Così riceverai offerte sempre in linea con i tuoi interessi.",
+    "FAQS_QUESTION_8": "Devo creare un profilo?",
+    "FAQS_ANSWER_8": "Sì. Per effettuare ricerche, è necessario creare un profilo con le informazioni della tua azienda. Questo consente al sistema di verificare la validità dell'utente e di fornire l'accesso al database dei contatti.",
 
     "FAQS_QUESTION_9": "Posso cancellare il mio account in qualsiasi momento?",
     "FAQS_ANSWER_9": "Sì, puoi richiedere la cancellazione del tuo account in qualsiasi momento dalle impostazioni del profilo o contattando il nostro supporto. Una volta eliminato, tutti i tuoi dati verranno rimossi in conformità con la nostra politica sulla privacy.",

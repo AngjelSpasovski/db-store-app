@@ -46,12 +46,12 @@ $header-total-height: 128px;
   .main-header-wrap{
     height: 5%;
     background-color: $darker;
-    margin: 3px 0px 3px 3px;
+    margin: 4px 0px 3px 3px;
   }
 
   .main-router-wrap { 
     padding: 1rem;
-    height: calc(100% - 11%); // adjust for header height
+    height: calc(100% - 12%); // adjust for header height
     background-color: $dark;
     overflow-y: auto;
     margin-left: 3px;

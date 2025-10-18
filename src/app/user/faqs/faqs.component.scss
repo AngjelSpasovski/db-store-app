@@ -55,41 +55,52 @@ $border-color:      color.adjust($darker, $lightness: 20%);
   }
 
   // Accordion cards
-  .faq-card {
-    background: $card-button-bg;
-    border: 1px solid $border-color;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba($darker, 0.5);
-
-    .accordion-button {
+  .accordion {
+    height: 60vh;
+    overflow-y: auto;
+    
+    .faq-card {
       background: $card-button-bg;
-      color: $light;
-      border: none;
-      padding: 1rem;
-      font-weight: 500;
-      border-radius: 0.5rem !important;
-      transition: background 0.2s;
-      &.collapsed {
-        background: $card-button-bg;
-      }
-      &:hover {
-        background: color.adjust($card-button-bg, $lightness: -5%);
-      }
-      &:not(.collapsed) {
-        background: $card-header-bg;
-      }
-      &::after {
-        filter: invert(1);
-      }
-    }
+      border: 1px solid $border-color;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba($darker, 0.5);
 
-    .accordion-collapse {
-      .accordion-body {
-        background: $card-header-bg;
+      .accordion-button {
+        background: $card-button-bg;
         color: $light;
+        border: none;
         padding: 1rem;
-        border-top: 1px solid $border-color;
+        font-weight: 500;
+        border-radius: 0.5rem !important;
+        transition: background 0.2s;
+
+        &.collapsed {
+          background: $card-button-bg;
+        }
+
+        &:hover {
+          background: color.adjust($card-button-bg, $lightness: -5%);
+        }
+
+        &:not(.collapsed) {
+          background: $card-header-bg;
+        }
+
+        &::after {
+          filter: invert(1);
+        }
+      }
+
+      .accordion-collapse {
+        .accordion-body {
+          background: $card-header-bg;
+          color: $light;
+          padding: 1rem;
+          border-top: 1px solid $border-color;
+        }
       }
     }
   }
+
+
 }

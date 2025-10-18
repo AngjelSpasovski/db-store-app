@@ -13,10 +13,10 @@ $header-total-height-margin: 70px; // Adjusted for larger header
   left: 0;
   width: 240px;
   height: calc(100vh - #{$header-total-height-margin});
-  background: $darker;
+  //background: $darker;
   overflow: hidden;
   transition: width 0.3s ease, transform 0.3s ease;
-  margin-top: 3px;
+  margin-top: 2px;
   z-index: 1000;
 
   &.closed {
@@ -37,16 +37,17 @@ $header-total-height-margin: 70px; // Adjusted for larger header
   }
 
   &__header {
-    padding: 11px;
-    margin-bottom: 5px;
-    box-shadow: 4px 0px 5px rgb(66, 82, 106);
+    margin-top: 2px;
+    padding: 5px;
+    background: $darker;
   }
 
   &__menu {
-    margin-top: 1rem;
+    margin-top: 4px;
+    margin-bottom: 4px;
     list-style: none;
-    padding: 0;
-    box-shadow: 4px 0px 5px rgb(66, 82, 106);
+    padding: 5px;
+    background: $darker;
 
     li a {
       display: flex;
@@ -64,6 +65,8 @@ $header-total-height-margin: 70px; // Adjusted for larger header
       }
     }
     li.active a {
+      width: 95%;
+      margin-left: 5px;
       background: $primary-blue;
       color: $light;
       border-radius: 4px;
@@ -74,15 +77,15 @@ $header-total-height-margin: 70px; // Adjusted for larger header
     padding: 1rem;
     font-size: 0.85rem;
     color: $light;
-    box-shadow: 4px 0px 5px rgb(66, 82, 106);
+    background: $darker;
   }
 
   &__menu {
     li.credits-indicator {
       margin-top: 1rem;        // мало растојание од долу
       text-align: center;      // центрирај ја иконата
-      cursor: default;
-      box-shadow: 4px 0px 5px rgb(66, 82, 106);
+      cursor: help;           // покажува дека е информативно
+      background: $dark;
 
       .icon {
         display: inline-block;
@@ -97,6 +100,8 @@ $header-total-height-margin: 70px; // Adjusted for larger header
   }
 
   .sidebar__menu li a:hover {
+    width: 95%;
+    margin-left: 5px;
     background: rgba(255, 255, 255, .06);
     border-radius: 4px;
   }
@@ -104,6 +109,7 @@ $header-total-height-margin: 70px; // Adjusted for larger header
   .sidebar__menu li.active a {
     background: linear-gradient(135deg, #00509e, #0a66c2);
     color: #fff;
+    
   }
 
   /* малку попрегледни икони */
