@@ -38,24 +38,36 @@ export class AppTitleService {
   /** рачно рефреширање (ако треба) */
   refresh(): void {
     const deepest = this.getDeepest(this.route.snapshot);
-    const key = deepest.data?.['title'] as string | undefined;
+    const t = deepest.data?.['title'] as any;
 
-    const translated = key ? this.i18n.instant(key) : this.fallbackFromUrl(deepest);
-    this.setTitle(translated);
+    if (t && typeof t === 'object') {
+      // поддржува { main?, prefix?, suffix? }
+      this.setTitle(t.main, { prefix: t.prefix, suffix: t.suffix });
+      return;
+    }
+
+    if (t != null) {
+      const key = this.s(t);
+      const translated = this.i18n.instant(key) || key;
+      this.setTitle(translated);
+      return;
+    }
+
+    const fallback = this.fallbackFromUrl(deepest);
+    this.setTitle(fallback);
   }
 
   /** привремен наслов (ако сакаш да промениш ад-hoc) */
+  /** Повикувај ја оваа ако сакаш да сетираш наслов ad-hoc */
   setTransient(titleText: string) {
-    this.title.setTitle(`${titleText}${this.sep}${this.appName}`);
+    const main = this.s(titleText);
+    this.title.setTitle(main ? `${main}${this.sep}${this.appName}` : this.appName);
   }
 
-  private setTitle(main: string) {
-  const safe = (main || '').trim();
-  const isKey = /^[A-Z0-9_.-]+$/.test(safe);        // ако личи на i18n key
-  const show  = isKey ? this.i18n.instant(safe) : safe;
-  const finalTitle = show ? `${show}${this.sep}${this.appName}` : this.appName;
-  this.title.setTitle(finalTitle);
-}
+  private setTitle(main: unknown, extras?: { prefix?: unknown; suffix?: unknown }) {
+    const final = this.join([extras?.prefix, main, extras?.suffix]) || this.appName;
+    this.title.setTitle(final);
+  }
 
 
   private getDeepest(s: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
@@ -67,11 +79,24 @@ export class AppTitleService {
   private fallbackFromUrl(s: ActivatedRouteSnapshot): string {
     const segs = s.url?.map(u => u.path).filter(Boolean) ?? [];
     if (!segs.length) return this.i18n.instant('HOME') || 'Home';
+
     const guess = segs[segs.length - 1].replace(/-/g, ' ');
+    
     // Пробај превод, ако нема – Title Case
     const maybe = this.i18n.instant(guess.toUpperCase());
     return maybe !== guess.toUpperCase()
       ? maybe
       : guess.charAt(0).toUpperCase() + guess.slice(1);
   }
+
+
+  private s(v: unknown): string {
+    if (typeof v === 'string') return v.trim();
+    if (v == null) return '';
+    try { return String(v).trim(); } catch { return ''; }
+  }
+  private join(parts: unknown[], sep = this.sep): string {
+    return parts.map(p => this.s(p)).filter(Boolean).join(sep);
+  }
+
 }

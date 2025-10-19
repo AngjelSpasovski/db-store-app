@@ -53,6 +53,10 @@
       }
     }
 
+    .nav-item {
+      margin: 0px 3px;
+    }
+
     .dropdown-toggle { color: #fff; background-color: #007bff; border: none; }
     .dropdown-menu { min-width: 180px; font-size: 0.9rem; }
     .language-selector { margin-left: auto; }
@@ -137,6 +141,40 @@
 
     &:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.35); }
   }
+
+
+  /* админ нав */
+  #adminNavbarContent .nav-link.active {
+    font-weight: 600;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .email-truncate {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .logout-btn {
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: .25rem .75rem;
+  }
+
+  .dropdown-menu {
+    background: #1f1f1f;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .dropdown-item {
+    color: #e8e8e8;
+  }
+
+  .dropdown-item:hover {
+    background: #2b2b2b;
+  }
+
 
   /* На мобилен – контроли полна ширина, убава вертикална линија */
   @media (max-width: 991.98px) {

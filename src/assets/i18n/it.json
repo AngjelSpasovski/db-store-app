@@ -264,9 +264,13 @@
     "FAQS_QUESTION_9": "Posso cancellare il mio account in qualsiasi momento?",
     "FAQS_ANSWER_9": "Sì, puoi richiedere la cancellazione del tuo account in qualsiasi momento dalle impostazioni del profilo o contattando il nostro supporto. Una volta eliminato, tutti i tuoi dati verranno rimossi in conformità con la nostra politica sulla privacy.",
     
-    "ONLY_PDF": "Sono ammessi solo file PDF."
+    "ONLY_PDF": "Sono ammessi solo file PDF.",
 
-
-
+    "ADMIN": {
+        "DASHBOARD": "Pannello di controllo",
+        "BILLING_USERS": "Fatturazione per utente",
+        "PACKAGE_MANAGEMENT": "Gestione pacchetti",
+        "USER_DETAILS": "Dettagli utente"
+    }
 
 }

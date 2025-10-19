@@ -1,6 +1,7 @@
+// src/app/HTMLHelpers/header/header.component.ts
 import { Component, Input, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
@@ -13,13 +14,19 @@ import { faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
   standalone: true,
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [CommonModule, LanguageSelectorComponent, FontAwesomeModule, TranslateModule]
+  imports: [
+    CommonModule,
+    RouterModule,
+    LanguageSelectorComponent, 
+    FontAwesomeModule, 
+    TranslateModule
+  ]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   // icons
   public faSignOutAlt = faSignOutAlt;
 
-  @Input() viewMode: 'home' | 'login' | 'forgot-password' |'reset-password' | 'user' = 'home';
+  @Input() viewMode: 'home' | 'login' | 'forgot-password' | 'reset-password' | 'user' | 'admin' = 'home';
   @Input() isLoggedIn = false;
   @Input() userEmail = '';
 
@@ -27,8 +34,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   public isUserNavOpen = false;
   public isHomeNavOpen = false;
+  public isAdminNavOpen = false; 
 
   private destroy$ = new Subject<void>();
+
+  public ready = false;
+
+  get isAdmin(): boolean {
+    return (this.userEmail || '').toLowerCase() === 'angjel.spasovski@gmail.com';
+  }
 
   constructor(
     private router: Router,
@@ -37,25 +51,39 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // 1) следи го URL-от и поставувај viewMode
+    // A) Синхроно земи го тековниот корисник (BehaviorSubject.value)
+    const u = this.auth.currentUser$?.value;
+    this.isLoggedIn = !!u;
+    this.userEmail = u?.email ?? '';
+
+    // B) Сетирај viewMode ИТНО според моменталниот URL (пред да стигнат router events)
+    this.viewMode = this.mapUrlToViewMode(this.router.url);
+    this.ready = true;
+
+    // C) После тоа – слушај ги промените на URL (NavigationEnd)
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd), takeUntil(this.destroy$))
       .subscribe((e: any) => {
         const url: string = e.urlAfterRedirects || e.url;
-        if (url.includes('/login')) {               this.viewMode = 'login'; }
-        else if (url.includes('/forgot-password')){ this.viewMode = 'forgot-password'; }
-        else if (url.includes('/reset-password')){  this.viewMode = 'reset-password'; }
-        else if (url.includes('/user')){            this.viewMode = 'user'; }
-        else  {                                     this.viewMode = 'home'; }
+        this.viewMode = this.mapUrlToViewMode(url);
       });
 
-    // 2) следи го тековниот корисник од AuthService, без sessionStorage директно
+    // D) Следи ги идните промени на корисникот
     this.auth.currentUser$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(u => {
-        this.isLoggedIn = !!u;
-        this.userEmail  = u?.email ?? '';
+      .subscribe(u2 => {
+        this.isLoggedIn = !!u2;
+        this.userEmail = u2?.email ?? '';
       });
+  }
+
+  private mapUrlToViewMode(url: string): typeof this.viewMode {
+    if (url.includes('/login')) return 'login';
+    if (url.includes('/forgot-password')) return 'forgot-password';
+    if (url.includes('/reset-password')) return 'reset-password';
+    if (url.includes('/admin')) return 'admin';
+    if (url.includes('/user')) return 'user';
+    return 'home';
   }
 
   ngOnDestroy(): void {
@@ -65,8 +93,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.showSettingsMenu = false;
-    this.auth.logout(); // ова веќе редиректира кон /login?tab=login
+    this.auth.logout();
   }
+
+  // togglers
+  toggleUserNav()  { this.isUserNavOpen  = !this.isUserNavOpen; }
+  toggleHomeNav()  { this.isHomeNavOpen  = !this.isHomeNavOpen; }
+  toggleAdminNav() { this.isAdminNavOpen = !this.isAdminNavOpen; }
+
+  // closers
+  closeUserNav()   { this.isUserNavOpen  = false; }
+  closeHomeNav()   { this.isHomeNavOpen  = false; }
+  closeAdminNav()  { this.isAdminNavOpen = false; }
 
   scrollToSection(id: string, evt: Event) {
     evt.preventDefault();
@@ -76,12 +114,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   toggleSettings(): void {
     this.showSettingsMenu = !this.showSettingsMenu;
   }
-  
-  toggleUserNav() { this.isUserNavOpen = !this.isUserNavOpen; }
-  closeUserNav() { this.isUserNavOpen = false; }
-
-  toggleHomeNav() { this.isHomeNavOpen = !this.isHomeNavOpen; }
-  closeHomeNav() { this.isHomeNavOpen = false; }
 
   // Затвори dropdown и нав кога кликнуваш надвор
   @HostListener('document:click')
@@ -93,6 +125,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onEsc() {
     this.showSettingsMenu = false;
     this.isUserNavOpen = false;
+    this.isAdminNavOpen = false;
   }
 
 }

@@ -2,18 +2,60 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { roleGuard } from './auth/role.guard';
+import { adminEmailGuard } from './auth/admin-email.guard';
+import { guestGuard } from './auth/guest.guard';
 
 export const appRoutes: Routes = [
   { path: '',               redirectTo: 'home', pathMatch: 'full' },
+  
   { path: 'account',        redirectTo: 'user/account', pathMatch: 'full' },
 
-  { path: 'home',            loadComponent: () => import('./home/home.page').then(m => m.HomePage),                                                 data: { title: 'HOME' } },
-  { path: 'login',           loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent),                               data: { title: 'LOGIN' } },
-  { path: 'confirm-email',   loadComponent: () => import('./auth/login/confirm-email/confirm-email.component').then(m => m.ConfirmEmailComponent),  data: { title: 'CONFIRM_EMAIL' } },
-  { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),  data: { title: 'FORGOT_PASSWORD' } },
-  { path: 'reset-password',  loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),     data: { title: 'RESET_PASSWORD' } },
+  { path: 'home',            loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+    data: { title: 'HOME' } 
+  },
 
-  { path: 'user',            loadChildren:  () => import('./user/user.module').then(m => m.UserModule),    canActivate: [authGuard, roleGuard],     data: { roles: ['user','admin','superadmin'], title: 'USER' }  },
+  { path: 'login',           loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent),
+    canActivate: [guestGuard],
+    data: { title: 'LOGIN' }
+  },
+
+  { path: 'confirm-email',   loadComponent: () => import('./auth/login/confirm-email/confirm-email.component').then(m => m.ConfirmEmailComponent),  
+    data: { title: 'CONFIRM_EMAIL' } 
+  },
+
+  { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),  
+    data: { title: 'FORGOT_PASSWORD' } 
+  },
+
+  { path: 'reset-password',  loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),     
+    data: { title: 'RESET_PASSWORD' } 
+  },
+
+  { 
+    path: 'user',            
+    loadChildren:  () => import('./user/user.module').then(m => m.UserModule), 
+    canActivate: [authGuard, roleGuard],  
+    data: { 
+      roles: ['user','admin','superadmin'], 
+      title: 'USER' 
+    }  
+  },
+
+  {
+    path: 'admin',
+    canActivate: [authGuard, adminEmailGuard],
+    loadComponent: () => import('./admin/admin-shell/admin-shell.component').then(m => m.AdminShellComponent),
+    data: { title: 'ADMIN' },
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+        data: { title: { prefix: 'Admin', main: 'Dashboard' } } // или само "Admin – Dashboard"
+      },
+    ]
+  },
+
 
   { path: '**', redirectTo: 'home' },
 ];

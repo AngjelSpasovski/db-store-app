@@ -1,3 +1,4 @@
+// src/app/auth/login/login.component.ts
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -76,13 +77,28 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
 
-    // if tolken exists, redirect to user/buy-credits
-    const token = this.auth.token;
-    const role  = this.auth.currentUser$.value?.role?.toLowerCase();
-    if (token && role) {
-      const target = role === 'superadmin' ? '/user/superadmin' : role === 'admin' ? '/user/admin' : '/user/buy-credits';
-      this.router.navigateByUrl(target);
+  // if token exists, redirect away from /login
+  const token = this.auth.token;
+  const u     = this.auth.currentUser$?.value || null;
+  const role  = u?.role?.toLowerCase();
+  const email = (u?.email || '').toLowerCase();
+
+    // if tolken exists, redirect to user/buy-credits or admin based on role
+  if (token && (role || email)) {
+    // ✅ special-case: admin by email
+    if (email === 'angjel.spasovski@gmail.com') {
+      this.router.navigateByUrl('/admin', { replaceUrl: true });
+      return;
     }
+
+    // old role-based fallback
+    const target =
+      role === 'superadmin' ? '/user/superadmin' :
+      role === 'admin'      ? '/user/admin'      :
+                              '/user/buy-credits';
+    this.router.navigateByUrl(target, { replaceUrl: true });
+    return;
+  }
 
     // Initialize forms
     this.loginForm = this.fb.group({
@@ -182,22 +198,33 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (res) => {
         this.needsEmailVerify = false;
 
+        // 1) ако има redirect query param, почитувај го
         const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
         if (redirect) {
           this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-          this.isSubmittingLogin = false; // ⟵ стоп
+          this.isSubmittingLogin = false;
           this.router.navigateByUrl(redirect);
           return;
         }
 
+        // 2) приоритет: ако e-mail == angjel... => оди директно на /admin
+        const email = (res?.user?.email ?? '').toLowerCase();
+        if (email === 'angjel.spasovski@gmail.com') {
+          this.router.navigateByUrl('/admin', { replaceUrl: true });
+          this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
+          this.isSubmittingLogin = false;
+          return;
+        }
+
+        // 3) инаку по улога во /user/*
         const role = (res.user.role || 'user').toLowerCase();
         switch (role) {
           case 'superadmin': this.router.navigateByUrl('/user/superadmin'); break;
-          case 'admin':      this.router.navigateByUrl('/user/admin');      break;
-          default:           this.router.navigateByUrl('/user/buy-credits');
+          case 'admin': this.router.navigateByUrl('/user/admin'); break;
+          default: this.router.navigateByUrl('/user/buy-credits');
         }
         this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-        this.isSubmittingLogin = false; // ⟵ стоп
+        this.isSubmittingLogin = false;
       },
       error: err => {
         if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {

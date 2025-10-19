@@ -26,7 +26,7 @@ import { AppTitleService } from './shared/app-title.service';
 })
 export class AppComponent implements OnInit {
 
-  public currentView: 'home' | 'login' | 'forgot-password' |'reset-password' | 'user' = 'home';
+  public currentView: 'home' | 'login' | 'forgot-password' |'reset-password' | 'user' | 'admin' = 'home';
   public userEmail: string = '';
   public isLoggedIn: boolean = false;
 
@@ -38,34 +38,22 @@ export class AppComponent implements OnInit {
     private languageService: LanguageService,
     private router: Router,
     private toast: ToastService,
-    private titles: AppTitleService,
+    private appTitle: AppTitleService,
     private language: LanguageService
   ) {
     // Set default language for ngx-translate
     this.translate.setDefaultLang('en'); 
 
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        const url = event.urlAfterRedirects;
+    // init snapshot
+    this.currentView = this.mapUrl(this.router.url);
+    this.isLoggedIn  = !!this.authService.currentUser$.value;
+    this.userEmail   = this.authService.getLoggedInUserEmail() || '';
 
-        if (url.includes('/login')) {
-          this.currentView = 'login';
-        }
-        else if (url.includes('/forgot-password')) {
-          this.currentView = 'forgot-password';
-        }
-        else if (url.includes('/reset-password')) {
-          this.currentView = 'reset-password';
-        }
-        else if (url.includes('/user')) {
-          this.currentView = 'user';
-        }
-        else {
-          this.currentView = 'home';
-        }
-
-        this.isLoggedIn = !!this.authService.currentUser$.value;
-        this.userEmail = this.authService.getLoggedInUserEmail() || '';
+    this.router.events.subscribe(ev => {
+      if (ev instanceof NavigationEnd) {
+        this.currentView = this.mapUrl(ev.urlAfterRedirects);
+        this.isLoggedIn  = !!this.authService.currentUser$.value;
+        this.userEmail   = this.authService.getLoggedInUserEmail() || '';
       }
     });
 
@@ -83,7 +71,7 @@ export class AppComponent implements OnInit {
     window.addEventListener('online',  this.onOnline);
 
     // Initialize app titles
-    this.titles.init();
+    this.appTitle.init();
 
     // Check if user is logged in
     this.isLoggedIn = !!this.authService.currentUser$.value;
@@ -116,6 +104,15 @@ export class AppComponent implements OnInit {
     // Clean up event listeners
     window.removeEventListener('offline', this.onOffline);
     window.removeEventListener('online',  this.onOnline);
+  }
+
+  private mapUrl(url: string): typeof this.currentView {
+    if (url.includes('/login')) return 'login';
+    if (url.includes('/forgot-password')) return 'forgot-password';
+    if (url.includes('/reset-password')) return 'reset-password';
+    if (url.includes('/admin')) return 'admin';
+    if (url.includes('/user')) return 'user';
+    return 'home';
   }
 
   // Handle logout confirmation
