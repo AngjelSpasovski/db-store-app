@@ -51,11 +51,25 @@ export const appRoutes: Routes = [
         path: '',
         pathMatch: 'full',
         loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
-        data: { title: { prefix: 'Admin', main: 'Dashboard' } } // или само "Admin – Dashboard"
+        data: { title: { prefix: 'Admin', main: 'Dashboard' } }
       },
+      {
+        path: 'user-details',
+        loadComponent: () => import('./admin/user-details/user-details.component').then(m => m.AdminUserDetailsComponent),
+        data: { title: { prefix: 'Admin', main: 'User Details' } }
+      },
+      {
+        path: 'billing-users',
+        loadComponent: () => import('./admin/billing-users/billing-users.component').then(m => m.AdminBillingUsersComponent),
+        data: { title: { prefix: 'Admin', main: 'Billing by Users' } }
+      },
+      {
+        path: 'package-management',
+        loadComponent: () => import('./admin/package-management/package-management.component').then(m => m.AdminPackageManagementComponent),
+        data: { title: { prefix: 'Admin', main: 'Package Management' } }
+      }
     ]
   },
-
 
   { path: '**', redirectTo: 'home' },
 ];
