@@ -1,8 +1,5 @@
-<aside class="sidebar"
-       [class.open]="isOpen"
-       [class.closed]="!isOpen">
+<aside class="sidebar" [class.open]="isOpen" [class.closed]="!isOpen">
 
-  <!-- toggle button -->
   <div class="sidebar__header">
     <button class="sidebar__toggle" (click)="toggle()">
       <i class="fas" [ngClass]="isOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
@@ -10,27 +7,37 @@
   </div>
 
   <ul class="sidebar__menu">
-    <li *ngFor="let item of menuItems"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }">
+    <li *ngFor="let item of menuItems" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <a [routerLink]="item.route" (click)="onMenuItemClick()">
         <span class="icon">{{ item.icon }}</span>
         <span class="label" *ngIf="isOpen">{{ item.label | translate }}</span>
       </a>
     </li>
 
-    <!-- Credits indicator when closed -->
-    <li class="credits-indicator" *ngIf="!isOpen" [title]="(credits$ | async) + ' credits'">
+    <!-- Credits indicator when closed (без default browser tooltip) -->
+    <li class="credits-indicator"
+        *ngIf="!isOpen"
+        [attr.aria-label]="remainingCredits + ' credits'">
       <a>
         <span class="icon">💰</span>
+        <span class="count">{{ remainingCredits > 999 ? '999+' : remainingCredits }}</span>
       </a>
     </li>
   </ul>
 
-  <!-- full footer when open -->
-  <div class="sidebar__footer" *ngIf="isOpen">
-    {{ 'REMAINING_CREDITS' | translate }}:
-    <span class="highlight">{{ credits$ | async }}</span>
+  <!-- footer со класа за SCSS таргетирање -->
+  <div class="sidebar__footer px-3 py-2 small text-muted">
+    {{ 'Remaining Credits' | translate }}: {{ remainingCredits }}
+    <div *ngIf="remainingCredits === 0" class="mt-2">
+      <a routerLink="/user/buy-credits" class="btn btn-secondary w-100" (click)="onMenuItemClick()">
+        {{ 'BUY_CREDITS' | translate }}
+      </a>
+    </div>
   </div>
-
 </aside>
+
+<div class="sidebar-backdrop"
+     *ngIf="isMobile && isOpen"
+     aria-hidden="true"
+     role="presentation">
+</div>

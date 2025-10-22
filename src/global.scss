@@ -62,3 +62,5 @@
 /* Sizes (if you need them) */
 .btn-app-sm{ padding: .35rem .6rem; font-size: .875rem; }
 .btn-app-lg{ padding: .6rem 1rem;   font-size: 1rem;    }
+
+body.sb-no-scroll { overflow: hidden; }

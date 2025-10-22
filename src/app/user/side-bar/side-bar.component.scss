@@ -4,24 +4,55 @@ $light:  #ffffff;
 $primary-blue: #00509e;
 
 $header-total-height: 64px;
-$header-total-height-margin: 70px; // Adjusted for larger header
+$header-total-height-margin: 75px;
+
+/* Кога е отворен мобилниот sidebar */
+body.sb-overlay-active {
+  /* ги дими/заматува обвивките */
+  .main-header-wrap,
+  .main-router-wrap,
+  .main-footer-wrap,
+  app-header,
+  .header-user {
+    filter: blur(1.5px) brightness(0.75);
+    transition: filter .18s ease, opacity .18s ease;
+    pointer-events: none;   /* 🚫 блокира кликови */
+    user-select: none;
+  }
+}
+
 
 .sidebar {
-  position: fixed; 
-  top: $header-total-height; 
-  bottom: 0; 
+  position: fixed;
+  top: $header-total-height;
+  bottom: 0;
   left: 0;
   width: 240px;
   height: calc(100vh - #{$header-total-height-margin});
-  //background: $darker;
   overflow: hidden;
-  transition: width 0.3s ease, transform 0.3s ease;
+  transition: width .3s ease, transform .3s ease;
   margin-top: 2px;
   z-index: 1000;
+  //background: $darker;
 
+  // ── collapsed (desktop mini)
   &.closed {
-    width: 60px;  /* mini-mode: icons only */
-    .label, .sidebar__footer { display: none; }
+    width: 60px;
+
+    // сокриј текст и footer
+    .label,
+    .sidebar__footer { display: none; }
+
+    // центрирај икони кога е мини
+    .sidebar__menu li a {
+      justify-content: center;
+    }
+
+    // спречи "искачување" при hover во мини мод
+    .sidebar__menu li a:hover {
+      width: 100%;
+      margin-left: 0;
+    }
   }
 
   &__toggle {
@@ -29,7 +60,7 @@ $header-total-height-margin: 70px; // Adjusted for larger header
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 0.5rem;
+    padding: .5rem;
     background: none;
     border: none;
     color: $light;
@@ -43,8 +74,7 @@ $header-total-height-margin: 70px; // Adjusted for larger header
   }
 
   &__menu {
-    margin-top: 4px;
-    margin-bottom: 4px;
+    margin: 4px 0;
     list-style: none;
     padding: 5px;
     background: $darker;
@@ -52,18 +82,15 @@ $header-total-height-margin: 70px; // Adjusted for larger header
     li a {
       display: flex;
       align-items: center;
-      padding: 0.75rem;
+      gap: .5rem;
+      padding: .75rem;
       color: $light;
       text-decoration: none;
 
-      .icon {
-        width: 30px;
-        text-align: center;
-      }
-      .label {
-        margin-left: 0.5rem;
-      }
+      .icon { width: 30px; text-align: center; }
+      .label { margin-left: .25rem; }
     }
+
     li.active a {
       width: 95%;
       margin-left: 5px;
@@ -71,56 +98,111 @@ $header-total-height-margin: 70px; // Adjusted for larger header
       color: $light;
       border-radius: 4px;
     }
+
+    // мал индикатор за кредити во closed state
+  /* ── Credits indicator (collapsed) ───────────────────────── */
+  li.credits-indicator {
+    margin-top: .75rem;
+    padding: 6px 0;
+    text-align: center;
+    background: $dark;
+    border-radius: 6px;
+
+    a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      text-decoration: none;
+      /* ако сакаш да е само информативно: */
+      pointer-events: none;
+    }
+
+    .icon {
+      display: inline-block;
+      font-size: 1.3rem;
+      line-height: 1;
+      color: $primary-blue;
+    }
+
+    .count {
+      font-weight: 700;
+      font-size: 0.7rem;   /* видливо и тесно */
+      line-height: 1;
+      color: $light;
+      letter-spacing: .5px;
+    }
+  }
+
   }
 
   &__footer {
     padding: 1rem;
-    font-size: 0.85rem;
-    color: $light;
+    font-size: .85rem;
+    color: $light !important;
     background: $darker;
   }
 
-  &__menu {
-    li.credits-indicator {
-      margin-top: 1rem;        // мало растојание од долу
-      text-align: center;      // центрирај ја иконата
-      cursor: help;           // покажува дека е информативно
-      background: $dark;
-
-      .icon {
-        display: inline-block;
-        font-size: 1.2rem;     // поудебелен преглед
-        color: $primary-blue;  // или било која accent боја
-      }
-
-      a {
-        pointer-events: none;  // не е кликабилно
-      }
-    }
-  }
-
+  // hover стил во нормална (open) состојба
   .sidebar__menu li a:hover {
     width: 95%;
     margin-left: 5px;
-    background: rgba(255, 255, 255, .06);
+    background: rgba(255,255,255,.06);
     border-radius: 4px;
   }
 
   .sidebar__menu li.active a {
     background: linear-gradient(135deg, #00509e, #0a66c2);
     color: #fff;
-    
   }
 
-  /* малку попрегледни икони */
-  .sidebar__menu .icon {
-    font-size: 1.1rem;
-    line-height: 1;
+  .sidebar__menu .icon { font-size: 1.1rem; line-height: 1; }
+
+  /* ── Backdrop под sidebar, над содржината ───────────────────────── */
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;                 /* покрива и header за затемнување; ако не сакаш → стави $header-total-height */
+    left: 0; right: 0; bottom: 0;
+    z-index: 900;           /* sidebar е 1000 → backdrop под sidebar, над страницата */
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    animation: sbFade .18s ease forwards;
+    pointer-events: all;    /* ги „јаде“ кликовите на позадината */
   }
 
-  /* Mobile off-canvas */
+  @keyframes sbFade { to { opacity: 1; } }
+
+  /* ── Mobile off-canvas */
   @media (max-width: 991px) {
-    &.open   { transform: translateX(0); }
+    width: 100%;                  // поширок на мобилен
+    transform: translateX(-100%); // default: скриен
+    &.open   { 
+      transform: translateX(0);
+      background-color: $darker;
+      border-right: 1px solid gray;
+    }
+
+    &.open .sidebar__header {
+      border-bottom: 1px solid gray;
+    }
+
+    &.open .sidebar__menu {
+      border-bottom: 1px solid gray;
+    }
+
     &.closed { transform: translateX(-100%); }
+
+    // во мобилен, не користиме mini-width → целосно off-canvas
+    &.closed .sidebar__footer,
+    &.closed .label { display: none; }
+
+    .sidebar {
+      width: 280px;
+      transform: translateX(-100%);
+      &.open   { transform: translateX(0); }
+      &.closed { transform: translateX(-100%); }
+    }
   }
 }

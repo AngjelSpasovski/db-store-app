@@ -271,6 +271,12 @@
         "BILLING_USERS": "Billing by Users",
         "PACKAGE_MANAGEMENT": "Package Management",
         "USER_DETAILS": "User Details"
-    }
+    },
+   
+    "RECEIPT": "Receipt",
+    "VIEW": "View",
+    "N_A": "N/A",
 
+    "PAYMENT_CANCELED": "Payment canceled.",
+    "PAYMENT_COMPLETED_TEST": "Payment completed (test). Credits will appear once backend confirms."
 }

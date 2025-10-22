@@ -271,6 +271,13 @@
         "BILLING_USERS": "Fatturazione per utente",
         "PACKAGE_MANAGEMENT": "Gestione pacchetti",
         "USER_DETAILS": "Dettagli utente"
-    }
+    },
+
+    "RECEIPT": "Ricevuta",
+    "VIEW": "Visualizza",
+    "N_A": "N/A",
+
+    "PAYMENT_CANCELED": "Pagamento annullato.",
+    "PAYMENT_COMPLETED_TEST": "Pagamento completato (test). I crediti appariranno una volta confermato dal backend."
 
 }

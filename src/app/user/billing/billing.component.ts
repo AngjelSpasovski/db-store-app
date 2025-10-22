@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AgGridModule } from 'ag-grid-angular';
 import { themeAlpine } from 'ag-grid-community';
-import { BillingService, Invoice } from './billing.service';
+import { ToastService } from '../../shared/toast.service';
+
+import { BILLING_API } from '../../shared/tokens.api';
+import { BillingApi, BillingRow } from '../../shared/billing.api';
 
 @Component({
   selector: 'app-billing',
@@ -13,84 +16,88 @@ import { BillingService, Invoice } from './billing.service';
   imports: [CommonModule, TranslateModule, AgGridModule],
 })
 export class BillingComponent implements OnInit {
+  private billingApi = inject<BillingApi>(BILLING_API);
+
   columnDefs: any[] = [];
   defaultColDef = { sortable: true, filter: true, resizable: true, flex: 1 };
   rowData: any[] = [];
 
-  // Dark theme params (усогласено со останатиот UI)
   public theme = themeAlpine.withParams({
-    backgroundColor: '#1b212b',                         // main background color
-    foregroundColor: '#e9eef6',                         // optional: grid text color
-    headerBackgroundColor: '#2a303a',                   // header background color
-    headerTextColor: '#c7cfda',                         // header text color
-    textColor: '#e9eef6',                               // border color for cells
-    cellTextColor: '#e9eef6',                           // cell text color
-    borderColor: 'rgba(255,255,255,.08)',               // border color for cells
-    rowHeight: 40,                                        // default row height
-    headerHeight: 48,                                     // header height
-    fontFamily: 'Inter, system-ui, Roboto, sans-serif',   // font family
-    fontSize: '14px',                                     // font size
-    accentColor: '#0d6efd',                             // accent color, e.g. for selected rows
+    backgroundColor: '#1b212b',
+    foregroundColor: '#e9eef6',
+    headerBackgroundColor: '#2a303a',
+    headerTextColor: '#c7cfda',
+    textColor: '#e9eef6',
+    cellTextColor: '#e9eef6',
+    borderColor: 'rgba(255,255,255,.08)',
+    rowHeight: 40,
+    headerHeight: 48,
+    fontFamily: 'Inter, system-ui, Roboto, sans-serif',
+    fontSize: '14px',
+    accentColor: '#0d6efd',
   });
 
   constructor(
-    private billingSvc: BillingService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
-    this.agGridInit();
+    const qp = new URLSearchParams(window.location.search);
+    if (qp.get('success') === '1') {
+      this.toast.success('Payment completed. Credits added after server confirmation.');
+      history.replaceState({}, '', window.location.pathname);
+    }
+    this.buildColumns();
+    this.load();
   }
 
-  public agGridInit() {
-    const invoices: Invoice[] = this.billingSvc.getAll();
-
-    // map -> grid rows
-    this.rowData = invoices.map((inv) => ({
-      id: inv.id,
-      timestamp: new Date(inv.timestamp),
-      credits: inv.credits,
-      amount: inv.amount,
-      success: inv.credits > 0,
-    }));
-
+  private buildColumns() {
     this.columnDefs = [
-      {
-        field: 'id',
-        headerName: this.translate.instant('ID_NUMBER'),
-        minWidth: 240,
-      },
+      { field: 'id', headerName: this.translate.instant('ID_NUMBER'), minWidth: 240 },
       {
         field: 'timestamp',
         headerName: this.translate.instant('TIMESTAMP'),
         filter: 'agDateColumnFilter',
-        valueFormatter: (p: any) => (p.value ? p.value.toLocaleString() : ''),
+        valueFormatter: (p: any) => (p.value ? new Date(p.value).toLocaleString() : ''),
         sort: 'desc',
         minWidth: 190,
       },
-      {
-        field: 'credits',
-        headerName: this.translate.instant('CREDITS'),
-        minWidth: 120,
-      },
+      { field: 'credits', headerName: this.translate.instant('CREDITS'), minWidth: 120 },
       {
         field: 'amount',
         headerName: this.translate.instant('AMOUNT'),
-        valueFormatter: (p: any) =>
-          p.value == null ? '' : `${p.value.toFixed(0)} €`,
+        valueFormatter: (p: any) => (p.value == null ? '' : `${Number(p.value).toFixed(0)} €`),
         minWidth: 120,
       },
       {
-        field: 'success',
+        field: 'status',
         headerName: this.translate.instant('STATUS'),
         minWidth: 120,
         cellRenderer: (p: any) => {
-          const ok = !!p.value;
+          const ok = p.value === 'SUCCESS';
           const text = ok ? this.translate.instant('SUCCESS') : this.translate.instant('FAILED');
           const cls = ok ? 'badge bg-success' : 'badge bg-danger';
           return `<span class="${cls}">${text}</span>`;
         },
+      },
+      {
+        field: 'receiptUrl',
+        headerName: this.translate.instant('RECEIPT'),
+        minWidth: 140,
+        cellRenderer: (p: any) => {
+          const url = p.value;
+          if (!url) return `<span class="text-muted">${this.translate.instant('N_A') || 'N/A'}</span>`;
+          const label = this.translate.instant('VIEW') || 'View';
+          return `<a href="${url}" target="_blank" rel="noopener">${label}</a>`;
+        }
       }
     ];
+  }
+
+  private load() {
+    this.billingApi.listMyPayments().subscribe((rows: BillingRow[]) => {
+      this.rowData = rows; // веќе е во формат {id,timestamp,credits,amount,status,receiptUrl}
+    });
   }
 }

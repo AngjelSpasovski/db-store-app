@@ -1,3 +1,4 @@
+// src/app/user/side-bar/side-bar.component.ts
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, HostBinding  } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common'; // for *ngFor, *ngIf, etc.
@@ -5,8 +6,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from 'src/app/auth/auth.service';
 import { CreditsService } from '../buy-credits/credit.service';
 import type { AuthUser } from '../../auth/auth.service';
-
-
+import { inject, OnInit } from '@angular/core';
+import { CREDITS_API } from '../../shared/tokens.api';
+import { CreditsApi } from '../../shared/credits.api';
 
 @Component({
   selector: 'app-sidebar',
@@ -40,6 +42,9 @@ export class SidebarComponent {
   public currentCredits = 0;                    // ← Current credits from session storage
   public credits$ = this.creditsSvc.credits$;    // ← Observable на кредити
 
+  private creditsApi = inject<CreditsApi>(CREDITS_API);
+  public remainingCredits = 0;
+
   public menuItems = [
     { label: 'BUY_CREDITS', icon: '🛒', route: '/user/buy-credits' },
     { label: 'SEARCH',      icon: '🔍', route: '/user/new-research' },
@@ -55,7 +60,8 @@ export class SidebarComponent {
   ) { }
 
   ngOnInit() {
-
+    this.creditsApi.getMyCredits().subscribe(v => this.remainingCredits = v);
+    
     // init credits
     const user: AuthUser | null = this.auth.getCurrentUser();
     if (user) {

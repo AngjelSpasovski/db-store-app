@@ -3,27 +3,40 @@
     <h3 class="m-0">{{ 'BUY_CREDITS_TITLE' | translate }}</h3>
   </div>
 
-  <div class="card-grid">
-    <div class="container-fluid px-0 h-100 overflow-auto">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
-        <div class="col" *ngFor="let pkg of creditPackages; trackBy: trackByCredits">
-          <div class="card acc-card credit-card h-100">
-            <div class="card-header">
-              {{ pkg.credits | number }} {{ 'CREDITS' | translate }}
-            </div>
+  <div class="container-fluid px-0 h-100">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
 
-            <div class="card-body text-center">
-              <!-- ако pkg.price е број, користи currency pipe; ако е стринг '199€', остави само {{ pkg.price }} -->
-              <div class="price display-6 mb-3">
-                {{ pkg.price }}
-              </div>
-              <button type="button" class="btn btn-app btn-buy w-100" (click)="purchase(pkg)">
-                {{ 'BUY_NOW' | translate }} <i class="bi bi-cart-plus ms-2"></i>
-              </button>
-            </div>
+      <!-- ✅ работи со packages и pkg.id -->
+      <div class="col" *ngFor="let pkg of packages; trackBy: trackByPkg">
+        <div class="card acc-card credit-card h-100">
+          <div class="card-header">
+            {{ pkg.credits | number }} {{ 'CREDITS' | translate }}
           </div>
+
+          <div class="card-body text-center">
+            <div *ngIf="!canBuy(pkg)" class="small text-warning mt-2">
+             Payment link not configured yet.
+            </div>  
+
+            <div class="price display-6 mb-1">
+              {{ pkg.displayPrice }}
+            </div>
+            <small class="text-muted" *ngIf="!environment.production">Stripe Test Mode</small>
+
+            <button class="btn btn-secondary w-100" [disabled]="loadingId===pkg.id || !canBuy(pkg)" (click)="purchase(pkg)">
+              <span *ngIf="loadingId!==pkg.id">
+                {{ canBuy(pkg) ? 'Buy Now' : 'work in progress' }}
+              </span>
+              <span *ngIf="loadingId===pkg.id" class="d-inline-flex align-items-center gap-2">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Processing...
+              </span>
+            </button>
+          </div>
+
         </div>
       </div>
+
     </div>
   </div>
 </section>
