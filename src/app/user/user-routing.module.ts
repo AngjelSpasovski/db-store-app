@@ -1,3 +1,4 @@
+// src/app/user/user-routing.module.ts
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -21,7 +22,7 @@ const routes: Routes = [
     path: '',
     component: UserComponent,
     canActivateChild: [roleGuard],
-    data: { roles: ['user', 'admin', 'superadmin'] }, // ⬅️ сите имаат пристап до основните user рути
+    data: { roles: ['user', 'adminUser','superadmin'] }, // ⬅️ сите имаат пристап до основните user рути
     children: [
       { path: '', redirectTo: 'buy-credits', pathMatch: 'full' },
 
@@ -40,7 +41,7 @@ const routes: Routes = [
       { path: 'service-delivery-policy', component: ServiceDeliveryPolicyComponent,  data: { title: 'SERVICE_DELIVERY_POLICY' } },
 
       // account page
-      { path: 'account',                 component: AccountComponent,                data: { title: 'ACCOUNT',        roles: ['user','admin','superadmin'] } },
+      { path: 'account',                 component: AccountComponent,                data: { title: 'ACCOUNT',        roles: ['user','adminUser','superadmin'] } },
 
 
       // ⬇️ Пример за admin-only подоцна:

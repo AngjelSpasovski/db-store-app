@@ -21,14 +21,14 @@ import { RouterModule } from '@angular/router';
     ReactiveFormsModule,
     TranslateModule,
     FontAwesomeModule,
-    RouterModule           
+    RouterModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('signupForm', { static: false }) signupFormRef!: ElementRef<HTMLFormElement>;
-  
+
   faEye       = faEye;
   faEyeSlash  = faEyeSlash;
   faArrowLeft = faArrowLeft;
@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isSubmittingLogin = false;
 
-  
+
   private sub!: Subscription;   // Subscription for logout event
 
   constructor(
@@ -91,11 +91,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // old role-based fallback
     const target =
-      role === 'superadmin' ? '/user/superadmin' :
-      role === 'admin'      ? '/user/admin'      :
-                              '/user/buy-credits';
+    role === 'superadmin' ? '/admin' :
+    /* adminUser и user одат исто */   '/user/buy-credits';
+
     this.router.navigateByUrl(target, { replaceUrl: true });
     return;
   }
@@ -114,15 +113,15 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       surname:              ['',    Validators.required],
       password:             ['',    [Validators.required, Validators.minLength(6)]],
       confirmPassword:      ['',    Validators.required],
-  
+
       // 1b. Column 2
       companyName:          ['',    Validators.required],
       companyAddress:       ['',    Validators.required],
       companyAddressSecond: [''],
-      
+
       phoneNumber:          ['',    [Validators.required, Validators.pattern(/^\d{9,15}$/)]],   // 9–15 цифри
       vat:                  ['',    [Validators.required, Validators.pattern(/^\d{11}$/)]],     // IT: точно 11 цифри
-  
+
       // 1c. Column 3
       city:                 ['',    Validators.required],
       state:                ['',    Validators.required],
@@ -171,7 +170,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
-  
+
   toggleConfirmPasswordVisibility() {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
@@ -219,12 +218,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
         // 3) инаку по улога во /user/*
         const role = (res.user.role || 'user').toLowerCase();
         switch (role) {
-          case 'superadmin': this.router.navigateByUrl('/user/superadmin'); break;
-          case 'admin': this.router.navigateByUrl('/user/admin'); break;
-          default: this.router.navigateByUrl('/user/buy-credits');
+          case 'superadmin': this.router.navigateByUrl('/admin'); break;
+          // adminUser и user имаат ист дом
+          default:           this.router.navigateByUrl('/user/buy-credits'); break;
         }
-        this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-        this.isSubmittingLogin = false;
       },
       error: err => {
         if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
@@ -562,10 +559,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   showApiErrors(err: any) {
     if (err?.status === 422 && err?.error?.errors) {
       this.serverErrorMsg = this.flattenErrors(err.error.errors).join('\n');
-    } 
+    }
     else if (err?.status === 0) {
       this.serverErrorMsg = this.translate.instant('TOAST.NETWORK_ERROR');
-    } 
+    }
     else {
       this.serverErrorMsg = err?.error?.message || this.translate.instant('TOAST.SERVER_ERROR');
     }

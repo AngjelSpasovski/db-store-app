@@ -44,7 +44,7 @@
   </nav>
 
   <!-- LOGIN / FORGOT-PASSWORD VIEW -->
-  <div *ngIf="viewMode === 'login' || viewMode === 'forgot-password' || viewMode === 'reset-password'" 
+  <div *ngIf="viewMode === 'login' || viewMode === 'forgot-password' || viewMode === 'reset-password'"
       class="navbar navbar-expand-lg navbar-dark w-100 login-nav bg-dark">
     <div class="" style="display: flex; justify-content: space-between; width: inherit;">
 
@@ -54,12 +54,12 @@
           DBStore
         </a>
 
-      
+
       <div class="language-selector">
         <app-language-selector></app-language-selector>
       </div>
 
-      
+
     </div>
   </div>
 
@@ -106,13 +106,13 @@
   <nav *ngIf="viewMode === 'admin'" class="navbar navbar-expand-lg navbar-dark w-100 bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand">DBStore Admin</a>
-  
+
       <button class="navbar-toggler" type="button" (click)="toggleAdminNav()" [attr.aria-expanded]="isAdminNavOpen">
         <span class="navbar-toggler-icon"></span>
       </button>
-  
+
       <div id="adminNavbarContent" class="navbar-collapse collapse" [class.show]="isAdminNavOpen">
-  
+
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <!-- активни состојби со routerLinkActive -->
           <li class="nav-item">
@@ -123,11 +123,17 @@
           </li>
 
           <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/admin/users']" routerLinkActive="active">
+              {{ 'ADMIN.USERS' | translate }}
+            </a>
+          </li>
+
+          <li class="nav-item">
             <a class="nav-link" [routerLink]="['/admin/user-details']" routerLinkActive="active">
               {{ 'ADMIN.USER_DETAILS' | translate }}
             </a>
           </li>
-  
+
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/admin/billing-users']" routerLinkActive="active">
               {{ 'ADMIN.BILLING_USERS' | translate }}
@@ -139,27 +145,47 @@
               {{ 'ADMIN.PACKAGE_MANAGEMENT' | translate }}
             </a>
           </li>
-  
+
+          <!-- 🔹 Superadmin секција (видлива само ако е superadmin) -->
+          <li class="nav-item dropdown" *ngIf="isSuperadmin">
+            <a class="nav-link dropdown-toggle" href="#" id="superadminDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Superadmin
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="superadminDropdown">
+              <li>
+                <a class="dropdown-item" [routerLink]="['/superadmin/packages']">
+                  Packages
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" [routerLink]="['/superadmin/admins']">
+                  Admins
+                </a>
+              </li>
+            </ul>
+          </li>
+
         </ul>
-  
+
         <ul class="navbar-nav ms-auto align-items-lg-center">
           <li class="nav-item">
             <p class="navbar-text text-white me-lg-3 email-truncate">
               <span class="email-style">{{ userEmail }}</span>
             </p>
           </li>
-  
+
           <li class="nav-item">
             <app-language-selector class="language-selector"></app-language-selector>
           </li>
-  
+
           <li class="nav-item">
             <button class="btn logout-btn" (click)="logout(); closeAdminNav()">
               <fa-icon [icon]="faSignOutAlt"></fa-icon> {{ 'LOGOUT' | translate }}
             </button>
           </li>
         </ul>
-  
+
       </div>
     </div>
   </nav>

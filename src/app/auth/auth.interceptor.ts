@@ -21,23 +21,35 @@ export class AuthInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const base  = (environment.baseApiUrl ?? '').replace(/\/+$/, '');
-    const token = localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+    const base = (environment.baseApiUrl ?? '').replace(/\/+$/,''); // пример: '/api'
+    const origin = window.location.origin;                          // 'http://localhost:4200'
 
+    // апсолутна база до API
+    const absBase = base.startsWith('http') ? base : `${origin}${base}`;
+
+    // апсолутен URL за тековното барање (ако е релативен, му додаваме origin)
+    const absUrl  = req.url.startsWith('http') ? req.url : `${origin}${req.url}`;
+
+    // што е asset?
     const isAsset = /\/(assets|i18n)\//.test(req.url);
-    const isAuth  = !!base && req.url.startsWith(`${base}/auth/`);
-    const isApi   = !!base && (req.url.startsWith(base) || (base.startsWith('/') && req.url.startsWith(base)));
 
+    // дали е API и дали е AUTH групата
+    const isApi  = !!base && absUrl.startsWith(absBase);
+    const isAuth = !!base && absUrl.startsWith(`${absBase}/auth/`);
+
+    const token = localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
     const addAuth = !!token && isApi && !isAsset && !isAuth;
 
-    // секогаш праќај јазик за API (не за assets)
     let finalReq = req;
     if (!isAsset) {
       const lang = (this.i18n.currentLang || this.i18n.getDefaultLang() || 'en').toLowerCase();
-      const setHeaders: Record<string, string> = { 'Accept-Language': lang };
-      if (addAuth) setHeaders['Authorization'] = `Bearer ${token}`;
-      finalReq = req.clone({ setHeaders });
+      const headers: Record<string,string> = { 'Accept-Language': lang };
+      if (addAuth) headers['Authorization'] = `Bearer ${token}`;
+      finalReq = req.clone({ setHeaders: headers });
     }
+
+    // debug logging
+    console.debug('[HTTP]', finalReq.method, finalReq.url, finalReq.headers.get('Authorization'));
 
     return next.handle(finalReq).pipe(
       catchError((err: HttpErrorResponse) => {

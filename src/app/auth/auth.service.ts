@@ -1,3 +1,4 @@
+// src/app/auth/auth.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
@@ -5,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from './auth.environment';
 
 /** === API types === */
-export type AuthRole = 'user' | 'admin' | 'superadmin';
+export type AuthRole = 'user' | 'adminUser' | 'superadmin';
 
 export interface AuthUser {
   id:          string;
@@ -69,13 +70,26 @@ export class AuthService {
     return localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY);
   }
 
+  private normalizeRole(role: string | undefined, email?: string): AuthRole {
+    const r = (role || 'user').toLowerCase();
+
+    // whitelist по е-мејл → секогаш superadmin
+    if ((email || '').toLowerCase() === 'angjel.spasovski@gmail.com') return 'superadmin';
+
+    // map backend варијанти кон нашата шема
+    if (r === 'admin_user' || r === 'adminuser' || r === 'admin') return 'adminUser';
+    if (r === 'superadmin') return 'superadmin';
+    return 'user';
+  }
+
   /** === API calls === */
   signIn(body: SignInReq, remember = false): Observable<SignInRes> {
     return this.http.post<SignInRes>(`${this.base}/auth/sign-in`, body).pipe(
       tap(res => {
+        const userNorm = { ...res.user, role: this.normalizeRole(res.user.role, res.user.email) };
         this.storeToken(res.accessToken, remember);
-        this.storeUser(res.user, remember);
-        this.currentUser$.next(res.user);
+        this.storeUser(userNorm, remember);
+        this.currentUser$.next(userNorm);
         this.isAuthed$.next(true);
       })
     );
@@ -119,7 +133,14 @@ export class AuthService {
 
   /** Returns the current user object (or null) */
   getCurrentUser(): AuthUser | null {
-    return this.readUser();
+    const u = this.readUser();
+    if (!u) return null;
+
+    const norm = { ...u, role: this.normalizeRole(u.role, u.email) };
+    if (norm.role !== u.role) this.storeUser(norm, !!localStorage.getItem('auth_token')); // resave
+
+    console.log('getCurrentUser', norm);
+    return norm;
   }
 
   /** Returns current email if logged in */
@@ -131,15 +152,21 @@ export class AuthService {
   getCredits(): number {
     const user = this.readUser();
     if (!user) return 0;
+
     const key = `credits_${user.email}`;
     const stored = sessionStorage.getItem(key);
+
     return stored ? +stored : 0;
-    }
+  }
+
   deductCredits(amount: number): void {
     const user = this.readUser();
     if (!user) return;
+
     const key = `credits_${user.email}`;
     const updated = Math.max(0, this.getCredits() - amount);
+
+    console.log('deductCredits', key, updated);
     sessionStorage.setItem(key, updated.toString());
   }
 

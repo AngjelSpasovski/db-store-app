@@ -17,8 +17,8 @@ import { faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
   imports: [
     CommonModule,
     RouterModule,
-    LanguageSelectorComponent, 
-    FontAwesomeModule, 
+    LanguageSelectorComponent,
+    FontAwesomeModule,
     TranslateModule
   ]
 })
@@ -34,7 +34,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   public isUserNavOpen = false;
   public isHomeNavOpen = false;
-  public isAdminNavOpen = false; 
+  public isAdminNavOpen = false;
+
+  public isSuperadmin = false;
 
   private destroy$ = new Subject<void>();
 
@@ -74,6 +76,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe(u2 => {
         this.isLoggedIn = !!u2;
         this.userEmail = u2?.email ?? '';
+      });
+
+      //
+      this.auth.currentUser$.subscribe(u => {
+        this.isSuperadmin = (u?.role?.toLowerCase() === 'superadmin');
       });
   }
 

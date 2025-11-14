@@ -180,7 +180,7 @@
     "PACKAGES_TEXT2": "Trust DBStore and find the perfect offers for you right away!",
     "PACKAGES_TEXT3": "Why choose Dbstore for your business?",
 
-    
+
     "OWNER": "Owner",
     "MARKETING_MANAGER": "Marketing Manager",
     "MANAGER": "Manager",
@@ -268,11 +268,12 @@
 
     "ADMIN": {
         "DASHBOARD": "Dashboard",
+        "USERS": "Users",
         "BILLING_USERS": "Billing by Users",
         "PACKAGE_MANAGEMENT": "Package Management",
         "USER_DETAILS": "User Details"
     },
-   
+
     "RECEIPT": "Receipt",
     "VIEW": "View",
     "N_A": "N/A",
