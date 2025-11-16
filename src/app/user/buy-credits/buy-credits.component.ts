@@ -7,6 +7,7 @@ import { ToastService } from '../../shared/toast.service';
 import { AuthService, AuthUser } from '../../auth/auth.service';
 import { PaymentsService } from '../../shared/payments.service';
 import { CREDIT_PACKAGES, CreditPackage } from './credit-packages.config';
+import { CreditsService } from './credit.service';
 
 import { environment } from 'src/environments/environment';
 
@@ -32,27 +33,33 @@ export class BuyCreditsComponent implements OnInit {
     private auth: AuthService,
     private payments: PaymentsService,
     private toast: ToastService,
+    private creditsSvc: CreditsService,
   ) {}
 
-  public ngOnInit(): void {
-    // optional cancel feedback
-    const qp = new URLSearchParams(window.location.search);
-    if (qp.get('canceled') === '1') {
-      this.toast.show('Payment canceled.', false, 3500, 'top-end');
-      this.toast.info('Payment canceled.', { position: 'top-end' });
+  // src/app/user/buy-credits/buy-credits.component.ts
 
-      // исчисти го query-string
-      history.replaceState({}, '', window.location.pathname);
-    }
+public ngOnInit(): void {
+  const qp = new URLSearchParams(window.location.search);
 
-    this.currentUser = this.auth.getCurrentUser();
-    if (this.currentUser) {
-      const storageKey = `credits_${this.currentUser.email}`;
-      const stored = sessionStorage.getItem(storageKey);
-      this.currentCredits = stored ? +stored : 0;
-      if (!stored) sessionStorage.setItem(storageKey, '0');
-    }
+  if (qp.get('canceled') === '1') {
+    this.toast.info('Payment canceled.', { position: 'top-end' });
   }
+
+  if (qp.get('success') === '1') {
+    this.toast.success('Payment completed successfully.', { position: 'top-end' });
+    // рефреш кредити од backend
+    this.creditsSvc.refreshFromApi();
+  }
+
+  // исчисти query string за да не останува success/canceled во URL
+  if (qp.has('canceled') || qp.has('success')) {
+    history.replaceState({}, '', window.location.pathname);
+  }
+
+  // ако сакаш – можеш и тука да повикаш refresh, не е штетно
+  this.creditsSvc.refreshFromApi();
+}
+
 
   public trackByPkg = (_: number, pkg: CreditPackage) => pkg.id;
 
@@ -60,8 +67,8 @@ export class BuyCreditsComponent implements OnInit {
     if (environment.paymentsMode === 'paymentLinks') {
       return !!pkg.paymentLinkUrl;
     }
-    // 'api' mode
-    return !!pkg.priceId;
+    // 'api' mode → мора да има валиден backendId
+    return typeof pkg.backendId === 'number';
   }
 
   async purchase(pkg: CreditPackage) {
@@ -69,16 +76,11 @@ export class BuyCreditsComponent implements OnInit {
 
     this.loadingId = pkg.id;
     try {
-      await this.payments.start(pkg); // redirect или no-op ако нема линк
-      // ако нема линк, start() ќе заврши без redirect → падни во else
-      if (environment.paymentsMode === 'paymentLinks' && !pkg.paymentLinkUrl) {
-        // покажи фина инфо порака наместо error
-        // this.toast.info('This package will be available soon.');
-        console.info('Package not ready yet.');
-        this.loadingId = null;
-      }
+      await this.payments.start({
+        packageId: pkg.backendId!,                // ⬅ користиме backendId
+        paymentLinkUrl: pkg.paymentLinkUrl ?? '',
+      });
     } catch {
-      // this.toast.error('Payment init failed.');
       this.loadingId = null;
     }
   }

@@ -16,7 +16,7 @@ import { CreditsApi } from '../../shared/credits.api';
   imports: [
     RouterModule,
     CommonModule,
-    TranslateModule    
+    TranslateModule
   ],
   templateUrl: './side-bar.component.html',
   styleUrls: ['./side-bar.component.scss'],
@@ -28,11 +28,11 @@ export class SidebarComponent {
 
   @Output() close = new EventEmitter<void>();   /** Emitted when a menu link is clicked on mobile */
 
-  @HostBinding('class.open')  get opened() { 
-    return this.isOpen; 
+  @HostBinding('class.open')  get opened() {
+    return this.isOpen;
   }
-  @HostBinding('class.closed') get closed() { 
-    return !this.isOpen; 
+  @HostBinding('class.closed') get closed() {
+    return !this.isOpen;
   }
 
   public currentUser: AuthUser | null = null;
@@ -60,14 +60,18 @@ export class SidebarComponent {
   ) { }
 
   ngOnInit() {
-    this.creditsApi.getMyCredits().subscribe(v => this.remainingCredits = v);
-    
-    // init credits
+    // 1) повлечи од API
+    this.creditsSvc.refreshFromApi();
+
+    // 2) претплати се на кредити и покажувај ги и во sidebar и на icon
+    this.creditsSvc.credits$.subscribe(v => {
+      this.remainingCredits = v;
+    });
+
+    // user load од AuthService останува како што е
     const user: AuthUser | null = this.auth.getCurrentUser();
     if (user) {
-      const key = `credits_${user.email}`;
-      const stored = sessionStorage.getItem(key);
-      this.currentCredits = stored ? +stored : 0;
+      this.currentUser = user;
     }
   }
 

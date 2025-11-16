@@ -4,15 +4,6 @@ import { CommonModule } from '@angular/common';
 import { UserRoutingModule } from './user-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 
-// API implementations
-import { CREDITS_API, BILLING_API } from '../shared/tokens.api';
-import { LocalCreditsApi } from '../shared/local-credits.api';
-import { LocalBillingApi } from '../shared/local-billing.api';
-
-// http implementations
-import { HttpCreditsApi } from '../shared/http-credits.api';
-import { HttpBillingApi } from '../shared/http-billing.api';
-
 // Standalone components
 import { UserComponent } from './user.component';
 import { SidebarComponent } from './side-bar/side-bar.component';
@@ -26,14 +17,6 @@ import { FaqsComponent } from './faqs/faqs.component';
 
 import { AccountComponent } from './account/account.component';
 import { environment } from 'src/environments/environment';
-
-const creditsProvider = environment.dataMode === 'api'
-  ? { provide: CREDITS_API, useExisting: HttpCreditsApi }
-  : { provide: CREDITS_API, useExisting: LocalCreditsApi };
-
-const billingProvider = environment.dataMode === 'api'
-  ? { provide: BILLING_API, useExisting: HttpBillingApi }
-  : { provide: BILLING_API, useExisting: LocalBillingApi };
 
 @NgModule({
   imports: [
@@ -51,8 +34,7 @@ const billingProvider = environment.dataMode === 'api'
     HistoryComponent,
     BillingComponent,
     FaqsComponent,
-    AccountComponent   
-  ],
-  providers: [creditsProvider, billingProvider]
+    AccountComponent
+  ]
 })
 export class UserModule {}

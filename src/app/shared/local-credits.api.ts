@@ -1,19 +1,17 @@
+// src/app/shared/local-credits.api.ts
 import { Injectable } from '@angular/core';
-import { CreditsApi } from './credits.api';
 import { Observable, of } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
+import { CreditsApi } from './credits.api';
 
 @Injectable({ providedIn: 'root' })
-export class LocalCreditsApi extends CreditsApi {
-
-  constructor(private auth: AuthService) { super(); }
+export class LocalCreditsApi implements CreditsApi {
+  private credits = 0;
 
   getMyCredits(): Observable<number> {
-    const user = this.auth.getCurrentUser();
-    if (!user) return of(0);
-    
-    const key = `credits_${user.email}`;
-    
-    return of(+(sessionStorage.getItem(key) ?? '0'));
+    return of(this.credits);
+  }
+
+  setCredits(value: number): void {
+    this.credits = Math.max(0, value);
   }
 }

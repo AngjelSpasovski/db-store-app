@@ -9,6 +9,7 @@ import { catchError } from 'rxjs/operators';
 import { environment } from './auth.environment';
 import { ToastService } from '../shared/toast.service';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -17,39 +18,55 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private toast: ToastService,
     private router: Router,
-    private i18n: TranslateService
+    private i18n: TranslateService,
+    private auth: AuthService
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const base = (environment.baseApiUrl ?? '').replace(/\/+$/,''); // пример: '/api'
-    const origin = window.location.origin;                          // 'http://localhost:4200'
+    const origin = window.location.origin; // 'http://localhost:4200'
+    const token  = this.auth.token;
+
+    // baseApiUrl: '/api/v1' или 'https://.../api/v1'
+    const base   = (environment.baseApiUrl ?? '/api').replace(/\/+$/, '');
+    // apiRoot: '/api' или 'https://.../api'
+    const apiRoot = base.replace(/\/v1$/, '');
+
+      // ⬇️ Stripe специјални ендпоинти
+      const isStripeCheckout = req.url.includes('/stripe/checkout/create') || req.url.includes('/stripe/webhook'); // ако некогаш го викаш и од фронт
 
     // апсолутна база до API
-    const absBase = base.startsWith('http') ? base : `${origin}${base}`;
+    const absBase     = base.startsWith('http')    ? base    : `${origin}${base}`;
+    const absApiRoot  = apiRoot.startsWith('http') ? apiRoot : `${origin}${apiRoot}`;
+    const absUrl      = req.url.startsWith('http') ? req.url : `${origin}${req.url}`;
 
-    // апсолутен URL за тековното барање (ако е релативен, му додаваме origin)
-    const absUrl  = req.url.startsWith('http') ? req.url : `${origin}${req.url}`;
-
-    // што е asset?
+    // asset-и (i18n + статички)
     const isAsset = /\/(assets|i18n)\//.test(req.url);
 
-    // дали е API и дали е AUTH групата
-    const isApi  = !!base && absUrl.startsWith(absBase);
-    const isAuth = !!base && absUrl.startsWith(`${absBase}/auth/`);
+    // дали е API повик:
+    //  - '/api/v1/...'
+    //  - '/api/...'
+    const isApi = !!base && (absUrl.startsWith(absBase) || absUrl.startsWith(absApiRoot));
 
-    const token = localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+    // дали е auth endpoint (sign-in, sign-up, reset итн.)
+    const isAuth = (!!base && (absUrl.startsWith(`${absBase}/auth/`) || absUrl.startsWith(`${absApiRoot}/auth/`)));
+
     const addAuth = !!token && isApi && !isAsset && !isAuth;
 
     let finalReq = req;
+
     if (!isAsset) {
       const lang = (this.i18n.currentLang || this.i18n.getDefaultLang() || 'en').toLowerCase();
-      const headers: Record<string,string> = { 'Accept-Language': lang };
-      if (addAuth) headers['Authorization'] = `Bearer ${token}`;
+      const headers: Record<string, string> = {
+        'Accept-Language': lang,
+      };
+      if (addAuth) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
       finalReq = req.clone({ setHeaders: headers });
     }
 
     // debug logging
-    console.debug('[HTTP]', finalReq.method, finalReq.url, finalReq.headers.get('Authorization'));
+    console.debug('[HTTP]',finalReq.method,finalReq.url,finalReq.headers.get('Authorization'));
 
     return next.handle(finalReq).pipe(
       catchError((err: HttpErrorResponse) => {
@@ -58,17 +75,25 @@ export class AuthInterceptor implements HttpInterceptor {
           this.router.url.startsWith('/forgot-password') ||
           this.router.url.startsWith('/reset-password');
 
-        const heavyError = [0, 500, 502, 503, 504].includes(err.status) || err.status >= 500;
+        const heavyError =
+          [0, 500, 502, 503, 504].includes(err.status) || err.status >= 500;
 
-        if (!isAuth && (!onAuthScreen || heavyError)) {
-          this.toast.error(this.prettyError(err), { position: 'top-end', duration: 6000 });
+        // глобален toast (освен за auth ендпоинти и „лесни“ грешки на login екрани)
+        // ⬇️ важно: НЕ прикажувај глобален toast за Stripe
+        if (!isAuth && !isStripeCheckout && (!onAuthScreen || heavyError)) {
+          this.toast.error(this.prettyError(err), {
+            position: 'top-end',
+            duration: 6000,
+          });
         }
 
+        // 401 → logout само ако сме праќале токен (addAuth == true)
         if (err.status === 401 && addAuth && !this.loggingOut) {
           this.loggingOut = true;
           localStorage.removeItem('auth_token');
           sessionStorage.removeItem('auth_token');
-          this.router.navigate(['/login'], { queryParams: { tab: 'login' } })
+          this.router
+            .navigate(['/login'], { queryParams: { tab: 'login' } })
             .finally(() => (this.loggingOut = false));
         }
 
@@ -84,7 +109,9 @@ export class AuthInterceptor implements HttpInterceptor {
     if (err.status === 401) return 'Session expired. Please sign in again.';
     if (err.status === 403) {
       const m = (err.error?.message || '').toLowerCase();
-      return m.includes('not verified') ? 'Email not verified. Check your inbox.' : (err.error?.message || 'Forbidden');
+      return m.includes('not verified')
+        ? 'Email not verified. Check your inbox.'
+        : (err.error?.message || 'Forbidden');
     }
     if (err.status === 404) return 'Resource not found.';
     if (err.status === 408) return 'Request timeout. Please try again.';

@@ -1,29 +1,30 @@
-import { Injectable } from '@angular/core';
+// src/app/user/buy-credits/credit.service.ts
+import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { AuthService } from '../../auth/auth.service';
+import { CREDITS_API } from '../../shared/tokens.api';
+import { CreditsApi } from '../../shared/credits.api';
 
 @Injectable({ providedIn: 'root' })
 export class CreditsService {
-  private readonly keyPrefix = 'credits_';
   private creditsSubject = new BehaviorSubject<number>(0);
   credits$ = this.creditsSubject.asObservable();
 
-  constructor(private auth: AuthService) {
-    const email = this.auth.getCurrentUser()?.email;
-    if (email) {
-      const stored = sessionStorage.getItem(this.keyPrefix + email);
-      this.creditsSubject.next(stored ? +stored : 0);
-    }
+  constructor(
+    @Inject(CREDITS_API) private api: CreditsApi
+  ) {}
+
+  refreshFromApi() {
+    this.api.getMyCredits().subscribe({
+      next: (v) => this.creditsSubject.next(v),
+      error: (err) => {
+        console.error('Failed to load credits', err);
+        // optionally: keep last value
+      },
+    });
   }
 
-  /** Додава кредити и ги памети во sessionStorage */
-  addCredits(amount: number) {
-    const email = this.auth.getCurrentUser()?.email;
-    if (!email) return;
-
-    const key = this.keyPrefix + email;
-    const newTotal = this.creditsSubject.value + amount;
-    sessionStorage.setItem(key, newTotal.toString());
-    this.creditsSubject.next(newTotal);
+  /** Опционално ако сакаш рачно да сетираш вредност */
+  setCredits(v: number) {
+    this.creditsSubject.next(Math.max(0, v));
   }
 }

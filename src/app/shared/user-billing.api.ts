@@ -116,8 +116,13 @@ export class UserBillingApi {
 
   createStripeCheckout(packageId: number) {
     const body: StripeCheckoutReq = { packageId };
+
+    // base = "/api/v1" → го тргаме само "/v1" за Stripe
+    const base = (environment.baseApiUrl ?? '/api').replace(/\/+$/, ''); // "/api/v1"
+    const stripeBase = base.replace(/\/v1$/, '');                        // "/api"
+
     return this.http.post<StripeCheckoutRes>(
-      `${this.api}/stripe/checkout/create`,
+      `${stripeBase}/stripe/checkout/create`,
       body
     );
   }
