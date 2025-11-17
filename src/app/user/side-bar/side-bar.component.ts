@@ -3,6 +3,7 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostLi
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common'; // for *ngFor, *ngIf, etc.
 import { TranslateModule } from '@ngx-translate/core';
+
 import { AuthService } from 'src/app/auth/auth.service';
 import { CreditsService } from '../buy-credits/credit.service';
 import type { AuthUser } from '../../auth/auth.service';
@@ -22,27 +23,22 @@ import { CreditsApi } from '../../shared/credits.api';
   styleUrls: ['./side-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SidebarComponent {
-  @Input() credits = 0;                         /** Credits to display in the sidebar */
-  @Input() isOpen = false;                      /** Whether the sidebar is open */
+export class SidebarComponent implements OnInit {
+  @Input() credits = 0;
+  @Input() isOpen = false;
 
-  @Output() close = new EventEmitter<void>();   /** Emitted when a menu link is clicked on mobile */
+  @Output() close = new EventEmitter<void>();
 
-  @HostBinding('class.open')  get opened() {
-    return this.isOpen;
-  }
-  @HostBinding('class.closed') get closed() {
-    return !this.isOpen;
-  }
+  @HostBinding('class.open')  get opened()  { return this.isOpen; }
+  @HostBinding('class.closed') get closed() { return !this.isOpen; }
 
   public currentUser: AuthUser | null = null;
-
   public isMobile = window.innerWidth < 992;
 
-  public currentCredits = 0;                    // ← Current credits from session storage
-  public credits$ = this.creditsSvc.credits$;    // ← Observable на кредити
+  /** Observable ако ти треба на друго место */
+  public credits$ = this.creditsSvc.credits$;
 
-  private creditsApi = inject<CreditsApi>(CREDITS_API);
+  /** Реален број за HTML */
   public remainingCredits = 0;
 
   public menuItems = [
@@ -51,25 +47,23 @@ export class SidebarComponent {
     { label: 'BILLING',     icon: '💳', route: '/user/billing' },
     { label: 'FAQS',        icon: '❓', route: '/user/faqs' },
     { label: 'ACCOUNT',     icon: '👤', route: '/user/account' },
-    // …
   ];
 
   constructor(
     private auth: AuthService,
     private creditsSvc: CreditsService
-  ) { }
+  ) {}
 
   ngOnInit() {
-    // 1) повлечи од API
+    // 1) повлечи кредити
     this.creditsSvc.refreshFromApi();
 
-    // 2) претплати се на кредити и покажувај ги и во sidebar и на icon
+    // 2) слушај ги и чувај ги како број
     this.creditsSvc.credits$.subscribe(v => {
-      this.remainingCredits = v;
+      this.remainingCredits = typeof v === 'number' ? v : 0;
     });
 
-    // user load од AuthService останува како што е
-    const user: AuthUser | null = this.auth.getCurrentUser();
+    const user = this.auth.getCurrentUser();
     if (user) {
       this.currentUser = user;
     }
@@ -78,13 +72,11 @@ export class SidebarComponent {
   toggle(): void {
     this.isOpen = !this.isOpen;
     if (this.isMobile && !this.isOpen) {
-      this.close.emit();  // notify parent on mobile collapse
+      this.close.emit();
     }
   }
 
-  /** Called when any menu link is clicked */
   onMenuItemClick(): void {
-    // only collapse on mobile
     if (this.isMobile) {
       this.close.emit();
     }
@@ -93,7 +85,6 @@ export class SidebarComponent {
   @HostListener('window:resize')
   onResize() {
     this.isMobile = window.innerWidth < 992;
-    this.isOpen = !this.isMobile;   // open on desktop, closed on mobile
+    this.isOpen = !this.isMobile;
   }
-
 }

@@ -1,30 +1,38 @@
 // src/app/user/buy-credits/credit.service.ts
 import { Injectable, Inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+
 import { CREDITS_API } from '../../shared/tokens.api';
-import { CreditsApi } from '../../shared/credits.api';
+import type { CreditsApi } from '../../shared/credits.api'; // 👈 ако го немаш овој файл, кажи, ќе го направиме
 
 @Injectable({ providedIn: 'root' })
 export class CreditsService {
-  private creditsSubject = new BehaviorSubject<number>(0);
-  credits$ = this.creditsSubject.asObservable();
+
+  private readonly creditsSubject = new BehaviorSubject<number>(0);
+  /** stream за сите компоненти (sidebar, buy-credits, итн.) */
+  readonly credits$ = this.creditsSubject.asObservable();
 
   constructor(
     @Inject(CREDITS_API) private api: CreditsApi
   ) {}
 
-  refreshFromApi() {
+  /** Се повикува после логин, после успешно плаќање, итн. */
+  refreshFromApi(): void {
     this.api.getMyCredits().subscribe({
-      next: (v) => this.creditsSubject.next(v),
-      error: (err) => {
-        console.error('Failed to load credits', err);
-        // optionally: keep last value
+      next: (value) => {
+        const n = typeof value === 'number' ? value : 0;
+        this.creditsSubject.next(n);
       },
+      error: (err) => {
+        console.error('Failed to load credits from API', err);
+        // по желба можеш да НЕ го ресетираш на 0, јас го оставам да не крашира
+        this.creditsSubject.next(0);
+      }
     });
   }
 
-  /** Опционално ако сакаш рачно да сетираш вредност */
-  setCredits(v: number) {
-    this.creditsSubject.next(Math.max(0, v));
+  /** snapshot ако ти треба моменталната вредност */
+  get current(): number {
+    return this.creditsSubject.value;
   }
 }

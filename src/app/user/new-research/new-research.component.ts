@@ -169,23 +169,24 @@ export class NewResearchComponent implements OnInit {
     if (this.downloadingId) return;
     this.downloadingId = row.id;
 
-    this.dataReqApi.download(row.id).subscribe({
-      next: (blob: Blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = this.doc.createElement('a');
-        a.href = url;
-        a.download = `data-request-${row.id}.csv`;
-        this.doc.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      },
-      error: (err: any) => {
-        console.error('Download failed', err);
-        this.toasts.error('Download failed. Please try again later.');
-      }
-    });
-
+    this.dataReqApi.download(row.id)
+      .pipe(finalize(() => (this.downloadingId = null)))
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = this.doc.createElement('a');
+          a.href = url;
+          a.download = `data-request-${row.id}.csv`;
+          this.doc.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        },
+        error: (err: any) => {
+          console.error('Download failed', err);
+          this.toasts.error('Download failed. Please try again later.');
+        }
+      });
   }
 
   trackByRequestId(_i: number, row: DataRequestRow) {

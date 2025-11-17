@@ -14,22 +14,26 @@
       </a>
     </li>
 
-    <!-- Credits indicator when closed (без default browser tooltip) -->
+    <!-- Credits indicator when closed -->
     <li class="credits-indicator"
         *ngIf="!isOpen"
         [attr.aria-label]="remainingCredits + ' credits'">
       <a>
         <span class="icon">💰</span>
-        <span class="count">{{ remainingCredits > 999 ? '999+' : remainingCredits }}</span>
+        <span class="count">
+          {{ remainingCredits > 999 ? '999+' : remainingCredits }}
+        </span>
       </a>
     </li>
   </ul>
 
-  <!-- footer со класа за SCSS таргетирање -->
+  <!-- footer -->
   <div class="sidebar__footer px-3 py-2 small text-muted">
     {{ 'Remaining Credits' | translate }}: {{ remainingCredits }}
     <div *ngIf="remainingCredits === 0" class="mt-2">
-      <a routerLink="/user/buy-credits" class="btn btn-secondary w-100" (click)="onMenuItemClick()">
+      <a routerLink="/user/buy-credits"
+         class="btn btn-secondary w-100"
+         (click)="onMenuItemClick()">
         {{ 'BUY_CREDITS' | translate }}
       </a>
     </div>

@@ -1,47 +1,53 @@
 // src/app/shared/data-request.api.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
 
 export interface DataRequestRow {
   id: number;
   userId: number;
-  expiredAt: string;
   createdAt: string;
   updatedAt: string;
+  expiredAt: string | null;
+}
+
+// од Swagger: GET /api/v1/users/me/data-requests -> { list: [...] }
+interface ListResponse {
+  list: DataRequestRow[];
+}
+
+// од Swagger: POST /api/v1/users/me/data-requests -> { dataRequest: {...} }
+interface CreateResponse {
+  dataRequest: DataRequestRow;
 }
 
 @Injectable({ providedIn: 'root' })
 export class DataRequestApi {
+  private readonly baseUrl = '/api/v1/users/me/data-requests';
 
   constructor(private http: HttpClient) {}
 
-  /** GET /api/v1/users/me/data-requests */
+  /** Враќа листа на сите data-requests за логираниот user */
   list(): Observable<DataRequestRow[]> {
     return this.http
-      .get<{ list: DataRequestRow[] }>('/api/v1/users/me/data-requests')
+      .get<ListResponse>(this.baseUrl)
       .pipe(map(res => res.list ?? []));
   }
 
-  /** POST /api/v1/users/me/data-requests (file upload) */
-  upload(file: File): Observable<DataRequestRow> {
-    const form = new FormData();
-    form.append('file', file);
+  /** Креира нов data-request со upload на CSV/Excel */
+  create(file: File): Observable<DataRequestRow> {
+    const formData = new FormData();
+    formData.append('file', file);
+
     return this.http
-      .post<{ dataRequest: DataRequestRow }>('/api/v1/users/me/data-requests', form)
+      .post<CreateResponse>(this.baseUrl, formData)
       .pipe(map(res => res.dataRequest));
   }
 
-  /** alias – компонентата вика create(...) */
-  create(file: File): Observable<DataRequestRow> {
-    return this.upload(file);
-  }
-
-  /** GET /api/v1/users/me/data-requests/{id}/download → CSV */
+  /** Download на CSV од одреден request */
   download(id: number): Observable<Blob> {
-    return this.http.get(`/api/v1/users/me/data-requests/${id}/download`, {
-      responseType: 'blob',
+    return this.http.get(`${this.baseUrl}/${id}/download`, {
+      responseType: 'blob'
     });
   }
 }

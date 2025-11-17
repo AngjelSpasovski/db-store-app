@@ -23,6 +23,8 @@ export class BuyCreditsComponent implements OnInit {
   public currentUser: AuthUser | null = null;
   public currentCredits = 0;
 
+  public credits$ = this.creditsSvc.credits$;
+
   // ✅ единствен извор на пакети
   public packages = CREDIT_PACKAGES;
   public loadingId: string | null = null;
@@ -38,27 +40,26 @@ export class BuyCreditsComponent implements OnInit {
 
   // src/app/user/buy-credits/buy-credits.component.ts
 
-public ngOnInit(): void {
-  const qp = new URLSearchParams(window.location.search);
+  public ngOnInit(): void {
+    const qp = new URLSearchParams(window.location.search);
 
-  if (qp.get('canceled') === '1') {
-    this.toast.info('Payment canceled.', { position: 'top-end' });
-  }
+    if (qp.get('canceled') === '1') {
+      this.toast.info('Payment canceled.', { position: 'top-end' });
+    }
 
-  if (qp.get('success') === '1') {
-    this.toast.success('Payment completed successfully.', { position: 'top-end' });
-    // рефреш кредити од backend
+    if (qp.get('success') === '1') {
+      this.toast.success('Payment completed successfully.', { position: 'top-end' });
+      // ✅ после успешно плаќање – рефреш кредити
+      this.creditsSvc.refreshFromApi();
+    }
+
+    if (qp.has('canceled') || qp.has('success')) {
+      history.replaceState({}, '', window.location.pathname);
+    }
+
+    // ✅ секое влегување во /user/buy-credits ќе си ги повлече кредитите
     this.creditsSvc.refreshFromApi();
   }
-
-  // исчисти query string за да не останува success/canceled во URL
-  if (qp.has('canceled') || qp.has('success')) {
-    history.replaceState({}, '', window.location.pathname);
-  }
-
-  // ако сакаш – можеш и тука да повикаш refresh, не е штетно
-  this.creditsSvc.refreshFromApi();
-}
 
 
   public trackByPkg = (_: number, pkg: CreditPackage) => pkg.id;
