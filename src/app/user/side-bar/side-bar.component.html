@@ -1,5 +1,4 @@
 <aside class="sidebar" [class.open]="isOpen" [class.closed]="!isOpen">
-
   <div class="sidebar__header">
     <button class="sidebar__toggle" (click)="toggle()">
       <i class="fas" [ngClass]="isOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
@@ -15,33 +14,27 @@
     </li>
 
     <!-- Credits indicator when closed -->
-    <li class="credits-indicator"
-        *ngIf="!isOpen"
-        [attr.aria-label]="remainingCredits + ' credits'">
+    <li class="credits-indicator" *ngIf="!isOpen && (credits$ | async) as credits"
+      [attr.aria-label]="credits + ' credits'">
       <a>
         <span class="icon">💰</span>
         <span class="count">
-          {{ remainingCredits > 999 ? '999+' : remainingCredits }}
+          {{ credits }}
         </span>
       </a>
     </li>
   </ul>
 
-  <!-- footer -->
-  <div class="sidebar__footer px-3 py-2 small text-muted">
-    {{ 'Remaining Credits' | translate }}: {{ remainingCredits }}
-    <div *ngIf="remainingCredits === 0" class="mt-2">
-      <a routerLink="/user/buy-credits"
-         class="btn btn-secondary w-100"
-         (click)="onMenuItemClick()">
+  <!-- footer со кредити -->
+  <div class="sidebar__footer px-3 py-2 small text-muted" *ngIf="credits$ | async as credits">
+    {{ 'Remaining Credits' | translate }}: {{ credits }}
+
+    <div *ngIf="credits === 0" class="mt-2">
+      <a routerLink="/user/buy-credits" class="btn btn-secondary w-100" (click)="onMenuItemClick()">
         {{ 'BUY_CREDITS' | translate }}
       </a>
     </div>
   </div>
 </aside>
 
-<div class="sidebar-backdrop"
-     *ngIf="isMobile && isOpen"
-     aria-hidden="true"
-     role="presentation">
-</div>
+<div class="sidebar-backdrop" *ngIf="isMobile && isOpen" aria-hidden="true" role="presentation"></div>

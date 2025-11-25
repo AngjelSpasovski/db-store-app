@@ -1,52 +1,53 @@
 // src/app/user/side-bar/side-bar.component.ts
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, HostBinding  } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  HostListener,
+  HostBinding,
+  OnInit,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common'; // for *ngFor, *ngIf, etc.
+import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AuthService } from 'src/app/auth/auth.service';
+import type { AuthUser } from 'src/app/auth/auth.service';
 import { CreditsService } from '../buy-credits/credit.service';
-import type { AuthUser } from '../../auth/auth.service';
-import { inject, OnInit } from '@angular/core';
-import { CREDITS_API } from '../../shared/tokens.api';
-import { CreditsApi } from '../../shared/credits.api';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [
-    RouterModule,
-    CommonModule,
-    TranslateModule
-  ],
+  imports: [RouterModule, CommonModule, TranslateModule],
   templateUrl: './side-bar.component.html',
   styleUrls: ['./side-bar.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent implements OnInit {
-  @Input() credits = 0;
   @Input() isOpen = false;
-
   @Output() close = new EventEmitter<void>();
 
-  @HostBinding('class.open')  get opened()  { return this.isOpen; }
-  @HostBinding('class.closed') get closed() { return !this.isOpen; }
+  @HostBinding('class.open') get opened() {
+    return this.isOpen;
+  }
+  @HostBinding('class.closed') get closed() {
+    return !this.isOpen;
+  }
 
   public currentUser: AuthUser | null = null;
   public isMobile = window.innerWidth < 992;
 
-  /** Observable ако ти треба на друго место */
+  /** Stream со кредити од сервисот (се слуша со async pipe во template) */
   public credits$ = this.creditsSvc.credits$;
-
-  /** Реален број за HTML */
-  public remainingCredits = 0;
 
   public menuItems = [
     { label: 'BUY_CREDITS', icon: '🛒', route: '/user/buy-credits' },
-    { label: 'SEARCH',      icon: '🔍', route: '/user/new-research' },
-    { label: 'BILLING',     icon: '💳', route: '/user/billing' },
-    { label: 'FAQS',        icon: '❓', route: '/user/faqs' },
-    { label: 'ACCOUNT',     icon: '👤', route: '/user/account' },
+    { label: 'SEARCH', icon: '🔍', route: '/user/new-research' },
+    { label: 'BILLING', icon: '💳', route: '/user/billing' },
+    { label: 'FAQS', icon: '❓', route: '/user/faqs' },
+    { label: 'ACCOUNT', icon: '👤', route: '/user/account' },
   ];
 
   constructor(
@@ -54,18 +55,17 @@ export class SidebarComponent implements OnInit {
     private creditsSvc: CreditsService
   ) {}
 
-  ngOnInit() {
-    // 1) повлечи кредити
+  ngOnInit(): void {
+    // Влечи кредити на влегување во апликацијата
     this.creditsSvc.refreshFromApi();
 
-    // 2) слушај ги и чувај ги како број
-    this.creditsSvc.credits$.subscribe(v => {
-      this.remainingCredits = typeof v === 'number' ? v : 0;
-    });
+    // Корисник за header делот
+    this.currentUser = this.auth.getCurrentUser();
 
-    const user = this.auth.getCurrentUser();
-    if (user) {
-      this.currentUser = user;
+    // initial state за мобилно/desktop
+    this.isMobile = window.innerWidth < 992;
+    if (this.isMobile) {
+      this.isOpen = false;
     }
   }
 
@@ -83,7 +83,7 @@ export class SidebarComponent implements OnInit {
   }
 
   @HostListener('window:resize')
-  onResize() {
+  onResize(): void {
     this.isMobile = window.innerWidth < 992;
     this.isOpen = !this.isMobile;
   }
