@@ -16,20 +16,19 @@ export class CreditsService {
     @Inject(CREDITS_API) private api: CreditsApi
   ) {}
 
-  /** Се повикува после логин, после успешно плаќање, итн. */
   refreshFromApi(): void {
     this.api.getMyCredits().subscribe({
-      next: (value) => {
+      next: (value: number) => {           // ✅ типизиран
         const n = typeof value === 'number' ? value : 0;
         this.creditsSubject.next(n);
       },
-      error: (err) => {
+      error: (err: unknown) => {          // ✅ типизиран
         console.error('Failed to load credits from API', err);
-        // по желба можеш да НЕ го ресетираш на 0, јас го оставам да не крашира
         this.creditsSubject.next(0);
       }
     });
   }
+
 
   /** snapshot ако ти треба моменталната вредност */
   get current(): number {

@@ -5,15 +5,16 @@ import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import { CreditsApi } from './credits.api';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class HttpCreditsApi implements CreditsApi {
-
   constructor(private http: HttpClient) {}
 
   getMyCredits(): Observable<number> {
     return this.http
-      .get<{ credits: number }>('/api/v1/users/me/credits')
+      .get<{ credits: number }>(`${environment.baseApiUrl}/users/me/credits`)
       .pipe(map(res => res.credits ?? 0));
   }
 }
+
