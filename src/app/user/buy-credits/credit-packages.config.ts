@@ -9,7 +9,7 @@ export interface CreditPackage {
 }
 
 export const CREDIT_PACKAGES: CreditPackage[] = [
-  { id:'p300',   backendId: 1,  credits:300,   displayPrice:'199€',  paymentLinkUrl:'', priceId:'' },
+  { id:'p300',   backendId: 1,  credits:100,   displayPrice:'199€',  paymentLinkUrl:'', priceId:'' },
   { id:'p500',   backendId: 2,  credits:500,   displayPrice:'275€',  paymentLinkUrl:'', priceId:'' },
   { id:'p1000',  backendId: 3,  credits:1000,  displayPrice:'500€',  paymentLinkUrl:'', priceId:'' },
   { id:'p2000',  backendId: 4,  credits:2000,  displayPrice:'800€',  paymentLinkUrl:'', priceId:'' },
