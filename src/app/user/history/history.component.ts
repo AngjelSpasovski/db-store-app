@@ -98,20 +98,19 @@ export class HistoryComponent  implements OnInit {
         filter: false,
         width: 140,
         cellRenderer: (p: any) => {
-          const url = p.value;
-          const status = p.data?.status;
-
-          // само ако е SUCCESS + има URL
-          if (!url || status !== 'SUCCESS') {
+          const url = p.value as string | undefined;
+          if (!url) {
             return `<span class="text-muted">${
               this.translate.instant('N_A') || 'N/A'
             }</span>`;
           }
-
           const label = this.translate.instant('DOWNLOAD') || 'Download';
-          return `<a href="${url}" target="_blank" rel="noopener">${label}</a>`;
+          // додаден download атрибут
+          return `<a href="${url}" target="_blank" rel="noopener" download="dummy_pdf.pdf">${label}</a>`;
         }
       }
+
+
     ];
   }
 

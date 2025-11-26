@@ -30,11 +30,10 @@
         </button>
       </div>
 
-      <div
-        *ngIf="searchForm.get('id')?.invalid && searchForm.get('id')?.touched"
-        class="text-danger small">
-        {{ 'ID_MUST_BE_11_DIGITS' | translate }}
+      <div *ngIf="searchForm.get('id')?.invalid && searchForm.get('id')?.touched" class="text-danger small">
+        {{ 'ID_MUST_BE_16_CHARS' | translate }}
       </div>
+
     </div>
 
   </form>

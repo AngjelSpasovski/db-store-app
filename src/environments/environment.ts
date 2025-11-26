@@ -8,8 +8,6 @@ export const environment = {
   stripePublishableKey: 'pk_test_51SA5lrRpEhEmFMYRhJZVN3TVzNOwDwZbuPrjXANSIEtuWlDlU39rm5IJBfqeAFOa5nbINzhtWz37UrkVKYSZNWJE00Bm3LBAPD',
   paymentsMode: 'api',
   dataMode: 'api' as DataMode, // 'local' или 'api',
-  //paymentsMode: 'paymentLinks' as 'paymentLinks' | 'api',
-  //dataMode: 'local' as 'local'|'api',
 };
 
 

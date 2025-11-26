@@ -201,7 +201,7 @@
     "SEARCH_PERSON": "Cerca persona per ID",
     "PERSONAL_ID_NUMBER": "Codice alfanumerico",
     "VALID_TEST_SEARCH_CASES": "Casi di ricerca di test validi",
-    "ID_MUST_BE_11_DIGITS": "Il numero di identificazione deve contenere 11 cifre.",
+    "ID_MUST_BE_16_DIGITS": "Il numero di identificazione deve contenere 16 cifre.",
     "ENTER_SEARCH_VALUE": "Inserisci il valore di ricerca",
     "TIMESTAMP": "Timbro temporale",
     "STATUS": "Stato",

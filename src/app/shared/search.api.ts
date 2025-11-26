@@ -1,7 +1,7 @@
 // src/app/shared/search.api.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 import { environment } from '../auth/auth.environment';
@@ -23,25 +23,24 @@ export class SearchApi {
   ) {}
 
   /**
-   * Search one person by Personal ID / id_match.
-   * За сега:
-   *  - ако dataMode === 'local' → dummy список (DummyIdService)
-   *  - ако dataMode === 'api'   → фрла грешка (нема backend endpoint уште)
+   * TEMP: локална симулација додека нема backend endpoint.
+   * Користиме DummyIdService и враќаме празен PDF ако е најден.
    */
   searchById(id: string): Observable<SearchByIdResult> {
-    if (environment.dataMode === 'local') {
-      const found = this.dummy.exists(id);
-      const downloadUrl = found
-        ? 'assets/privacy/privacy-policy-it.pdf'
-        : undefined;
+    const normalized = (id || '').trim().toUpperCase();
+    const found = this.dummy.exists(normalized);
 
-      // мал fake delay да изгледа „реално“
-      return of({ found, downloadUrl }).pipe(delay(400));
-    }
+    // TODO: направи едноставен празен PDF во assets, пример:
+    // src/assets/search/blank-result.pdf
+    const downloadUrl = found ? 'assets/dummy-search/dummy_pdf.pdf' : undefined;
 
-    // TODO: кога backend ќе направи реално search endpoint
-    return throwError(
-      () => new Error('Search by Personal ID is not implemented on the backend yet.')
-    );
+    return of({ found, downloadUrl }).pipe(delay(400));
   }
+
+  // ⬇️ Овој дел можеш да го користиш кога ќе биде готов backend-от:
+  // private realSearch(id: string): Observable<SearchByIdResult> {
+  //   return this.http.get<SearchByIdResult>(`${this.api}/users/me/search`, {
+  //     params: { id }
+  //   });
+  // }
 }

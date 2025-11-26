@@ -1,11 +1,22 @@
 // src/app/user/new-research/new-research.component.ts
-import { Component, OnInit, Renderer2, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  OnInit,
+  Renderer2,
+  Inject,
+  ChangeDetectionStrategy
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { SearchApi } from '../../shared/search.api';
-import { DataRequestApi, DataRequestRow } from '../../shared/data-request.api';
+import { DataRequestApi, DataRequestRow } from 'src/app/shared/data-request.api';
 
 import { SearchHistoryService, SearchRecord } from './new-search-history.service';
 import { AuthService } from '../../auth/auth.service';
@@ -22,14 +33,13 @@ import { finalize } from 'rxjs/operators';
     CommonModule,
     ReactiveFormsModule,
     TranslateModule,
-    HistoryComponent
+    HistoryComponent,
   ],
   templateUrl: './new-research.component.html',
   styleUrls: ['./new-research.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewResearchComponent implements OnInit {
-
   // single-ID search
   searchForm!: FormGroup;
   records: SearchRecord[] = [];
@@ -57,11 +67,19 @@ export class NewResearchComponent implements OnInit {
 
   ngOnInit() {
     this.searchForm = this.fb.group({
-      id: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]]
+      id: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(16),
+          Validators.maxLength(16),
+          Validators.pattern(/^[A-Za-z0-9]+$/), // само букви и цифри
+        ],
+      ],
     });
 
     this.loadHistory();
-    const last = this.records.find(r => r.success);
+    const last = this.records.find((r) => r.success);
     this.fileUrl = last?.fileUrl;
 
     this.loadDataRequests();
@@ -85,11 +103,14 @@ export class NewResearchComponent implements OnInit {
     this.searching = true;
     this.searchForm.disable();
 
-    this.searchApi.searchById(id)
-      .pipe(finalize(() => {
-        this.searching = false;
-        this.searchForm.enable();
-      }))
+    this.searchApi
+      .searchById(id)
+      .pipe(
+        finalize(() => {
+          this.searching = false;
+          this.searchForm.enable();
+        })
+      )
       .subscribe({
         next: (res) => {
           const success = !!res.found;
@@ -97,15 +118,18 @@ export class NewResearchComponent implements OnInit {
 
           const rec: SearchRecord = {
             id,
-            timestamp: new Date().toLocaleString(),
+            timestamp: new Date().toISOString(), // подобро за сортирање
             success,
-            fileUrl
+            fileUrl,
           };
           this.history.add(rec);
           this.loadHistory();
           this.fileUrl = fileUrl;
 
           if (success) {
+            // 🔻 ОВДЕ ОДЗЕМАМЕ 1 КРЕДИТ
+            this.auth.deductCredits(1);
+
             this.toasts.show(`✔ ID ${id} found!`, true, 5000);
           } else {
             this.toasts.show(`❌ ID ${id} not found.`, false, 5000);
@@ -113,13 +137,13 @@ export class NewResearchComponent implements OnInit {
         },
         error: (err) => {
           console.error('Search failed', err);
-          this.toasts.error(err.message || 'Search failed. Please try again later.');
-        }
+          this.toasts.error(
+            err.message || 'Search failed. Please try again later.'
+          );
+        },
       });
   }
-
   // ===== bulk search via CSV / Excel (Data Request) =====
-
   onBulkFileChange(ev: Event) {
     const input = ev.target as HTMLInputElement;
     this.bulkFile = input.files?.[0] ?? null;
@@ -130,38 +154,41 @@ export class NewResearchComponent implements OnInit {
 
     this.uploadingBulk = true;
 
-    this.dataReqApi.create(this.bulkFile).subscribe({
-      next: (row: DataRequestRow) => {
-        this.uploadingBulk = false;
-        this.toasts.success('Data request created successfully.');
+    this.dataReqApi
+      .create(this.bulkFile)
+      .pipe(finalize(() => (this.uploadingBulk = false)))
+      .subscribe({
+        next: (res) => {
+          const row = res.dataRequest; // <- од CreateResponse
+          this.toasts.success('Data request created successfully.');
 
-        // додај на листа на врв
-        this.dataRequests = [row, ...this.dataRequests];
+          // додај на врв
+          this.dataRequests = [row, ...this.dataRequests];
 
-        // ресетирај input
-        this.bulkFile = null;
-      },
-      error: (err: any) => {
-        console.error('Bulk upload failed', err);
-        this.uploadingBulk = false;
-        this.toasts.error('Failed to create data request.');
-      }
-    });
+          // ресетирај input
+          this.bulkFile = null;
+        },
+        error: (err: any) => {
+          console.error('Bulk upload failed', err);
+          this.toasts.error('Failed to create data request.');
+        },
+      });
   }
 
   loadDataRequests() {
     this.loadingRequests = true;
 
-    this.dataReqApi.list()
-      .pipe(finalize(() => this.loadingRequests = false))
+    this.dataReqApi
+      .listMyRequests()
+      .pipe(finalize(() => (this.loadingRequests = false)))
       .subscribe({
-        next: (res: DataRequestRow[]) => {
-          this.dataRequests = res;
+        next: (res) => {
+          this.dataRequests = res.list ?? [];
         },
         error: (err: any) => {
           console.error('Failed to load data requests', err);
           this.toasts.error('Failed to load data requests.');
-        }
+        },
       });
   }
 
@@ -169,7 +196,8 @@ export class NewResearchComponent implements OnInit {
     if (this.downloadingId) return;
     this.downloadingId = row.id;
 
-    this.dataReqApi.download(row.id)
+    this.dataReqApi
+      .download(row.id)
       .pipe(finalize(() => (this.downloadingId = null)))
       .subscribe({
         next: (blob: Blob) => {
@@ -185,7 +213,7 @@ export class NewResearchComponent implements OnInit {
         error: (err: any) => {
           console.error('Download failed', err);
           this.toasts.error('Download failed. Please try again later.');
-        }
+        },
       });
   }
 
