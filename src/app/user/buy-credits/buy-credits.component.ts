@@ -38,8 +38,6 @@ export class BuyCreditsComponent implements OnInit {
     private creditsSvc: CreditsService,
   ) {}
 
-  // src/app/user/buy-credits/buy-credits.component.ts
-
   public ngOnInit(): void {
     const qp = new URLSearchParams(window.location.search);
 
@@ -61,7 +59,6 @@ export class BuyCreditsComponent implements OnInit {
     this.creditsSvc.refreshFromApi();
   }
 
-
   public trackByPkg = (_: number, pkg: CreditPackage) => pkg.id;
 
   public canBuy(pkg: CreditPackage): boolean {
@@ -76,13 +73,19 @@ export class BuyCreditsComponent implements OnInit {
     if (this.loadingId || !this.canBuy(pkg)) return;
 
     this.loadingId = pkg.id;
+
     try {
-      await this.payments.start({
-        packageId: pkg.backendId!,                // ⬅ користиме backendId
+      this.payments.start({
+        packageId: pkg.backendId!,
         paymentLinkUrl: pkg.paymentLinkUrl ?? '',
       });
-    } catch {
-      this.loadingId = null;
+    } finally {
+      // ако не нè редиректира (грешка), копчето да не остане заглавено
+      setTimeout(() => {
+        if (this.loadingId === pkg.id) {
+          this.loadingId = null;
+        }
+      }, 4000);
     }
   }
 

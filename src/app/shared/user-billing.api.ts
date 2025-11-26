@@ -1,5 +1,7 @@
+// src/app/user/user-billing.api.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 import { environment } from '../auth/auth.environment';
 
 export interface BillingDetails {
@@ -15,111 +17,89 @@ export interface BillingDetails {
   stateCode: string;
   nation: string;
   vatNumber: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export type BillingDetailsCreateDto = Omit<BillingDetails, 'id'|'userId'|'createdAt'|'updatedAt'>;
-export type BillingDetailsPatchDto  = Partial<BillingDetailsCreateDto>;
-
-export interface InvoicePackage {
-  id: number;
-  name: string;
-  description?: string;
-  credits: number;
-  price: number;
-  durationDays: number;
-  isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface InvoiceRow {
-  id: number;
-  userId: number;
-  packageId: number;
-  package: InvoicePackage;
-  status: 'PENDING'|'PAID'|'FAILED'|'CANCELED'|string;
-  amount: number;
-  stripeSessionId?: string;
-  stripePaymentIntentId?: string;
-  paymentMethod?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Paged<T> {
-  list: T[];
-  total: number;
+export interface BillingDetailsPayload {
+  email: string;
+  companyName?: string;
+  address1?: string;
+  address2?: string;
+  buildingNumber?: string;
+  zipcode?: string;
+  city?: string;
+  stateCode?: string;
+  nation?: string;
+  vatNumber?: string;
+}
+
+
+/** Точно како што враќа Swagger: { billing_details: { ... } } */
+export interface BillingDetailsResponse {
+  billing_details: BillingDetails | null;
 }
 
 export interface StripeCheckoutReq {
   packageId: number;
+  successUrl?: string;
+  cancelUrl?: string;
 }
 
 export interface StripeCheckoutRes {
   sessionId: string;
-  checkoutUrl: string;
-  invoiceId: number;
+  redirectUrl: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class UserBillingApi {
-
-  private api = (environment.baseApiUrl ?? '/api').replace(/\/+$/, '');
+  private base = (environment.baseApiUrl ?? '/api').replace(/\/+$/, '');
 
   constructor(private http: HttpClient) {}
 
-  // ==== Billing details ====
-
-  getBillingDetails() {
-    return this.http.get<{ billing_details: BillingDetails }>(
-      `${this.api}/users/me/billing-details`
-    );
+  /** GET /api/v1/users/me/billing-details */
+  getMyBillingDetails() {
+    return this.http
+      .get<{ billing_details: BillingDetails | null }>(
+        `${this.base}/users/me/billing-details`
+      )
+      .pipe(
+        map(res => res.billing_details ?? null)
+      );
   }
 
-  createBillingDetails(body: BillingDetailsCreateDto) {
-    return this.http.post<{ billing_details: BillingDetails }>(
-      `${this.api}/users/me/billing-details`,
-      body
-    );
+  /**
+   * POST /api/v1/users/me/billing-details
+   * create или FULL update (како што пишува во Swagger)
+   */
+  saveMyBillingDetails(payload: BillingDetailsPayload) {
+    return this.http
+      .post<{ billing_details: BillingDetails }>(
+        `${this.base}/users/me/billing-details`,
+        payload
+      )
+      .pipe(
+        map(res => res.billing_details)
+      );
   }
 
-  patchBillingDetails(body: BillingDetailsPatchDto) {
-    return this.http.patch<{ billing_details: BillingDetails }>(
-      `${this.api}/users/me/billing-details`,
-      body
-    );
+  /**
+   * PATCH /api/v1/users/me/billing-details
+   * partial update – ако сакаш да менуваш само дел од полињата
+   */
+  patchBillingDetails(payload: Partial<BillingDetailsPayload>) {
+    return this.http
+      .patch<BillingDetailsResponse>(`${this.base}/users/me/billing-details`, payload)
+      .pipe(map(res => res.billing_details));
   }
 
-  // ==== Invoices ====
-
-  listInvoices(perPage = 20, page = 1) {
-    const params = new HttpParams()
-      .set('perPage', String(perPage))
-      .set('page', String(page));
-
-    return this.http.get<Paged<InvoiceRow>>(
-      `${this.api}/users/me/invoices`,
-      { params }
-    );
-  }
-
-  createInvoice(packageId: number) {
-    return this.http.post<{ invoice: InvoiceRow }>(
-      `${this.api}/users/me/invoices`,
-      { packageId }
-    );
-  }
-
-  // ==== Stripe checkout ====
-
+  /** Stripe checkout за купување кредити – го користиме постоечкиот endpoint */
   createStripeCheckout(packageId: number) {
     const body: StripeCheckoutReq = { packageId };
 
-    // base = "/api/v1" → го тргаме само "/v1" за Stripe
-    const base = (environment.baseApiUrl ?? '/api').replace(/\/+$/, ''); // "/api/v1"
-    const stripeBase = base.replace(/\/v1$/, '');                        // "/api"
+    // base = "/api/v1" → го тргаме само "/v1" за Stripe → "/api"
+    const base = (environment.baseApiUrl ?? '/api').replace(/\/+$/, '');
+    const stripeBase = base.replace(/\/v1$/, '');
 
     return this.http.post<StripeCheckoutRes>(
       `${stripeBase}/stripe/checkout/create`,

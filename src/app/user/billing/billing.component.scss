@@ -63,6 +63,55 @@ $card-price-color: #658eb6;
   }
 
   .invalid { color: #f28b82; }
+
+  .column-panel {
+    background: #1f2733;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+}
+
+.billing-modal .modal-content {
+  background: #1b212b;
+  color: #e9eef6;
+  border-radius: 0.75rem;
+}
+
+.billing-toolbar {
+  position: relative;
+  z-index: 1; // toolbar над grid header-от
+}
+
+.billing-column-chooser {
+  position: relative; // референтна точка за панелот
+}
+
+.billing-column-panel {
+  position: absolute;
+  right: 0;
+  top: 110%; // под копчето
+  min-width: 190px;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  background: #1f2632;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 1050;
+
+  max-height: 260px;
+  overflow-y: auto;
+
+  .form-check-input {
+    cursor: pointer;
+  }
+  .form-check-label {
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #e9eef6;
+  }
 }
 
 /* ag-Grid fine-tune */
@@ -72,4 +121,5 @@ $card-price-color: #658eb6;
   .ag-row.ag-row-hover { background-color: #2a303a !important; }
   .ag-row-selected { background-color: rgba(13,110,253,.18) !important; }
   .ag-cell-focus { outline: 2px solid #0d6efd; }
+  .ag-btn-download { padding: .15rem .5rem; font-size: .75rem;}
 }

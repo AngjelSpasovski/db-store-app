@@ -1,13 +1,34 @@
+// src/app/shared/billing.api.ts
 import { Observable } from 'rxjs';
-export type BillingStatus = 'SUCCESS'|'FAILED'|'PENDING';
+
+export type BillingStatus = 'SUCCESS' | 'FAILED' | 'PENDING' | 'PAID';
+
 export interface BillingRow {
-  id: string;
-  timestamp: string;   // ISO
+  id: number;
+  timestamp: string;
+
   credits: number;
   amount: number;
   status: BillingStatus;
-  receiptUrl?: string;
+
+  stripeSessionId: string;
+  createdAt: string;
+
+  // 🔽 package info (од Invoice)
+  packageName?: string;
+  packageCredits?: number;
+  packagePrice?: number;
+  packageDiscountPercentage?: string;
+  packageIsActive?: boolean;
+  packageCreatedAt?: string;
+  packageUpdatedAt?: string;
+
+  // 🔽 за frontend
+  receiptUrl?: string | null;
 }
+
+
 export abstract class BillingApi {
   abstract listMyPayments(): Observable<BillingRow[]>;
 }
+

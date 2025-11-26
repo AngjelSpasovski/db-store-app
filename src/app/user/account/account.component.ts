@@ -12,6 +12,7 @@ import { UserService, UserDetailsDTO } from '../user.service';
 import { ToastService } from '../../shared/toast.service';
 import { CreditsService } from '../buy-credits/credit.service';
 import type { AuthUser } from '../../auth/auth.service';
+import { InvoiceApi, InvoiceDto } from '../../shared/invoice.api';
 
 @Component({
   selector: 'app-account',
@@ -41,6 +42,8 @@ export class AccountComponent implements OnInit {
   data: UserDetailsDTO | null = null;
   form!: FormGroup; // non-null
 
+  invoices: InvoiceDto[] = [];
+
   public currentUser: AuthUser | null = null;
   public currentCredits = 0;                      // ← Current credits from session storage
   public credits$ = this.creditsSvc.credits$;     // ← Observable на кредити
@@ -51,19 +54,34 @@ export class AccountComponent implements OnInit {
     private toast: ToastService,
     private translate: TranslateService,
     private fb: FormBuilder,
-    private creditsSvc: CreditsService
+    private creditsSvc: CreditsService,
+    private invoiceApi: InvoiceApi
   ) { }
 
   ngOnInit(): void {
     this.refresh();
 
-    // init credits
+    // init credits од sessionStorage (како што веќе имаш)
     const user: AuthUser | null = this.auth.getCurrentUser();
     if (user) {
       const key = `credits_${user.email}`;
       const stored = sessionStorage.getItem(key);
       this.currentCredits = stored ? +stored : 0;
     }
+
+    // да си ги вчитаме сите invoices
+    this.loadInvoices();
+  }
+
+  private loadInvoices(): void {
+    this.invoiceApi.listMyInvoices().subscribe({
+      next: (list) => {
+        this.invoices = list || [];
+      },
+      error: (err) => {
+        console.error('Failed to load invoices', err);
+      }
+    });
   }
 
   enableEdit() {
@@ -96,15 +114,14 @@ export class AccountComponent implements OnInit {
     this.editMode = true;
   }
 
-cancelEdit() {
-  this.editMode = false;
-  this.showPass = this.showConfirm = false;
-  if (this.form && this.data) {
-    const u = this.data.user;
-    this.form.reset({ firstName: u.firstName ?? '', lastName: u.lastName ?? '', companyName: u.companyName ?? '', password: '', confirm: '' }, { emitEvent: false });
+  cancelEdit() {
+    this.editMode = false;
+    this.showPass = this.showConfirm = false;
+    if (this.form && this.data) {
+      const u = this.data.user;
+      this.form.reset({ firstName: u.firstName ?? '', lastName: u.lastName ?? '', companyName: u.companyName ?? '', password: '', confirm: '' }, { emitEvent: false });
+    }
   }
-}
-
 
   save() {
     if (!this.form || !this.data) return;
@@ -130,7 +147,6 @@ cancelEdit() {
         error: () => this.toast.error('Update failed', { position: 'top-end' })
       });
   }
-
 
   private matchIfProvided(pwdKey: string, confirmKey: string) {
     return (fg: FormGroup) => {
@@ -162,6 +178,33 @@ cancelEdit() {
         },
         error: () => this.toast.error('Failed to load account details', { position: 'top-end' })
       });
+  }
+
+  /**
+ * Го враќа најновиот SUCCESS invoice за даден packageId (ако постои и има receiptUrl).
+ */
+  findInvoiceForPackage(packageId: number | undefined | null): InvoiceDto | null {
+    if (!packageId) return null;
+
+    const candidates = this.invoices.filter(inv =>
+      inv.packageId === packageId &&
+      inv.status === 'SUCCESS' &&
+      !!inv.receiptUrl
+    );
+
+    if (!candidates.length) return null;
+
+    // земи го најновиот по createdAt
+    candidates.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    return candidates[candidates.length - 1];
+  }
+
+  openInvoice(inv: InvoiceDto | null | undefined): void {
+    if (!inv?.receiptUrl) {
+      this.toast.error('Invoice not available for this package.');
+      return;
+    }
+    window.open(inv.receiptUrl, '_blank', 'noopener');
   }
 
 }

@@ -136,29 +136,6 @@
         </div>
       </div>
 
-      <!-- Packages -->
-      <div class="col-12">
-        <div class="card acc-card">
-          <div class="card-header">Packages</div>
-          <div class="card-body p-0">
-            <div *ngIf="!d.userPackages?.length" class="p-3">No packages yet.</div>
-            <div *ngFor="let up of d.userPackages" class="package-row">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-semibold">{{ up.package.name }}</div>
-                  <div class="small">{{ up.package.description }}</div>
-                </div>
-                <div class="text-end">
-                  <div><strong>Left:</strong> {{ up.creditsRemaining }}</div>
-                  <div class="small">Expires: {{ up.expiresAt | date:'mediumDate' }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
     </div>
   </ng-container>
 </div>

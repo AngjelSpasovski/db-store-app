@@ -1,26 +1,50 @@
-// src/app/user/billing/local-billing.api.ts
+// src/app/shared/local-billing.api.ts
 import { Injectable } from '@angular/core';
-import { BillingApi, BillingRow, BillingStatus } from './billing.api'; // 👈 внимавај на патеката
 import { Observable, of } from 'rxjs';
-import { BillingService } from '../user/billing/billing.service';
+import { BillingApi, BillingRow, BillingStatus } from './billing.api';
+
+interface LocalPayment {
+  id: number;
+  timestamp: string | number | Date;
+  credits: number;
+  amount: number;
+  status: BillingStatus;
+  stripeSessionId?: string;
+  receiptUrl?: string | null;
+}
 
 @Injectable({ providedIn: 'root' })
-export class LocalBillingApi extends BillingApi {
-  constructor(private billing: BillingService) { super(); }
+export class LocalBillingApi implements BillingApi {
 
-  private toStatus(credits: number): BillingStatus {
-    return credits > 0 ? 'SUCCESS' : 'FAILED';
-  }
+  /** mock storage во memory */
+  private storage: LocalPayment[] = [
+    // тука можеш да ставиш пример записи ако сакаш
+    // {
+    //   id: 1,
+    //   timestamp: new Date(),
+    //   credits: 100,
+    //   amount: 100,
+    //   status: 'SUCCESS',
+    //   stripeSessionId: 'sess_123',
+    //   receiptUrl: null
+    // }
+  ];
 
   listMyPayments(): Observable<BillingRow[]> {
-    const rows: BillingRow[] = this.billing.getAll().map((inv: { id: any; timestamp: string | number | Date; credits: number; amount: any; }) => ({
-      id: inv.id,
-      timestamp: new Date(inv.timestamp).toISOString(),
-      credits: inv.credits,
-      amount: inv.amount,
-      status: this.toStatus(inv.credits),   // ✅ точно типизиран BillingStatus
-      receiptUrl: undefined,
-    }));
-    return of(rows);                         // ✅ Observable<BillingRow[]>
+    const rows: BillingRow[] = this.storage.map(p => {
+      const ts = new Date(p.timestamp).toISOString();
+      return {
+        id: p.id,
+        timestamp: ts,
+        createdAt: ts,
+        credits: p.credits,
+        amount: p.amount,
+        status: p.status,
+        stripeSessionId: p.stripeSessionId ?? '',
+        receiptUrl: p.receiptUrl ?? null,
+      };
+    });
+
+    return of(rows);
   }
 }

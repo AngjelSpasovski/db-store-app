@@ -93,17 +93,23 @@ export class HistoryComponent  implements OnInit {
 
       {
         field: 'fileUrl',
-        headerName: this.translate.instant('DOWNLOAD'),
+        headerName: this.translate.instant('RECEIPT'),
         sortable: false,
         filter: false,
         width: 140,
-        cellRenderer: (params: { value: any; }) => {
-          return params.value
-            ? `<a href="${params.value}" download
-                  class="btn btn-sm btn-outline-primary">
-                 ${this.translate.instant('DOWNLOAD')}
-               </a>`
-            : '';
+        cellRenderer: (p: any) => {
+          const url = p.value;
+          const status = p.data?.status;
+
+          // само ако е SUCCESS + има URL
+          if (!url || status !== 'SUCCESS') {
+            return `<span class="text-muted">${
+              this.translate.instant('N_A') || 'N/A'
+            }</span>`;
+          }
+
+          const label = this.translate.instant('DOWNLOAD') || 'Download';
+          return `<a href="${url}" target="_blank" rel="noopener">${label}</a>`;
         }
       }
     ];
