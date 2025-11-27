@@ -1,25 +1,31 @@
 $dark:       #222428;
 $darker:     #1e1e1e;
 $light:      #ffffff;
-$primary:    #4d8dff;
-$secondary:  #555;
-
-$primary-blue: #00509e;
-$primary-blue-light: #00a8ff;
-
-$card-header-bg: #2a3443;
-$card-button-bg: #42526a;
-$card-price-color: #658eb6;
 
 $table-header-bg: #343a40;
 $table-row-color: #495057;
-$table-row-selected: rgba(40,167,69,0.2); // green with transparency
-$table-sucsess: #28a745;
+$table-row-selected: rgba(40,167,69,0.2);
+$table-success: #28a745;
 $table-danger: #dc3545;
+$table-bulk: #ffc107; // 👈 жолта за bulk
 
+.history-root {
+  padding: 0.75rem 0.75rem 0.5rem;
+
+  .history-header h5 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: $light;
+  }
+
+  .status-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
 
 :host ::ng-deep .ag-theme-alpine {
-
   .ag-header {
     background-color: $table-header-bg;
   }
@@ -28,10 +34,8 @@ $table-danger: #dc3545;
     font-weight: 500;
   }
 
-  .ag-row {
-    &.ag-row-hover {
-      background-color: $table-row-color !important;
-    }
+  .ag-row.ag-row-hover {
+    background-color: $table-row-color !important;
   }
 
   .ag-row-selected {
@@ -39,7 +43,7 @@ $table-danger: #dc3545;
   }
 
   .ag-cell-focus {
-    outline: 2px solid $table-sucsess;
+    outline: 2px solid $table-success;
   }
 }
 
@@ -49,11 +53,72 @@ $table-danger: #dc3545;
   height: 0.75rem;
   border-radius: 50%;
   vertical-align: middle;
-  margin: auto;
 }
-:host ::ng-deep .status-dot.success {
-  background-color: $table-sucsess;
+
+:host ::ng-deep .status-success {
+  background-color: $table-success;
 }
-:host ::ng-deep .status-dot.danger {
+:host ::ng-deep .status-error {
   background-color: $table-danger;
+}
+:host ::ng-deep .status-bulk {
+  background-color: $table-bulk;
+}
+
+/* TYPE badge */
+:host ::ng-deep .type-pill {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+:host ::ng-deep .type-single {
+  background: rgba(13, 110, 253, 0.15);
+  color: #0d6efd;
+}
+:host ::ng-deep .type-bulk {
+  background: rgba(255, 193, 7, 0.18);
+  color: #ffc107;
+}
+
+:host ::ng-deep .ag-root-wrapper {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+:host ::ng-deep .ag-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+:host ::ng-deep .ag-header-cell-label {
+  padding-inline: 0.75rem;
+}
+
+:host ::ng-deep .ag-cell {
+  padding-inline: 0.75rem;
+}
+
+/* pagination bar */
+:host ::ng-deep .ag-paging-panel {
+  padding: 0.35rem 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* badge за ID (#31, #30...) */
+.req-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 0.15rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: rgba(13, 110, 253, 0.12);
+  color: #e0e7ff;
+  border: 1px solid rgba(13, 110, 253, 0.5);
 }

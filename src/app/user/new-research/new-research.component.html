@@ -1,128 +1,94 @@
 <!-- src/app/user/new-research/new-research.component.html -->
 <section class="container new-research p-4">
-
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="m-0">{{ 'SEARCH_PERSON' | translate }}</h3>
   </div>
 
-  <!-- Single ID Search Form -->
-  <form [formGroup]="searchForm" (ngSubmit)="submit()">
+  <!-- TOP ROW: left = single search, right = bulk upload -->
+  <div class="row g-3 align-items-end mb-4">
 
-    <div class="mb-3">
-      <label for="id" class="form-label">
-        {{ 'PERSONAL_ID_NUMBER' | translate }}
-      </label>
+    <!-- SINGLE SEARCH -->
+    <div class="col-12 col-md-6">
+      <form [formGroup]="searchForm" (ngSubmit)="submit()">
+        <label for="id" class="form-label">
+          {{ 'PERSONAL_ID_NUMBER' | translate }}
+        </label>
+        <div class="input-group">
+          <input
+            id="id"
+            type="search"
+            class="form-control"
+            formControlName="id"
+            placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}"
+          />
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="searchForm.invalid || searching"
+          >
+            <span *ngIf="!searching">{{ 'SEARCH' | translate }}</span>
+            <span *ngIf="searching" class="spinner-border spinner-border-sm"></span>
+          </button>
+        </div>
 
-      <div class="input-group">
-        <input
-          id="id"
-          type="search"
-          class="form-control"
-          formControlName="id"
-          placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}" />
+        <!-- SLOT за error порака – има фиксна висина, не го поместува layout-от -->
+        <div class="validation-slot">
+          <div
+            *ngIf="
+              searchForm.get('id')?.invalid &&
+              (searchForm.get('id')?.touched || searchForm.get('id')?.dirty)
+            "
+            class="text-danger small"
+          >
+            {{ 'ID_MUST_BE_16_CHARS' | translate }}
+          </div>
+        </div>
 
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="searchForm.invalid || searching">
-          <span *ngIf="!searching">{{ 'SEARCH' | translate }}</span>
-          <span *ngIf="searching" class="spinner-border spinner-border-sm"></span>
-        </button>
-      </div>
-
-      <div *ngIf="searchForm.get('id')?.invalid && searchForm.get('id')?.touched" class="text-danger small">
-        {{ 'ID_MUST_BE_16_CHARS' | translate }}
-      </div>
-
+      </form>
     </div>
 
-  </form>
-
-  <!-- Search Results / History -->
-  <div class="history-wrapper mt-4">
-    <app-history></app-history>
-  </div>
-
-  <!-- divider -->
-  <hr class="my-5" />
-
-  <!-- Bulk search (CSV/Excel) -->
-  <div class="bulk-search">
-
-    <h4 class="mb-2">
-      {{ 'BULK_SEARCH_TITLE' | translate: { default: 'Bulk search from file' } }}
-    </h4>
-    <p class="text-muted small mb-3">
-      {{ 'BULK_SEARCH_DESC' | translate: { default: 'Upload CSV/Excel file with IDs and we will process them.' } }}
-    </p>
-
-    <div class="row g-3 align-items-center">
-      <div class="col-md-6">
+    <!-- BULK UPLOAD (истата линија, десно) -->
+    <div class="col-12 col-md-6">
+      <label class="form-label">
+        {{ 'BULK_SEARCH_TITLE' | translate:{ default:'Bulk search from file' } }}
+      </label>
+      <div class="input-group">
         <input
+        id="bulkFileInput"
           type="file"
           class="form-control"
           (change)="onBulkFileChange($event)"
-          accept=".csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-      </div>
-
-      <div class="col-md-3">
+          accept=".txt,.csv"
+        />
         <button
           type="button"
-          class="btn btn-outline-primary w-100"
+          class="btn btn-outline-primary"
           [disabled]="!bulkFile || uploadingBulk"
-          (click)="uploadBulk()">
-
+          (click)="uploadBulk()"
+        >
           <ng-container *ngIf="!uploadingBulk; else uploadingTpl">
-            {{ 'UPLOAD_FILE' | translate: { default: 'Upload & create request' } }}
+            {{ 'UPLOAD_FILE' | translate:{ default:'Upload' } }}
           </ng-container>
-
           <ng-template #uploadingTpl>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            {{ 'UPLOADING' | translate: { default: 'Uploading…' } }}
+            <span class="spinner-border spinner-border-sm me-1"></span>
+            {{ 'UPLOADING' | translate:{ default:'Uploading…' } }}
           </ng-template>
         </button>
       </div>
+      <div class="form-text text-muted small mt-1">
+        {{
+          'BULK_SEARCH_DESC'
+          | translate:{
+              default:
+                'Upload a .txt or .csv file with IDs. Results will be available as .csv and kept for 7 days.'
+            }
+        }}
+      </div>
     </div>
+  </div>
 
-    <!-- Table with previous data-requests -->
-    <div class="table-responsive mt-4" *ngIf="dataRequests?.length">
-      <table class="table table-dark table-sm align-middle mb-0">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>{{ 'CREATED_AT' | translate }}</th>
-            <th>{{ 'EXPIRES_AT' | translate }}</th>
-            <th class="text-end">{{ 'ACTIONS' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let req of dataRequests; trackBy: trackByRequestId">
-            <td>{{ req.id }}</td>
-            <td>{{ req.createdAt | date:'short' }}</td>
-            <td>{{ req.expiredAt | date:'short' }}</td>
-            <td class="text-end">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="downloadRequest(req)"
-                [disabled]="downloadingId === req.id">
-                <ng-container *ngIf="downloadingId !== req.id; else dlLoading">
-                  {{ 'DOWNLOAD' | translate }}
-                </ng-container>
-                <ng-template #dlLoading>
-                  <span class="spinner-border spinner-border-sm"></span>
-                </ng-template>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <p
-      class="text-muted small mt-3"
-      *ngIf="!loadingRequests && (!dataRequests || !dataRequests.length)">
-      {{ 'NO_DATA_REQUESTS_YET' | translate: { default: 'You have no data requests yet.' } }}
-    </p>
+  <!-- HISTORY – full width card -->
+  <div class="card-block history-card mt-3">
+    <app-history></app-history>
   </div>
 </section>

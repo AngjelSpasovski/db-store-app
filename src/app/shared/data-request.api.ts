@@ -1,7 +1,7 @@
 // src/app/shared/data-request.api.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 export interface DataRequestRow {
@@ -12,49 +12,39 @@ export interface DataRequestRow {
   expiredAt: string | null;
 }
 
-// ако ти затреба подоцна за детална сметка
-export interface DataRequestDto {
-  id: number;
-  file: string;
-  status: string;      // e.g. "NEW", "READY", "ERROR"
-  createdAt: string;
-  expireAt: string;
-  updatedAt: string;
-}
-
-// од Swagger: GET /api/v1/users/me/data-requests -> { list: [...] }
-interface ListResponse {
-  list: DataRequestRow[];
-}
-
-// од Swagger: POST /api/v1/users/me/data-requests -> { dataRequest: {...} }
+// POST response
 interface CreateResponse {
   dataRequest: DataRequestRow;
 }
 
 @Injectable({ providedIn: 'root' })
 export class DataRequestApi {
-  // пример: https://web-society.xyz-dev.com/api/v1/users/me/data-requests
   private readonly baseUrl = `${environment.baseApiUrl}/users/me/data-requests`;
 
   constructor(private http: HttpClient) {}
 
   /** GET /api/v1/users/me/data-requests */
-  listMyRequests(): Observable<ListResponse> {
-    return this.http.get<ListResponse>(this.baseUrl);
+  listMyRequests(): Observable<DataRequestRow[]> {
+    return this.http.get<any>(this.baseUrl).pipe(
+      map(res => {
+        // безбедно: поддржи и array и обвивка, ако ја сменат во иднина
+        if (Array.isArray(res)) return res as DataRequestRow[];
+        if (Array.isArray(res?.list)) return res.list as DataRequestRow[];
+        return [];
+      })
+    );
   }
 
   /** POST /api/v1/users/me/data-requests  (multipart/form-data) */
   create(file: File): Observable<CreateResponse> {
     const formData = new FormData();
     formData.append('file', file);
-
     return this.http.post<CreateResponse>(this.baseUrl, formData);
   }
 
   /** GET /api/v1/users/me/data-requests/{id}/download  (text/csv) */
   download(id: number): Observable<Blob> {
-    const url = `${this.baseUrl}/${id}/download`;
+    const url = `${environment.baseApiUrl}/users/me/data-requests/${id}/download`;
     return this.http.get(url, { responseType: 'blob' });
   }
 }

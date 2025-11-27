@@ -1,46 +1,85 @@
 <!-- src/app/user/billing/billing.component.html -->
-<section class="container billing-component p-4">
-  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+<section class="container billing-page p-4">
+  <!-- PAGE TITLE -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="m-0">{{ 'BILLING_TITLE' | translate }}</h3>
+  </div>
 
-    <div class="d-flex flex-column align-items-end gap-2">
-      <!-- Top row: Filters + Export -->
-      <div class="d-flex gap-2 flex-wrap justify-content-end">
+  <!-- CARD WRAPPER (ист стил како Search history card) -->
+  <div class="card-block billing-card">
+
+    <!-- TOOLBAR: filters + export + columns -->
+    <div
+      class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 billing-toolbar">
+
+      <!-- LEFT SIDE: description (опционално, можеш да преведеш key) -->
+      <div class="text-muted small">
+        {{ 'BILLING_SUBTITLE' | translate:{ default:'Billing history of packages purchased' } }}
+      </div>
+
+      <!-- RIGHT SIDE: filters / export / columns -->
+      <div class="d-flex flex-wrap align-items-center gap-2 justify-content-end">
+
         <!-- Filter buttons -->
-        <div class="btn-group btn-group-sm" role="group" aria-label="Filter by status">
-          <button type="button" class="btn btn-outline-light" [class.active]="statusFilter === 'ALL'"
+        <div
+          class="btn-group btn-group-sm billing-filters"
+          role="group"
+          aria-label="Filter by status">
+
+          <button
+            type="button"
+            class="btn btn-filter"
+            [class.active]="statusFilter === 'ALL'"
             (click)="setStatusFilter('ALL')">
             All
           </button>
-          <button type="button" class="btn btn-outline-light" [class.active]="statusFilter === 'SUCCESS'"
+
+          <button
+            type="button"
+            class="btn btn-filter"
+            [class.active]="statusFilter === 'SUCCESS'"
             (click)="setStatusFilter('SUCCESS')">
             Success
           </button>
-          <button type="button" class="btn btn-outline-light" [class.active]="statusFilter === 'FAILED'"
+
+          <button
+            type="button"
+            class="btn btn-filter"
+            [class.active]="statusFilter === 'FAILED'"
             (click)="setStatusFilter('FAILED')">
             Failed
           </button>
-          <button type="button" class="btn btn-outline-light" [class.active]="statusFilter === 'PENDING'"
+
+          <button
+            type="button"
+            class="btn btn-filter"
+            [class.active]="statusFilter === 'PENDING'"
             (click)="setStatusFilter('PENDING')">
             Pending
           </button>
         </div>
 
         <!-- Export buttons -->
-        <div class="btn-group btn-group-sm" role="group" aria-label="Export">
-          <button type="button" class="btn btn-outline-light" (click)="exportCsv()">
+        <div class="btn-group btn-group-sm billing-export" role="group" aria-label="Export">
+          <button
+            type="button"
+            class="btn btn-export"
+            (click)="exportCsv()">
             CSV
           </button>
-          <button type="button" class="btn btn-outline-light" (click)="exportExcel()">
+          <button
+            type="button"
+            class="btn btn-export"
+            (click)="exportExcel()">
             Excel
           </button>
         </div>
 
-        <!-- Column chooser (overlay) -->
-        <div class="billing-column-chooser ms-2">
+        <!-- Column chooser -->
+        <div class="billing-column-chooser">
           <button
             type="button"
-            class="btn btn-outline-light btn-sm"
+            class="btn btn-export btn-sm"
             (click)="toggleColumnPanel()">
             Columns
           </button>
@@ -50,7 +89,9 @@
             *ngIf="showColumnPanel">
             <div class="small fw-semibold mb-1">Visible columns</div>
 
-            <div *ngFor="let col of columnChooser" class="form-check form-check-sm mb-1">
+            <div
+              *ngFor="let col of columnChooser"
+              class="form-check form-check-sm mb-1">
               <input
                 class="form-check-input"
                 type="checkbox"
@@ -67,65 +108,84 @@
 
       </div>
     </div>
-  </div>
 
-  <!-- DESKTOP: ag-Grid -->
-  <div *ngIf="!isMobile">
-    <ag-grid-angular
-      [theme]="theme"
-      [columnDefs]="columnDefs"
-      [defaultColDef]="defaultColDef"
-      [rowData]="rowData"
-      [pagination]="true"
-      [paginationPageSize]="12"
-      [paginationPageSizeSelector]="[12, 20, 50, 100]"
-      style="width: 100%; height: 66vh"
-      (gridReady)="onGridReady($event)">
-    </ag-grid-angular>
-  </div>
+    <!-- DESKTOP: ag-Grid во card -->
+    <div *ngIf="!isMobile" class="billing-grid-wrapper">
+      <ag-grid-angular
+        [theme]="theme"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [rowData]="rowData"
+        [pagination]="true"
+        [paginationPageSize]="10"
+        [paginationPageSizeSelector]="[10, 20, 50, 100]"
+        style="width: 100%; height: 57vh"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
 
-  <!-- MOBILE: accordion cards -->
-  <div *ngIf="isMobile">
-    <div class="accordion" id="billingAccordion">
-      <div class="accordion-item bg-dark text-light" *ngFor="let row of rowData; let i = index">
-        <h2 class="accordion-header" [id]="'heading' + i">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            [attr.data-bs-target]="'#collapse' + i" aria-expanded="false" [attr.aria-controls]="'collapse' + i">
-            #{{ row.id }} ·
-            {{ row.timestamp | date: 'MM/dd/yyyy, HH:mm' }} ·
-            {{ row.amount | number: '1.0-0' }} €
-          </button>
-        </h2>
-        <div [id]="'collapse' + i" class="accordion-collapse collapse" [attr.aria-labelledby]="'heading' + i"
-          data-bs-parent="#billingAccordion">
-          <div class="accordion-body">
-            <p class="mb-1"><strong>Package:</strong> {{ row.packageName }}</p>
-            <p class="mb-1">
-              <strong>Pkg credits:</strong> {{ row.packageCredits }}
-            </p>
-            <p class="mb-1">
-              <strong>Pkg price:</strong> {{ row.packagePrice }} €
-            </p>
-            <p class="mb-1">
-              <strong>Discount:</strong> {{ row.packageDiscountPercentage }}
-            </p>
-            <p class="mb-1">
-              <strong>Credits:</strong> {{ row.credits }}
-            </p>
-            <p class="mb-1">
-              <strong>Status:</strong>
-              <span class="badge bg-success" *ngIf="row.status === 'SUCCESS'">Success</span>
-              <span class="badge bg-warning text-dark" *ngIf="row.status === 'PENDING'">Pending</span>
-              <span class="badge bg-danger" *ngIf="row.status === 'FAILED'">Failed</span>
-            </p>
-
-            <button type="button" class="btn btn-outline-light btn-sm mt-2" (click)="openInvoiceFromRow(row)">
-              Invoice details
+    <!-- MOBILE: accordion cards (оставено како што имаше) -->
+    <div *ngIf="isMobile" class="billing-mobile-list mt-3">
+      <div class="accordion" id="billingAccordion">
+        <div
+          class="accordion-item bg-dark text-light"
+          *ngFor="let row of rowData; let i = index">
+          <h2 class="accordion-header" [id]="'heading' + i">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#collapse' + i"
+              aria-expanded="false"
+              [attr.aria-controls]="'collapse' + i">
+              #{{ row.id }} ·
+              {{ row.timestamp | date:'MM/dd/yyyy, HH:mm' }} ·
+              {{ row.amount | number:'1.0-0' }} €
             </button>
+          </h2>
+          <div
+            [id]="'collapse' + i"
+            class="accordion-collapse collapse"
+            [attr.aria-labelledby]="'heading' + i"
+            data-bs-parent="#billingAccordion">
+            <div class="accordion-body">
+              <p class="mb-1"><strong>Package:</strong> {{ row.packageName }}</p>
+              <p class="mb-1">
+                <strong>Pkg credits:</strong> {{ row.packageCredits }}
+              </p>
+              <p class="mb-1">
+                <strong>Pkg price:</strong> {{ row.packagePrice }} €
+              </p>
+              <p class="mb-1">
+                <strong>Discount:</strong> {{ row.packageDiscountPercentage }}
+              </p>
+              <p class="mb-1">
+                <strong>Credits:</strong> {{ row.credits }}
+              </p>
+              <p class="mb-1">
+                <strong>Status:</strong>
+                <span class="badge bg-success" *ngIf="row.status === 'SUCCESS'">
+                  Success
+                </span>
+                <span class="badge bg-warning text-dark" *ngIf="row.status === 'PENDING'">
+                  Pending
+                </span>
+                <span class="badge bg-danger" *ngIf="row.status === 'FAILED'">
+                  Failed
+                </span>
+              </p>
+
+              <button
+                type="button"
+                class="btn btn-outline-light btn-sm mt-2"
+                (click)="openInvoiceFromRow(row)">
+                Invoice details
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
+  </div> <!-- /card-block -->
 </section>

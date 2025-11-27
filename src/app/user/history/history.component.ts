@@ -1,143 +1,122 @@
-// history.component.ts
-import { Component, OnInit } from '@angular/core';
-import { CommonModule }  from '@angular/common';
+// src/app/user/history/history.component.ts
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  Inject,
+} from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AgGridModule }  from 'ag-grid-angular';
+import { AgGridModule } from 'ag-grid-angular';
 import { Subscription } from 'rxjs';
 
-import { SearchHistoryService, SearchRecord } from '../new-research/new-search-history.service';
-
-// Importing themes from ag-Grid
 import { themeAlpine } from 'ag-grid-community';
-
+import { DataRequestApi, DataRequestRow } from 'src/app/shared/data-request.api';
+import { SearchHistoryService } from '../new-research/new-search-history.service';
 
 @Component({
   selector: 'app-history',
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    TranslateModule,
-    AgGridModule
-  ]
+  imports: [CommonModule, TranslateModule, AgGridModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HistoryComponent  implements OnInit {
-
-  records: SearchRecord[] = [];
-  filterId = '';
-  sortField: 'id' | 'timestamp' = 'timestamp';
-  sortAsc = false;
-
-  // Dark theme params (усогласено со останатиот UI)
+export class HistoryComponent implements OnInit, OnDestroy {
   public theme = themeAlpine.withParams({
-    backgroundColor: '#1b212b',                         // main background color
-    foregroundColor: '#e9eef6',                         // optional: grid text color
-    headerBackgroundColor: '#2a303a',                   // header background color
-    headerTextColor: '#c7cfda',                         // header text color
-    textColor: '#e9eef6',                               // border color for cells
-    cellTextColor: '#e9eef6',                           // cell text color
-    borderColor: 'rgba(255,255,255,.08)',               // border color for cells
-    rowHeight: 40,                                        // default row height
-    headerHeight: 48,                                     // header height
-    fontFamily: 'Inter, system-ui, Roboto, sans-serif',   // font family
-    fontSize: '14px',                                     // font size
-    accentColor: '#0d6efd',                             // accent color, e.g. for selected rows
+    backgroundColor: '#151821',
+    foregroundColor: '#e9eef6',
+    headerBackgroundColor: '#252a36',
+    headerTextColor: '#cfd6e4',
+    textColor: '#e9eef6',
+    cellTextColor: '#e9eef6',
+    borderColor: 'rgba(255,255,255,.10)',
+    rowHeight: 40,
+    headerHeight: 46,
+    fontFamily: 'Inter, system-ui, Roboto, sans-serif',
+    fontSize: '14px',
+    accentColor: '#0d6efd',
   });
 
-
-  // ag-Grid config
   columnDefs: any[] = [];
   defaultColDef = { sortable: true, filter: true, resizable: true, flex: 1 };
-  rowData: SearchRecord[] = [];
+  rowData: DataRequestRow[] = [];
 
   private sub!: Subscription;
 
   constructor(
-    private historySvc: SearchHistoryService,
-    private translate: TranslateService) {}
+    private historyStore: SearchHistoryService,
+    private translate: TranslateService,
+    private cdr: ChangeDetectorRef,
+    private dataReqApi: DataRequestApi,
+    @Inject(DOCUMENT) private doc: Document
+  ) {}
 
   ngOnInit(): void {
-    // Subscribe to every update
-    this.sub = this.historySvc.history$.subscribe(list => {
-      this.rowData = list;
+    this.sub = this.historyStore.history$.subscribe((rows) => {
+      this.rowData = rows;
+      this.cdr.markForCheck();
     });
 
-    // Define columns, using translate.instant for headers
+    this.historyStore.reload();
+
     this.columnDefs = [
+      // badge колона
       {
         field: 'id',
-        headerName: this.translate.instant('ID_NUMBER')
-      },
-
-      {
-        field: 'timestamp',
-        headerName: this.translate.instant('TIMESTAMP'),
-        // Format the ISO string into a locale datetime
-        valueFormatter: (params: { value: string | number | Date; }) =>
-          params.value ? new Date(params.value).toLocaleString() : ''
-      },
-
-      {
-        field: 'success',
-        headerName: this.translate.instant('STATUS'),
-        sortable: false,
+        headerName: '#',
+        width: 110,
+        cellRenderer: (p: any) =>
+          `<span class="req-badge">#${p.value}</span>`,
+        sortable: true,
         filter: false,
-        width: 90,
-        cellRenderer: (params: { value: any; }) => {
-          const ok = params.value;
-          // Render a simple dot whose color is driven by CSS
-          return `<span class="status-dot ${ok ? 'success' : 'danger'}"></span>`;
-        }
       },
-
       {
-        field: 'fileUrl',
-        headerName: this.translate.instant('RECEIPT'),
+        field: 'createdAt',
+        headerName: this.translate.instant('CREATED_AT'),
+        valueFormatter: (p: any) =>
+          p.value ? new Date(p.value).toLocaleString() : '',
+      },
+      {
+        field: 'expiredAt',
+        headerName: this.translate.instant('EXPIRES_AT'),
+        valueFormatter: (p: any) =>
+          p.value ? new Date(p.value).toLocaleString() : '',
+      },
+      {
+        headerName: this.translate.instant('ACTIONS'),
         sortable: false,
         filter: false,
         width: 140,
-        cellRenderer: (p: any) => {
-          const url = p.value as string | undefined;
-          if (!url) {
-            return `<span class="text-muted">${
-              this.translate.instant('N_A') || 'N/A'
-            }</span>`;
-          }
-          const label = this.translate.instant('DOWNLOAD') || 'Download';
-          // додаден download атрибут
-          return `<a href="${url}" target="_blank" rel="noopener" download="dummy_pdf.pdf">${label}</a>`;
-        }
-      }
-
-
+        cellRenderer: () =>
+          `<button class="btn btn-sm btn-outline-primary">DOWNLOAD</button>`,
+        onCellClicked: (params: any) => {
+          const row = params.data as DataRequestRow;
+          this.download(row);
+        },
+      },
     ];
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.sub?.unsubscribe();
   }
 
-
-  get displayedRecords(): SearchRecord[] {
-
-    let list = this.records.filter(r => r.id.includes(this.filterId));
-
-    list = list.sort((a, b) => {
-      const aVal = a[this.sortField];
-      const bVal = b[this.sortField];
-      return this.sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+  private download(row: DataRequestRow) {
+    this.dataReqApi.download(row.id).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = this.doc.createElement('a');
+        a.href = url;
+        a.download = `data-request-${row.id}.csv`;
+        this.doc.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Download failed', err),
     });
-    return list;
   }
-
-  toggleSort(field: 'id' | 'timestamp') {
-    if (this.sortField === field) {
-      this.sortAsc = !this.sortAsc;
-    } else {
-      this.sortField = field;
-      this.sortAsc = true;
-    }
-  }
-
 }

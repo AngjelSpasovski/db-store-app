@@ -1,12 +1,21 @@
-<!-- history.component.html -->
-<section>
+<!-- src/app/user/history/history.component.html -->
+<section class="history-root">
+  <div
+    class="history-header d-flex justify-content-between align-items-center mb-2"
+  >
+    <h5 class="mb-0">
+      {{ 'SEARCH_HISTORY' | translate:{ default:'Search history' } }}
+    </h5>
+  </div>
 
   <ag-grid-angular
     [theme]="theme"
     [columnDefs]="columnDefs"
     [defaultColDef]="defaultColDef"
     [rowData]="rowData"
-    style="width:100%; height:55vh;">
+    [pagination]="true"
+    [paginationPageSize]="20"
+    style="width: 100%; height: 40vh"
+  >
   </ag-grid-angular>
-
 </section>

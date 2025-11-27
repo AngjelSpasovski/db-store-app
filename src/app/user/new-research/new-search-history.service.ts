@@ -1,41 +1,35 @@
 // src/app/user/new-research/new-search-history.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-
-export interface SearchRecord {
-  id: string;
-  timestamp: string;
-  success: boolean;
-  fileUrl?: string;
-}
+import { DataRequestApi, DataRequestRow } from 'src/app/shared/data-request.api';
 
 @Injectable({ providedIn: 'root' })
 export class SearchHistoryService {
-  private storageKey = 'app_search_history';
+  private historySubject = new BehaviorSubject<DataRequestRow[]>([]);
+  readonly history$ = this.historySubject.asObservable();
 
-  private historySubject = new BehaviorSubject<SearchRecord[]>(
-    this.loadFromStorage()
-  );
-  public history$ = this.historySubject.asObservable();
+  constructor(private dataReqApi: DataRequestApi) {}
 
-  add(record: SearchRecord): void {
-    const list = [record, ...this.historySubject.value];
-    sessionStorage.setItem(this.storageKey, JSON.stringify(list));
-    this.historySubject.next(list);
-  }
+  /**
+   * Ги вчитува сите data-requests од backend
+   * и ги сортира по createdAt (најновите најгоре).
+   */
+  reload(): void {
+    this.dataReqApi.listMyRequests().subscribe({
+      next: (rows) => {
+        const sorted = [...rows].sort((a, b) => {
+          const aTime = new Date(a.createdAt).getTime();
+          const bTime = new Date(b.createdAt).getTime();
+          return bTime - aTime;
+        });
 
-  getAll(): SearchRecord[] {
-    return this.historySubject.value;
-  }
-
-  private loadFromStorage(): SearchRecord[] {
-    try {
-      const raw = sessionStorage.getItem(this.storageKey);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
+        console.log('[DataRequests] list response ➜', sorted);
+        this.historySubject.next(sorted);
+      },
+      error: (err) => {
+        console.error('[DataRequests] list failed', err);
+        this.historySubject.next([]);
+      }
+    });
   }
 }

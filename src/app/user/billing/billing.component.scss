@@ -1,125 +1,169 @@
-
+// src/app/user/billing/billing.component.scss
 @use 'sass:color';
 
-$dark:       #222428;
-$darker:     #1e1e1e;
-$light:      #ffffff;
-$primary:    #4d8dff;
-$secondary:  #555;
-
-$primary-blue: #00509e;
-$primary-blue-light: #00a8ff;
-
-$card-header-bg: #2a3443;
-$card-button-bg: #42526a;
-$card-price-color: #658eb6;
-
-.billing-component {
-  --bg-2: #1b212b;
-  --text-0: #e9eef6;
-  --text-1: #c7cfda;
-  --muted: #99a3b3;
-  --border: rgba(255,255,255,.08);
+.billing-page {
+  --bg-card: #1b212b;
+  --text: #e9eef6;
+  --text-muted: #99a3b3;
+  --border: rgba(255, 255, 255, 0.08);
   --brand: #0d6efd;
 
-  .acc-card {
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: 0 6px 16px rgba(0,0,0,.22);
-    color: var(--muted);
+  color: var(--text);
 
-    .card-header {
-      background: rgba(255,255,255,.04);
-      border-bottom: 1px solid var(--border);
-      color: var(--text-1);
-      font-weight: 600;
-      padding: .65rem .9rem;
-    }
-
-    .card-body { padding: .9rem; }
-  }
-
-  .inner-title {
-    font-size: 1.5rem;
+  h3 {
     font-weight: 600;
-    text-align: center;
-    color: $light;
+    letter-spacing: 0.01em;
   }
 
-  .form-label { color: var(--text-1); }
-
-  .form-control {
-    background: #12161c;
-    color: var(--text-0);
+  .card-block.billing-card {
+    background: var(--bg-card);
+    border-radius: 0.75rem;
     border: 1px solid var(--border);
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   }
 
-  .form-control:focus {
-    background: #151a21;
-    color: #fff;
+  .billing-toolbar {
+    position: relative;
+  }
+
+  /* ===== FILTER & EXPORT BUTTONS ===== */
+  .btn-filter,
+  .btn-export {
+    border-radius: 999px;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--border);
+    background: #202632;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .btn-filter.active {
+    background: var(--brand);
     border-color: var(--brand);
-    box-shadow: 0 0 0 .2rem rgba(13,110,253,.12);
+    color: #fff;
   }
 
-  .invalid { color: #f28b82; }
+  .btn-export:hover {
+    /* НЕ користиме color.scale со CSS var – директно ставаме малку потемна боја */
+    background: #0b5ed7;
+    border-color: var(--brand);
+    color: #fff;
+  }
 
-  .column-panel {
-    background: #1f2733;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+  /* column chooser trigger */
+  .billing-column-chooser {
+    position: relative;
+  }
+
+  .billing-column-panel {
+    position: absolute;
+    right: 0;
+    top: 110%;
+    min-width: 190px;
+    padding: 0.6rem 0.8rem;
     border-radius: 0.5rem;
-    padding: 0.75rem 1rem;
+    background: #1f2632;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    z-index: 1050;
+
     max-height: 260px;
     overflow-y: auto;
+
+    .form-check-input {
+      cursor: pointer;
+    }
+
+    .form-check-label {
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #e9eef6;
+    }
   }
-}
 
-.billing-modal .modal-content {
-  background: #1b212b;
-  color: #e9eef6;
-  border-radius: 0.75rem;
-}
-
-.billing-toolbar {
-  position: relative;
-  z-index: 1; // toolbar над grid header-от
-}
-
-.billing-column-chooser {
-  position: relative; // референтна точка за панелот
-}
-
-.billing-column-panel {
-  position: absolute;
-  right: 0;
-  top: 110%; // под копчето
-  min-width: 190px;
-  padding: 0.6rem 0.8rem;
-  border-radius: 0.5rem;
-  background: #1f2632;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  z-index: 1050;
-
-  max-height: 260px;
-  overflow-y: auto;
-
-  .form-check-input {
-    cursor: pointer;
+  .billing-grid-wrapper {
+    margin-top: 0.5rem;
   }
-  .form-check-label {
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: #e9eef6;
-  }
-}
 
-/* ag-Grid fine-tune */
-:host ::ng-deep .ag-theme-alpine {
-  .ag-header { background-color: #2a303a; }
-  .ag-header-cell-label { color: var(--text-1); font-weight: 600; }
-  .ag-row.ag-row-hover { background-color: #2a303a !important; }
-  .ag-row-selected { background-color: rgba(13,110,253,.18) !important; }
-  .ag-cell-focus { outline: 2px solid #0d6efd; }
-  .ag-btn-download { padding: .15rem .5rem; font-size: .75rem;}
+  /* ===== ag-Grid FINE TUNING (ист look како Search) ===== */
+  :host ::ng-deep .ag-theme-alpine {
+    background-color: transparent;
+
+    .ag-root-wrapper {
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background-color: #141922;
+    }
+
+    .ag-header {
+      background-color: #2a303a;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ag-header-cell-label {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .ag-row {
+      border-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .ag-row.ag-row-hover {
+      background-color: #232936 !important;
+    }
+
+    .ag-row-selected {
+      background-color: rgba(13, 110, 253, 0.18) !important;
+    }
+
+    .ag-cell {
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+
+    .ag-cell-focus {
+      outline: 2px solid var(--brand);
+      outline-offset: -1px;
+    }
+
+    .ag-paging-panel {
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .ag-paging-button {
+      border-radius: 999px;
+    }
+  }
+
+  /* MOBILE ACCORDION slight polish */
+  .billing-mobile-list {
+    .accordion-item {
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #151921;
+      & + .accordion-item {
+        margin-top: 0.75rem;
+      }
+    }
+
+    .accordion-button {
+      background: #1d2330;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .accordion-body {
+      background: #151921;
+      font-size: 0.85rem;
+    }
+  }
 }
