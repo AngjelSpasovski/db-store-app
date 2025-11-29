@@ -27,6 +27,84 @@
     position: relative;
   }
 
+    .billing-toolbar {
+    position: relative;
+  }
+
+    /* spacing between buttons inside each group */
+    .billing-filters .btn,
+    .billing-export .btn,
+    .billing-column-chooser .btn {
+      margin-right: 0.4rem; /* мал простор меѓу копчињата */
+    }
+
+    /* remove last margin so the group ends cleanly */
+    .billing-filters .btn:last-child,
+    .billing-export .btn:last-child,
+    .billing-column-chooser .btn:last-child {
+      margin-right: 0;
+    }
+
+  /* wrapper за секоја „капсула“ (Sorting / Download / Table View) */
+  .toolbar-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #171c25;
+  }
+
+  .toolbar-label {
+    position: absolute;
+    top: -0.55rem;
+    left: 1rem;
+    padding: 0 0.45rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    background: var(--bg-card); // да „исече“ од горниот раб
+  }
+
+  /* ===== FILTER & EXPORT BUTTONS – pill стил ===== */
+  .btn-filter,
+  .btn-export {
+    border-radius: 999px;
+    padding: 0.35rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #202632;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    font-weight: 500;
+    transition: background-color 0.15s ease, border-color 0.15s ease,
+      color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  /* hover за НЕактивните filter копчиња */
+  .btn-filter:not(.active):hover {
+    background: #0b5ed7;
+    border-color: var(--brand);
+    color: #fff;
+  }
+
+  .btn-filter.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+    box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.35);
+  }
+
+  .btn-export:hover {
+    background: #0b5ed7;
+    border-color: var(--brand);
+    color: #fff;
+  }
+
   /* ===== FILTER & EXPORT BUTTONS ===== */
   .btn-filter,
   .btn-export {
@@ -167,3 +245,32 @@
     }
   }
 }
+
+  /* --- Scrollbar styling за ag-Grid (Chrome/Edge/Opera) --- */
+  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
+  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+
+  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
+  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar-track {
+    background-color: #151823; /* позадина, блиску до card/bg */
+  }
+
+  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
+  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar-thumb {
+    background-color: #34384d; /* thumb боја */
+    border-radius: 4px;
+  }
+
+  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb:hover,
+  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar-thumb:hover {
+    background-color: #4a4f6a; /* hover малку посветло */
+  }
+
+  /* Firefox варијанта */
+  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport {
+    scrollbar-width: thin;
+    scrollbar-color: #34384d #151823;
+  }

@@ -1,12 +1,7 @@
 <section class="container credits-page py-3">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">{{ 'BUY_CREDITS_TITLE' | translate }}</h3>
-  </div>
-
   <div class="container-fluid px-0 h-100">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
 
-      <!-- ✅ работи со packages и pkg.id -->
       <div class="col" *ngFor="let pkg of packages; trackBy: trackByPkg">
         <div class="card acc-card credit-card h-100">
           <div class="card-header">
@@ -14,26 +9,47 @@
           </div>
 
           <div class="card-body text-center">
-            <div *ngIf="!canBuy(pkg)" class="small text-warning mt-2">
-             Payment link not configured yet.
-            </div>  
 
-            <div class="price display-6 mb-1">
+            <!-- small warning кога нема линк -->
+            <div *ngIf="!canBuy(pkg)" class="hint-error">
+              Payment link not configured yet.
+            </div>
+
+            <div class="price mb-1">
               {{ pkg.displayPrice }}
             </div>
-            <small class="text-muted" *ngIf="!environment.production">Stripe Test Mode</small>
 
-            <button class="btn btn-secondary w-100" [disabled]="loadingId===pkg.id || !canBuy(pkg)" (click)="purchase(pkg)">
-              <span *ngIf="loadingId!==pkg.id">
-                {{ canBuy(pkg) ? 'Buy Now' : 'work in progress' }}
+            <!-- Stripe mode badge -->
+            <div class="mb-3">
+              <span
+                *ngIf="environment.production; else testMode"
+                class="mode-pill">
+                One-time purchase
               </span>
-              <span *ngIf="loadingId===pkg.id" class="d-inline-flex align-items-center gap-2">
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Processing...
-              </span>
+              <ng-template #testMode>
+                <span class="mode-pill mode-pill-test">
+                  Stripe test mode
+                </span>
+              </ng-template>
+            </div>
+
+            <button
+              class="btn-credits"
+              [disabled]="loadingId===pkg.id || !canBuy(pkg)"
+              (click)="purchase(pkg)">
+
+              <ng-container *ngIf="loadingId!==pkg.id; else loadingTpl">
+                {{ canBuy(pkg) ? 'Buy now' : 'Work in progress' }}
+              </ng-container>
+
+              <ng-template #loadingTpl>
+                <span class="d-inline-flex align-items-center gap-2">
+                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Processing...
+                </span>
+              </ng-template>
             </button>
           </div>
-
         </div>
       </div>
 

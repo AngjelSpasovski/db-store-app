@@ -1,93 +1,96 @@
 <!-- src/app/user/new-research/new-research.component.html -->
 <section class="container new-research p-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">{{ 'SEARCH_PERSON' | translate }}</h3>
-  </div>
 
-  <!-- TOP ROW: left = single search, right = bulk upload -->
-  <div class="row g-3 align-items-end mb-4">
+  <!-- TOP CARD: Single search + Bulk upload -->
+  <div class="card-block search-card mb-3">
+    <!-- <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="m-0 section-title">
+        {{ 'SEARCH_PERSON' | translate }}
+      </h3>
+    </div> -->
 
-    <!-- SINGLE SEARCH -->
-    <div class="col-12 col-md-6">
-      <form [formGroup]="searchForm" (ngSubmit)="submit()">
-        <label for="id" class="form-label">
-          {{ 'PERSONAL_ID_NUMBER' | translate }}
+    <div class="row g-3 align-items-end">
+      <!-- SINGLE SEARCH -->
+      <div class="col-12 col-md-6">
+        <form [formGroup]="searchForm" (ngSubmit)="submit()">
+          <label for="id" class="form-label small">
+            {{ 'PERSONAL_ID_NUMBER' | translate }}
+          </label>
+          <div class="input-group">
+            <input
+              id="id"
+              type="search"
+              class="form-control"
+              formControlName="id"
+              placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}"
+            />
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="searchForm.invalid || searching"
+            >
+              <span *ngIf="!searching">{{ 'SEARCH' | translate }}</span>
+              <span *ngIf="searching" class="spinner-border spinner-border-sm"></span>
+            </button>
+          </div>
+
+          <!-- SLOT за error порака – фиксна висина -->
+          <div class="validation-slot">
+            <div
+              *ngIf="
+                searchForm.get('id')?.invalid &&
+                (searchForm.get('id')?.touched || searchForm.get('id')?.dirty)
+              "
+              class="text-danger small"
+            >
+              {{ 'ID_MUST_BE_16_CHARS' | translate }}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- BULK UPLOAD -->
+      <div class="col-12 col-md-6">
+        <label class="form-label small">
+          {{ 'BULK_SEARCH_TITLE' | translate:{ default:'Bulk search from file' } }}
         </label>
         <div class="input-group">
           <input
-            id="id"
-            type="search"
+            id="bulkFileInput"
+            type="file"
             class="form-control"
-            formControlName="id"
-            placeholder="{{ 'ENTER_SEARCH_VALUE' | translate }}"
+            (change)="onBulkFileChange($event)"
+            accept=".txt,.csv"
           />
           <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="searchForm.invalid || searching"
+            type="button"
+            class="btn btn-outline-primary"
+            [disabled]="!bulkFile || uploadingBulk"
+            (click)="uploadBulk()"
           >
-            <span *ngIf="!searching">{{ 'SEARCH' | translate }}</span>
-            <span *ngIf="searching" class="spinner-border spinner-border-sm"></span>
+            <ng-container *ngIf="!uploadingBulk; else uploadingTpl">
+              {{ 'UPLOAD_FILE' | translate:{ default:'Upload' } }}
+            </ng-container>
+            <ng-template #uploadingTpl>
+              <span class="spinner-border spinner-border-sm me-1"></span>
+              {{ 'UPLOADING' | translate:{ default:'Uploading…' } }}
+            </ng-template>
           </button>
         </div>
-
-        <!-- SLOT за error порака – има фиксна висина, не го поместува layout-от -->
-        <div class="validation-slot">
-          <div
-            *ngIf="
-              searchForm.get('id')?.invalid &&
-              (searchForm.get('id')?.touched || searchForm.get('id')?.dirty)
-            "
-            class="text-danger small"
-          >
-            {{ 'ID_MUST_BE_16_CHARS' | translate }}
-          </div>
+        <div class="form-text text-muted small mt-1">
+          {{
+            'BULK_SEARCH_DESC'
+              | translate:{
+                  default:
+                    'Upload a .txt or .csv file with IDs. Results will be available as .csv and kept for 7 days.'
+                }
+          }}
         </div>
-
-      </form>
-    </div>
-
-    <!-- BULK UPLOAD (истата линија, десно) -->
-    <div class="col-12 col-md-6">
-      <label class="form-label">
-        {{ 'BULK_SEARCH_TITLE' | translate:{ default:'Bulk search from file' } }}
-      </label>
-      <div class="input-group">
-        <input
-        id="bulkFileInput"
-          type="file"
-          class="form-control"
-          (change)="onBulkFileChange($event)"
-          accept=".txt,.csv"
-        />
-        <button
-          type="button"
-          class="btn btn-outline-primary"
-          [disabled]="!bulkFile || uploadingBulk"
-          (click)="uploadBulk()"
-        >
-          <ng-container *ngIf="!uploadingBulk; else uploadingTpl">
-            {{ 'UPLOAD_FILE' | translate:{ default:'Upload' } }}
-          </ng-container>
-          <ng-template #uploadingTpl>
-            <span class="spinner-border spinner-border-sm me-1"></span>
-            {{ 'UPLOADING' | translate:{ default:'Uploading…' } }}
-          </ng-template>
-        </button>
-      </div>
-      <div class="form-text text-muted small mt-1">
-        {{
-          'BULK_SEARCH_DESC'
-          | translate:{
-              default:
-                'Upload a .txt or .csv file with IDs. Results will be available as .csv and kept for 7 days.'
-            }
-        }}
       </div>
     </div>
   </div>
 
-  <!-- HISTORY – full width card -->
+  <!-- HISTORY CARD -->
   <div class="card-block history-card mt-3">
     <app-history></app-history>
   </div>

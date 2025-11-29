@@ -1,9 +1,12 @@
 <!-- faqs.component.html -->
-<div class="container faqs-component p-4 bg-dark text-white">
+<div class="container faqs-component p-4">
+  <!-- Ако сакаш title, можеш да го откоментираш ова
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="m-0">{{ 'FAQS_TITLE' | translate }}</h3>
   </div>
+  -->
 
+  <!-- SEARCH BAR -->
   <div class="search-container mb-4 position-relative">
     <i class="bi bi-search search-icon" aria-hidden="true"></i>
     <input
@@ -15,7 +18,8 @@
     />
   </div>
 
-  <div class="accordion" id="faqAccordion">
+  <!-- ACCORDION LIST -->
+  <div class="accordion faq-accordion" id="faqAccordion">
     <ng-container *ngFor="let fd of filteredFaqs; let i = index; trackBy: trackByIndex">
       <div class="accordion-item faq-card mb-3">
         <h2 class="accordion-header" [id]="'heading' + i">

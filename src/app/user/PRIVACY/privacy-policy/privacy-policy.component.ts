@@ -15,12 +15,29 @@ import { PdfViewerModule }   from 'ng2-pdf-viewer';
   ]
 })
 export class PrivacyPolicyComponent  implements OnInit {
-  
+
   public culture: string = 'IT'; // Default culture
   public pdfSrc = `../../../../assets/privacy/privacy-policy/privacy-policy-${this.culture}.pdf`; // Path to the PDF file
+
+  zoom = 1;
+  private readonly zoomStep = 0.2;
+  private readonly minZoom = 0.6;
+  private readonly maxZoom = 2.0;
 
   constructor() { }
 
   ngOnInit() {}
+
+  zoomIn(): void {
+    this.zoom = Math.min(this.zoom + this.zoomStep, this.maxZoom);
+  }
+
+  zoomOut(): void {
+    this.zoom = Math.max(this.zoom - this.zoomStep, this.minZoom);
+  }
+
+  resetZoom(): void {
+    this.zoom = 1;
+  }
 
 }

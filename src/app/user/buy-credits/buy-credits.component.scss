@@ -7,12 +7,15 @@
   --text-0: #e9eef6;
   --text-1: #c7cfda;
   --muted: #99a3b3;
-  --border: rgba(255,255,255,.08);
+  --border: rgba(255, 255, 255, .08);
   --brand: #0d6efd;
   --brand-2: #495662;
 
-  .card-grid { /* spacing fix за bootstrap grid во оваа секција */
-    .row { margin-left: 0; margin-right: 0; }
+  .card-grid {
+    .row {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 
   /* унифицирана картичка – исто како .acc-card */
@@ -20,21 +23,24 @@
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: 14px;
-    box-shadow: 0 6px 16px rgba(0,0,0,.22);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .22);
     color: var(--text-1);
     overflow: hidden;
 
     .card-header {
-      background: rgba(255,255,255,.04);
+      background: rgba(255, 255, 255, .04);
       border-bottom: 1px solid var(--border);
       color: var(--text-1);
       font-weight: 600;
       padding: .65rem .9rem;
+      text-transform: uppercase;
+      font-size: .78rem;
+      letter-spacing: .12em;
     }
 
     .card-body {
       background: transparent;
-      padding: 1.25rem;
+      padding: 1.25rem 1.35rem 1.3rem;
       color: var(--text-0);
     }
   }
@@ -44,18 +50,87 @@
     transition: transform .15s ease, box-shadow .15s ease;
 
     &:hover {
-      box-shadow: 0 10px 22px rgba(0,0,0,.28);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, .28);
     }
 
     .price {
       color: var(--text-0);
       font-weight: 800;
       letter-spacing: .4px;
+      font-size: 2.2rem;
+    }
+
+    .hint-error {
+      font-size: .78rem;
+      color: #ffd166;
+      margin-bottom: .35rem;
     }
   }
 
-  /* мал breakpoint: 2 по ред да изгледаат „дишено“ */
+  /* mode / tag pill (Stripe test, best value, ...) */
+  .mode-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .15rem .75rem;
+    border-radius: 999px;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    background: rgba(255, 255, 255, .06);
+    color: var(--muted);
+  }
+
+  .mode-pill-test {
+    background: rgba(13, 110, 253, 0.16);
+    color: var(--text-0);
+  }
+
+  /* CTA копче – brand pill стил */
+  .btn-credits {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid var(--brand);
+    background: var(--brand);
+    color: #fff;
+    font-weight: 600;
+    font-size: .86rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: .55rem 1rem;
+    margin-top: .85rem;
+    transition: background .15s ease, box-shadow .15s ease, transform .1s ease;
+
+    &:hover:not(:disabled) {
+      background: #0b5ed7;
+      border-color: #0b5ed7;
+      box-shadow: 0 0 0 .12rem rgba(13, 110, 253, .35);
+      transform: translateY(-1px);
+    }
+
+    &:disabled,
+    &.disabled {
+      background: var(--brand-2);
+      border-color: var(--brand-2);
+      color: var(--muted);
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: .9;
+    }
+  }
+
+  .btn-credits .spinner-border {
+    width: 1rem;
+    height: 1rem;
+  }
+
   @media (max-width: 576px) {
-    .price { font-size: 1.8rem; }
+    .price {
+      font-size: 1.8rem;
+    }
   }
 }

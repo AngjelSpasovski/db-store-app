@@ -1,33 +1,127 @@
 @use 'sass:color';
 
-$dark:       #222428;
-$darker:     #1e1e1e;
-$light:      #ffffff;
-$primary:    #4d8dff;
-$secondary:  #555;
-
-$primary-blue: #00509e;
-$primary-blue-light: #00a8ff;
-
-$card-header-bg: #2a3443;
-$card-button-bg: #42526a;
-$card-price-color: #658eb6;
-
-
 :host {
-    .privacy-polisy-component{
+  .privacy-page {
+    --bg-0: #0f1216;
+    --bg-1: #141922;
+    --bg-2: #1b212b;
+    --text-0: #e9eef6;
+    --text-1: #c7cfda;
+    --muted: #99a3b3;
+    --border: rgba(255, 255, 255, 0.08);
+    --brand: #0d6efd;
+  }
 
-        .inner-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            text-align: center;
-            color: $light;
-        }
+  .privacy-card {
+    //max-width: 900px;
+    //max-height: 82vh;   /* 🚥 ограничување во рамки на viewport */
+    height: 72vh;
+    background: var(--bg-2);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    overflow-y: auto;   /* скрол на картата, не внатре во pdf */
+    color: var(--text-0);
+  }
+
+  .card-header {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.25rem;
+    text-align: center;
+  }
+
+  .card-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    background: #141922;
+  }
+
+  /* Zoom toolbar */
+  .pdf-toolbar {
+    .btn-outline-light {
+      --bs-btn-color: var(--text-1);
+      --bs-btn-border-color: var(--border);
+      --bs-btn-hover-bg: rgba(255, 255, 255, 0.08);
+      --bs-btn-hover-border-color: var(--border);
+      --bs-btn-padding-x: 0.7rem;
     }
 
-    pdf-viewer {
-        border: 1px solid #ccc;
-        border-radius: 0.25rem;
-        box-shadow: 0 2px 6px rgba(#000, 0.1);
+    .btn-zoom-display {
+      --bs-btn-color: var(--text-0);
+      --bs-btn-bg: rgba(255, 255, 255, 0.06);
+      --bs-btn-border-color: var(--border);
+      --bs-btn-hover-bg: rgba(255, 255, 255, 0.12);
+      --bs-btn-hover-border-color: var(--border);
+      font-weight: 500;
+      min-width: 70px;
     }
+  }
+
+  .pdf-shell {
+    width: 100%;
+    max-width: 720px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* DARK MODE ЗА PDF */
+  .pdf-dark {
+    background: #0c1016;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  }
+
+  .pdf-dark pdf-viewer {
+    display: block;
+    width: 100%;
+    height: auto; /* наместо 100% */
+  }
+
+
+
+  /* ng2-pdf-viewer – внатрешни елементи (потребен е ::ng-deep) */
+  :host ::ng-deep .pdf-dark .ng2-pdf-viewer-container {
+    background: #0d0f14 !important;   /* темна позадина */
+    height: auto !important;            /* растегни се колку што треба */
+    overflow: visible !important;       /* без inner scroll */
+  }
+
+  /* инверзија за темна позадина + светол текст */
+  :host ::ng-deep .pdf-dark canvas {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  /* текст-слој дополнително да е светол */
+  :host ::ng-deep .pdf-dark .textLayer span {
+    color: #f5f5f5 !important;
+    mix-blend-mode: screen;
+  }
+
+  @media (max-width: 768px) {
+    .card-body {
+      padding: 0.75rem;
+    }
+
+    .pdf-shell {
+      max-width: 100%;
+      height: 65vh;
+    }
+  }
 }
+
+
+/* PDF dark mode */
+:host ::ng-deep .pdf-dark canvas {
+  filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(0.95);
+}
+
+/* Text layer да биде светол */
+:host ::ng-deep .pdf-dark .textLayer span {
+  color: #ffffff !important;
+  mix-blend-mode: screen;
+}
+

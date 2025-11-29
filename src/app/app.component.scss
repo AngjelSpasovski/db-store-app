@@ -22,13 +22,12 @@ html,body,ion-app {
 #content-wrap {
     flex: 1 1 auto;
     //height: 95vh;
-    overflow-y: auto;
+    overflow-y: hidden;
     position: absolute;
     top: 64px;
     left: 0;
     right: 0;
     bottom: 0;
-    overflow-y: auto;
 }
 
 app-logout-warning {
@@ -38,9 +37,9 @@ app-logout-warning {
 }
 
 #toast-container.top-0 {
-  top: 72px !important;   
+  top: 72px !important;
 }
 #toast-container {
-  right: 12px;           
+  right: 12px;
   z-index: 1200;
 }

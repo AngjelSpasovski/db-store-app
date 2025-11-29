@@ -1,88 +1,92 @@
 .new-research {
-
   --bg: #141922;
   --bg-card: #1b212b;
   --text: #e9eef6;
   --text-muted: #99a3b3;
-  --border: rgba(255,255,255,.08);
+  --border: rgba(255, 255, 255, 0.08);
   --brand: #0d6efd;
 
   color: var(--text);
 
+  h3 {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
   .section-title {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--text);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
   }
 
-  .search-card {
+  /* истиот card стил како Billing */
+  .card-block.search-card,
+  .card-block.history-card {
     background: var(--bg-card);
+    border-radius: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: .75rem;
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   }
 
-  /* ===== TABLE CONTAINER (SIDE-BY-SIDE DESKTOP / STACKED MOBILE) ===== */
-  .tables-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-
-    @media (max-width: 992px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .table-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 1.25rem;
-    border-radius: .75rem;
-    min-height: 360px;
-  }
-
-  .bulk-upload-box {
-    background: #10141b;
-    padding: 1rem;
-    border-radius: .5rem;
-    border: 1px solid var(--border);
+  .form-label.small {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
   }
 
   .form-control {
     background: #1e1e1e;
     color: var(--text);
     border: 1px solid var(--border);
+    font-size: 0.9rem;
   }
 
   .form-control:focus {
     border-color: var(--brand);
-    box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
   }
 
+  .form-control::file-selector-button {
+    background: #202632;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-muted);
+    padding: 0.35rem 0.9rem;
+    margin-right: 0.5rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .form-control::file-selector-button:hover {
+    background: #262c38;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e9eef6;
+  }
+
+  /* Lighter placeholder color */
   .form-control::placeholder {
-    color: #8f9bb3 !important;   // светло сиво слично на muted
+    color: #b8c2d6 !important;   /* посветла синкава-сива */
     opacity: 1;
   }
 
-
-  .card-block {
-    background: var(--bg-1);
-    border-radius: 0.75rem;
-    border: 1px solid var(--border);
-    padding: 1.5rem;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+  /* Firefox */
+  .form-control::-moz-placeholder {
+    color: #b8c2d6 !important;
+    opacity: 1;
   }
 
   .validation-slot {
-    min-height: 1.2rem; // ~ една линија текст
+    min-height: 1.2rem;
     margin-top: 0.25rem;
     font-size: 0.8rem;
 
-    // кога нема error, да нема празен црвен текст
     .text-danger {
       margin: 0;
     }
   }
-
-
 }

@@ -1,113 +1,116 @@
 <!-- src/app/user/billing/billing.component.html -->
 <section class="container billing-page p-4">
   <!-- PAGE TITLE -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <!--  <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="m-0">{{ 'BILLING_TITLE' | translate }}</h3>
-  </div>
+  </div> -->
 
   <!-- CARD WRAPPER (ист стил како Search history card) -->
   <div class="card-block billing-card">
 
     <!-- TOOLBAR: filters + export + columns -->
-    <div
-      class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 billing-toolbar">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 billing-toolbar">
 
-      <!-- LEFT SIDE: description (опционално, можеш да преведеш key) -->
-      <div class="text-muted small">
-        {{ 'BILLING_SUBTITLE' | translate:{ default:'Billing history of packages purchased' } }}
+      <!-- LEFT SIDE: description -->
+      <div class="form-label small mb-0">
+        {{ 'BILLING_HISTORY' | translate:{ default:'Billing history of packages purchased' } }}
       </div>
 
-      <!-- RIGHT SIDE: filters / export / columns -->
-      <div class="d-flex flex-wrap align-items-center gap-2 justify-content-end">
+      <!-- RIGHT SIDE: grouped controls -->
+      <div class="d-flex flex-wrap align-items-stretch gap-3 justify-content-end">
 
-        <!-- Filter buttons -->
-        <div
-          class="btn-group btn-group-sm billing-filters"
-          role="group"
-          aria-label="Filter by status">
+        <!-- SORTING GROUP -->
+        <div class="toolbar-section">
+          <span class="toolbar-label">Sorting</span>
+          <div  class="btn-group btn-group-sm billing-filters"
+                role="group"
+                aria-label="Filter by status">
 
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="statusFilter === 'ALL'"
-            (click)="setStatusFilter('ALL')">
-            All
-          </button>
+            <button
+              type="button"
+              class="btn btn-filter"
+              [class.active]="statusFilter === 'ALL'"
+              (click)="setStatusFilter('ALL')">
+              ALL
+            </button>
 
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="statusFilter === 'SUCCESS'"
-            (click)="setStatusFilter('SUCCESS')">
-            Success
-          </button>
+            <button
+              type="button"
+              class="btn btn-filter"
+              [class.active]="statusFilter === 'SUCCESS'"
+              (click)="setStatusFilter('SUCCESS')">
+              SUCCESS
+            </button>
 
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="statusFilter === 'FAILED'"
-            (click)="setStatusFilter('FAILED')">
-            Failed
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="statusFilter === 'PENDING'"
-            (click)="setStatusFilter('PENDING')">
-            Pending
-          </button>
+            <button
+              type="button"
+              class="btn btn-filter"
+              [class.active]="statusFilter === 'FAILED'"
+              (click)="setStatusFilter('FAILED')">
+              FAILED
+            </button>
+          </div>
         </div>
 
-        <!-- Export buttons -->
-        <div class="btn-group btn-group-sm billing-export" role="group" aria-label="Export">
-          <button
-            type="button"
-            class="btn btn-export"
-            (click)="exportCsv()">
-            CSV
-          </button>
-          <button
-            type="button"
-            class="btn btn-export"
-            (click)="exportExcel()">
-            Excel
-          </button>
-        </div>
-
-        <!-- Column chooser -->
-        <div class="billing-column-chooser">
-          <button
-            type="button"
-            class="btn btn-export btn-sm"
-            (click)="toggleColumnPanel()">
-            Columns
-          </button>
-
+        <!-- DOWNLOAD GROUP -->
+        <div class="toolbar-section">
+          <span class="toolbar-label">Download</span>
           <div
-            class="billing-column-panel mt-2"
-            *ngIf="showColumnPanel">
-            <div class="small fw-semibold mb-1">Visible columns</div>
+            class="btn-group btn-group-sm billing-export"
+            role="group"
+            aria-label="Export">
+            <button
+              type="button"
+              class="btn btn-export"
+              (click)="exportCsv()">
+              CSV
+            </button>
+            <button
+              type="button"
+              class="btn btn-export"
+              (click)="exportExcel()">
+              EXCEL
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLE VIEW / COLUMNS GROUP -->
+        <div class="toolbar-section">
+          <span class="toolbar-label">Table View</span>
+          <div class="billing-column-chooser">
+            <button
+              type="button"
+              class="btn btn-export btn-sm"
+              (click)="toggleColumnPanel()">
+              COLUMNS
+            </button>
 
             <div
-              *ngFor="let col of columnChooser"
-              class="form-check form-check-sm mb-1">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                [checked]="col.visible"
-                [disabled]="col.lock"
-                (change)="onToggleColumn(col, $event)">
-              <label class="form-check-label">
-                {{ col.label }}
-                <span *ngIf="col.lock" class="text-muted">(fixed)</span>
-              </label>
+              class="billing-column-panel mt-2"
+              *ngIf="showColumnPanel">
+              <div class="small fw-semibold mb-1">Visible columns</div>
+
+              <div
+                *ngFor="let col of columnChooser"
+                class="form-check form-check-sm mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [checked]="col.visible"
+                  [disabled]="col.lock"
+                  (change)="onToggleColumn(col, $event)">
+                <label class="form-check-label">
+                  {{ col.label }}
+                  <span *ngIf="col.lock" class="text-muted">(fixed)</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
 
       </div>
     </div>
+
 
     <!-- DESKTOP: ag-Grid во card -->
     <div *ngIf="!isMobile" class="billing-grid-wrapper">
@@ -166,9 +169,6 @@
                 <strong>Status:</strong>
                 <span class="badge bg-success" *ngIf="row.status === 'SUCCESS'">
                   Success
-                </span>
-                <span class="badge bg-warning text-dark" *ngIf="row.status === 'PENDING'">
-                  Pending
                 </span>
                 <span class="badge bg-danger" *ngIf="row.status === 'FAILED'">
                   Failed

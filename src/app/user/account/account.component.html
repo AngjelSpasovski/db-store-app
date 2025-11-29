@@ -1,128 +1,175 @@
-<div class="container py-3 account-page">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">My Account</h3>
+<!-- account.component.html -->
+<div class="container account-page py-3">
+  <div class="account-toolbar d-flex justify-content-between align-items-center mb-3">
+    <!-- <h3 class="m-0">My Account</h3>-->
 
     <div class="d-flex gap-2">
-      <button class="btn btn-sm btn-outline-secondary"
-              (click)="refresh()" [disabled]="loading || saving">
+      <button
+        class="btn btn-sm btn-outline-secondary"
+        (click)="refresh()"
+        [disabled]="loading || saving">
         <span *ngIf="!loading">Refresh</span>
         <span *ngIf="loading" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
       </button>
 
-      <button *ngIf="!editMode" class="btn btn-sm btn-primary"
-              (click)="enableEdit()">
+      <button
+        *ngIf="!editMode"
+        class="btn btn-sm btn-primary"
+        (click)="enableEdit()">
         Edit
       </button>
 
       <ng-container *ngIf="editMode">
-
-        <button class="btn btn-sm btn-success"
-                (click)="save()"
-                [disabled]="saving || form.invalid || !form.dirty">
+        <button
+          class="btn btn-sm btn-success"
+          (click)="save()"
+          [disabled]="saving || form.invalid || !form.dirty">
           <span *ngIf="!saving">Save</span>
           <span *ngIf="saving" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
         </button>
 
-
-        <button class="btn btn-sm btn-outline-light" (click)="cancelEdit()" [disabled]="saving">
+        <button
+          class="btn btn-sm btn-outline-light"
+          (click)="cancelEdit()"
+          [disabled]="saving">
           Cancel
         </button>
-
       </ng-container>
     </div>
   </div>
 
   <ng-container *ngIf="data as d">
     <div class="row g-3">
-      <!-- Profile -->
-      <div class="col-md-6">
-        <div class="card acc-card h-100">
-          <div class="card-header">Profile</div>
-          <div class="card-body">
+    <!-- Profile -->
+    <div class="col-md-6">
+      <div class="card acc-card h-100">
+        <div class="card-header">Profile</div>
+        <div class="card-body">
 
-            <!-- view mode -->
-            <div *ngIf="!editMode; else editForm">
-              <div class="mb-2"><span class="label">Name</span> <span class="value">{{ fullName() }}</span></div>
-              <div class="mb-2"><span class="label">Email</span> <span class="value">{{ d.user.email }}</span></div>
-              <div class="mb-2"><span class="label">Company</span> <span class="value">{{ d.user.companyName || '—' }}</span></div>
-              <div class="mb-2"><span class="label">Role</span> <span class="value">{{ d.user.role }}</span></div>
-              <div class="mb-2"><span class="label">Status</span> <span class="value">{{ d.user.isActive ? 'Active' : 'Inactive' }}</span></div>
-              <div class="mb-2"><span class="label">Created</span> <span class="value">{{ d.user.createdAt | date:'medium' }}</span></div>
+          <!-- VIEW MODE -->
+          <ng-container *ngIf="!editMode; else editForm">
+            <div class="mb-2">
+              <span class="label">Name</span>
+              <span class="value">{{ fullName() }}</span>
             </div>
 
-            <!-- edit mode -->
-            <ng-template #editForm>
-              <form [formGroup]="form" (ngSubmit)="save()" novalidate>
-                <div class="row g-2">
-                  <div class="col-sm-6">
-                    <label class="form-label">First name</label>
-                    <input class="form-control" formControlName="firstName" />
-                    <div *ngIf="f('firstName').touched && f('firstName').invalid" class="invalid small">
-                      Required (max 60)
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                    <label class="form-label">Last name</label>
-                    <input class="form-control" formControlName="lastName" />
-                    <div *ngIf="f('lastName').touched && f('lastName').invalid" class="invalid small">
-                      Required (max 60)
-                    </div>
-                  </div>
+            <div class="mb-2">
+              <span class="label">Email</span>
+              <span class="value">{{ d.user.email }}</span>
+            </div>
 
-                  <div class="col-12">
-                    <label class="form-label">Company</label>
-                    <input class="form-control" formControlName="companyName" />
+            <div class="mb-2">
+              <span class="label">Company</span>
+              <span class="value">{{ d.user.companyName || '—' }}</span>
+            </div>
+
+            <div class="mb-2">
+              <span class="label">Role</span>
+              <span class="value">{{ d.user.role }}</span>
+            </div>
+
+            <div class="mb-2">
+              <span class="label">Status</span>
+              <span class="value">{{ d.user.isActive ? 'Active' : 'Inactive' }}</span>
+            </div>
+
+            <div class="mb-2">
+              <span class="label">Created</span>
+              <span class="value">
+                {{ d.user.createdAt | date: 'medium' }}
+              </span>
+            </div>
+          </ng-container>
+
+          <!-- EDIT MODE -->
+          <ng-template #editForm>
+            <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+              <div class="row g-2">
+                <div class="col-sm-6">
+                  <label class="form-label">First name</label>
+                  <input class="form-control" formControlName="firstName" />
+                  <div *ngIf="f('firstName').touched && f('firstName').invalid" class="invalid small">
+                    Required (max 60)
                   </div>
-
-                  <div class="col-sm-6">
-                    <label class="form-label">New password <span class="">(optional)</span></label>
-                    <div class="input-wrap">
-                      <input [type]="showPass ? 'text' : 'password'"
-                            autocomplete="new-password"
-                            class="form-control"
-                            formControlName="password"
-                            placeholder="Min 8 characters"
-                            [ngClass]="{'is-invalid': f('password').touched && f('password').invalid}" />
-                      <button type="button" class="toggle-eye" (click)="showPass = !showPass" [attr.aria-label]="showPass ? 'Hide' : 'Show'">
-                        <fa-icon [icon]="showPass ? faEyeSlash : faEye"></fa-icon>
-                      </button>
-                    </div>
-                    <div *ngIf="f('password').touched && f('password').errors?.['minlength']" class="invalid small">
-                      Min 8 characters
-                    </div>
-                  </div>
-
-                  <div class="col-sm-6">
-                    <label class="form-label">Confirm</label>
-                    <div class="input-wrap">
-                      <input [type]="showConfirm ? 'text' : 'password'"
-                            autocomplete="new-password"
-                            class="form-control"
-                            formControlName="confirm"
-                            [ngClass]="{
-                                'is-invalid':
-                                  (f('confirm').touched && f('confirm').invalid) || (form.touched && form.errors?.['mismatch'])
-                              }" />
-                      <button type="button" class="toggle-eye" (click)="showConfirm = !showConfirm" [attr.aria-label]="showConfirm ? 'Hide' : 'Show'">
-                        <fa-icon [icon]="showConfirm ? faEyeSlash : faEye"></fa-icon>
-                      </button>
-                    </div>
-                    <div *ngIf="f('confirm').touched && f('confirm').errors?.['required']" class="invalid small">
-                      Required when setting a new password
-                    </div>
-                    <div *ngIf="form.touched && form.errors?.['mismatch']" class="invalid small">
-                      Passwords do not match
-                    </div>
-                  </div>
-
-
                 </div>
-              </form>
-            </ng-template>
 
-          </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Last name</label>
+                  <input class="form-control" formControlName="lastName" />
+                  <div *ngIf="f('lastName').touched && f('lastName').invalid" class="invalid small">
+                    Required (max 60)
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Company</label>
+                  <input class="form-control" formControlName="companyName" />
+                </div>
+
+                <div class="col-sm-6">
+                  <label class="form-label">New password <span>(optional)</span></label>
+                  <div class="input-wrap">
+                    <input
+                      [type]="showPass ? 'text' : 'password'"
+                      autocomplete="new-password"
+                      class="form-control"
+                      formControlName="password"
+                      placeholder="Min 8 characters"
+                      [ngClass]="{
+                        'is-invalid': f('password').touched && f('password').invalid
+                      }"
+                    />
+                    <button
+                      type="button"
+                      class="toggle-eye"
+                      (click)="showPass = !showPass"
+                      [attr.aria-label]="showPass ? 'Hide' : 'Show'"
+                    >
+                      <fa-icon [icon]="showPass ? faEyeSlash : faEye"></fa-icon>
+                    </button>
+                  </div>
+                  <div *ngIf="f('password').touched && f('password').errors?.['minlength']" class="invalid small">
+                    Min 8 characters
+                  </div>
+                </div>
+
+                <div class="col-sm-6">
+                  <label class="form-label">Confirm</label>
+                  <div class="input-wrap">
+                    <input
+                      [type]="showConfirm ? 'text' : 'password'"
+                      autocomplete="new-password"
+                      class="form-control"
+                      formControlName="confirm"
+                      [ngClass]="{
+                        'is-invalid':
+                          (f('confirm').touched && f('confirm').invalid) ||
+                          (form.touched && form.errors?.['mismatch'])
+                      }"
+                    />
+                    <button
+                      type="button"
+                      class="toggle-eye"
+                      (click)="showConfirm = !showConfirm"
+                      [attr.aria-label]="showConfirm ? 'Hide' : 'Show'"
+                    >
+                      <fa-icon [icon]="showConfirm ? faEyeSlash : faEye"></fa-icon>
+                    </button>
+                  </div>
+                  <div *ngIf="f('confirm').touched && f('confirm').errors?.['required']" class="invalid small">
+                    Required when setting a new password
+                  </div>
+                  <div *ngIf="form.touched && form.errors?.['mismatch']" class="invalid small">
+                    Passwords do not match
+                  </div>
+                </div>
+              </div>
+            </form>
+          </ng-template>
+
         </div>
       </div>
+    </div>
 
       <!-- Credits -->
       <div class="col-md-6">
@@ -131,11 +178,16 @@
           <div class="card-body d-flex flex-column justify-content-center align-items-center">
             <div class="credits-number">{{ credits$ | async }}</div>
             <div class="small mb-3">{{ 'REMAINING_CREDITS' | translate }}</div>
-            <button type="button" routerLink="/user/buy-credits" class="btn btn-app btn-buy w-30">Buy credits</button>
+
+            <button
+              type="button"
+              routerLink="/user/buy-credits"
+              class="btn btn-buy w-30">
+              Buy credits
+            </button>
           </div>
         </div>
       </div>
-
     </div>
   </ng-container>
 </div>

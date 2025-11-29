@@ -50,7 +50,7 @@ export class BillingComponent implements OnInit {
   rowData: BillingRow[] = [];
 
   /** моментален филтер */
-  statusFilter: 'ALL' | 'SUCCESS' | 'FAILED' | 'PENDING' = 'ALL';
+  statusFilter: 'ALL' | 'SUCCESS' | 'FAILED' = 'ALL';
 
   /** ag-Grid API референца */
   private gridApi!: GridApi<BillingRow>;
@@ -69,15 +69,15 @@ export class BillingComponent implements OnInit {
   selectedRow: BillingRow | null = null;
 
   public theme = themeAlpine.withParams({
-    backgroundColor: '#1b212b',
+    backgroundColor: '#151821',
     foregroundColor: '#e9eef6',
-    headerBackgroundColor: '#2a303a',
-    headerTextColor: '#c7cfda',
+    headerBackgroundColor: '#252a36',
+    headerTextColor: '#cfd6e4',
     textColor: '#e9eef6',
     cellTextColor: '#e9eef6',
-    borderColor: 'rgba(255,255,255,.08)',
+    borderColor: 'rgba(255,255,255,.10)',
     rowHeight: 40,
-    headerHeight: 48,
+    headerHeight: 46,
     fontFamily: 'Inter, system-ui, Roboto, sans-serif',
     fontSize: '14px',
     accentColor: '#0d6efd',
@@ -111,12 +111,19 @@ export class BillingComponent implements OnInit {
       payments: this.billingApi.listMyPayments(),
       invoices: this.invoiceApi.listMyInvoices(),
     }).subscribe({
+
       next: ({ payments, invoices }) => {
         this.invoices = invoices ?? [];
         this.buildInvoiceMap();
-        this.allRows = this.mergeInvoicesIntoPayments(payments ?? []);
+        //this.allRows = this.mergeInvoicesIntoPayments(payments ?? []);
+
+        this.allRows = this
+          .mergeInvoicesIntoPayments(payments ?? [])
+          .filter(r => r.status === 'SUCCESS' || r.status === 'FAILED');
+
         this.applyFilter();
       },
+
       error: (err) => {
         console.error('Failed to load billing data', err);
         this.toast.error('Failed to load billing history.');
@@ -137,7 +144,7 @@ export class BillingComponent implements OnInit {
   }
 
   /** смена на статус филтерот */
-  setStatusFilter(filter: 'ALL' | 'SUCCESS' | 'FAILED' | 'PENDING') {
+  setStatusFilter(filter: 'ALL' | 'SUCCESS' | 'FAILED') {
     this.statusFilter = filter;
     this.applyFilter();
   }

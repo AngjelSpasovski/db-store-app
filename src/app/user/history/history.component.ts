@@ -25,6 +25,7 @@ import { SearchHistoryService } from '../new-research/new-search-history.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoryComponent implements OnInit, OnDestroy {
+
   public theme = themeAlpine.withParams({
     backgroundColor: '#151821',
     foregroundColor: '#e9eef6',

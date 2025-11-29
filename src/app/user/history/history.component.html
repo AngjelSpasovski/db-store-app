@@ -1,11 +1,9 @@
 <!-- src/app/user/history/history.component.html -->
 <section class="history-root">
-  <div
-    class="history-header d-flex justify-content-between align-items-center mb-2"
-  >
-    <h5 class="mb-0">
-      {{ 'SEARCH_HISTORY' | translate:{ default:'Search history' } }}
-    </h5>
+  <div class="history-header d-flex justify-content-between align-items-center mb-2">
+    <div class="form-label small">
+        {{ 'SEARCH_HISTORY' | translate:{ default:'Search history' } }}
+    </div>
   </div>
 
   <ag-grid-angular

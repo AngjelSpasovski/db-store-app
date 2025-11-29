@@ -1,106 +1,129 @@
 @use 'sass:color';
 
-$dark:              #222428;
-$darker:            #1e1e1e;
-$light:             #ffffff;
-$card-header-bg:    #2a3443;
-$card-button-bg:    #42526a;
-$border-color:      color.adjust($darker, $lightness: 20%);
+$dark:       #222428;
+$darker:     #1e1e1e;
+$light:      #ffffff;
 
 :host {
+  --bg-card: #1b212b;
+  --text: #e9eef6;
+  --text-muted: #99a3b3;
+  --border: rgba(255, 255, 255, 0.08);
+  --brand: #0d6efd;
 
-  // .faqs-component{
-  //   height: 81vh;
-  //   overflow-y: auto;
-  //   background: $dark;
-  //   border-radius: 0.5rem;
-  //   padding: 2rem;
-  //   box-shadow: 0 2px 8px $darker;
-  // } 
-
-  
-  .inner-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-align: center;
-    color: $light;
+  .faqs-component {
+    background: var(--bg-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    color: var(--text);
   }
 
-  // Search bar
+  /* ===== SEARCH BAR (исто feeling како New Search) ===== */
   .search-container {
     .search-icon {
       position: absolute;
       top: 50%;
-      left: 1rem;
+      left: 0.9rem;
       transform: translateY(-50%);
-      color: color.adjust($light, $lightness: -30%);
+      color: #8a94aa;
       pointer-events: none;
+      font-size: 0.9rem;
     }
+
     .form-control {
       width: 100%;
-      padding-left: 2.5rem;
+      padding-left: 2.4rem;
       height: 2.75rem;
-      background: $darker;
-      border: 1px solid $border-color;
-      border-radius: 0.5rem;
-      color: $light;
+      background: #1e1e1e;
+      border: 1px solid var(--border);
+      border-radius: 0.6rem;
+      color: var(--text);
+      font-size: 0.9rem;
+
       &::placeholder {
-        color: color.adjust($light, $lightness: -40%);
+        color: #b8c2d6 !important; // посветло, видливо
+        opacity: 1;
       }
+
       &:focus {
-        box-shadow: 0 0 0 0.2rem rgba($card-button-bg, 0.25);
-        border-color: $card-button-bg;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
       }
     }
   }
 
-  // Accordion cards
-  .accordion {
-    height: 60vh;
+  /* ===== ACCORDION LIST (card стил како Billing/Mobile) ===== */
+  .faq-accordion {
+    max-height: 60vh;
     overflow-y: auto;
-    
+    margin: 0; // без дополнителни маргини
+
     .faq-card {
-      background: $card-button-bg;
-      border: 1px solid $border-color;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 4px rgba($darker, 0.5);
+      background: #1d2330;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
 
       .accordion-button {
-        background: $card-button-bg;
-        color: $light;
-        border: none;
-        padding: 1rem;
+        background: #1d2330;
+        color: var(--text);
+        font-size: 0.95rem;
         font-weight: 500;
-        border-radius: 0.5rem !important;
-        transition: background 0.2s;
+        padding: 0.85rem 1rem;
+        border: none;
+        box-shadow: none;
+        transition: background 0.18s ease, color 0.18s ease;
 
         &.collapsed {
-          background: $card-button-bg;
+          background: #1d2330;
         }
 
         &:hover {
-          background: color.adjust($card-button-bg, $lightness: -5%);
+          background: #242b39;
         }
 
         &:not(.collapsed) {
-          background: $card-header-bg;
+          background: #2a303a;
         }
 
         &::after {
-          filter: invert(1);
+          filter: invert(0.8); // бела стрелка
         }
       }
 
-      .accordion-collapse {
-        .accordion-body {
-          background: $card-header-bg;
-          color: $light;
-          padding: 1rem;
-          border-top: 1px solid $border-color;
-        }
+      .accordion-body {
+        background: #151921;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        padding: 0.9rem 1rem 1rem;
       }
     }
   }
 
+  /* ===== Scrollbar styling (исто како Billing/Search) ===== */
+  .faq-accordion::-webkit-scrollbar {
+    width: 8px;
+  }
 
+  .faq-accordion::-webkit-scrollbar-track {
+    background-color: #151823;
+  }
+
+  .faq-accordion::-webkit-scrollbar-thumb {
+    background-color: #34384d;
+    border-radius: 4px;
+  }
+
+  .faq-accordion::-webkit-scrollbar-thumb:hover {
+    background-color: #4a4f6a;
+  }
+
+  // Firefox
+  .faq-accordion {
+    scrollbar-width: thin;
+    scrollbar-color: #34384d #151823;
+  }
 }
