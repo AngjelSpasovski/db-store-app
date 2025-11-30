@@ -5,7 +5,7 @@
       <div class="col" *ngFor="let pkg of packages; trackBy: trackByPkg">
         <div class="card acc-card credit-card h-100">
           <div class="card-header">
-            {{ pkg.credits | number }} {{ 'CREDITS' | translate }}
+            {{ pkg.displayPrice }}
           </div>
 
           <div class="card-body text-center">
@@ -16,7 +16,7 @@
             </div>
 
             <div class="price mb-1">
-              {{ pkg.displayPrice }}
+              {{ pkg.credits | number }} <span class="price-desc">{{ 'CREDITS' | translate }}</span>
             </div>
 
             <!-- Stripe mode badge -->

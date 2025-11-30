@@ -139,7 +139,7 @@ export class AuthService {
     const norm = { ...u, role: this.normalizeRole(u.role, u.email) };
     if (norm.role !== u.role) this.storeUser(norm, !!localStorage.getItem('auth_token')); // resave
 
-    console.log('getCurrentUser', norm);
+    //console.log('getCurrentUser', norm);
     return norm;
   }
 

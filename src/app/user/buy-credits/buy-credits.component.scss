@@ -34,7 +34,7 @@
       font-weight: 600;
       padding: .65rem .9rem;
       text-transform: uppercase;
-      font-size: .78rem;
+      font-size: 1.1rem;
       letter-spacing: .12em;
     }
 
@@ -59,6 +59,11 @@
       font-weight: 800;
       letter-spacing: .4px;
       font-size: 2.2rem;
+
+      .price-desc{
+        font-size: 1.7rem;
+        color: gray;
+      }
     }
 
     .hint-error {
