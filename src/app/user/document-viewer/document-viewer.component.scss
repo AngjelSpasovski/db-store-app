@@ -10,18 +10,32 @@
     --muted: #99a3b3;
     --border: rgba(255, 255, 255, 0.08);
     --brand: #0d6efd;
+
+    /* fullscreen layout за секцијата */
+    &.is-fullscreen {
+      max-width: 100%;
+      width: 100%;
+      padding-block: 0;
+    }
   }
 
   .privacy-card {
     //max-width: 900px;
-    //max-height: 82vh;   /* 🚥 ограничување во рамки на viewport */
     height: 72vh;
     background: var(--bg-2);
     border-radius: 14px;
     border: 1px solid var(--border);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-    overflow-y: auto;   /* скрол на картата, не внатре во pdf */
+    overflow-y: auto;
     color: var(--text-0);
+    transition: border-radius 0.2s ease, height 0.2s ease, max-width 0.2s ease;
+
+    &.fullscreen {
+      max-width: 100%;
+      height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
   }
 
   .card-header {
@@ -32,7 +46,6 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 0.85rem 1.25rem;
-    text-align: center;
   }
 
   .card-body {
@@ -62,10 +75,27 @@
   }
 
   .pdf-shell {
+    position: relative;
     width: 100%;
     max-width: 720px;
     border-radius: 8px;
     overflow: hidden;
+    margin-inline: auto;
+
+    /* fade-in animation */
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+
+    &.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    &.has-error {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* DARK MODE ЗА PDF */
@@ -78,50 +108,97 @@
   .pdf-dark pdf-viewer {
     display: block;
     width: 100%;
-    height: auto; /* наместо 100% */
+    height: auto;
+  }
+
+  /* LOADING OVERLAY + SKELETON */
+  .pdf-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 55%),
+                #0d0f14;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pdf-skeleton {
+    width: 85%;
+    max-width: 640px;
+    height: 60%;
+    border-radius: 6px;
+    background: linear-gradient(
+      90deg,
+      #181b24 0%,
+      #202432 25%,
+      #181b24 50%,
+      #202432 75%,
+      #181b24 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite linear;
+  }
+
+  @keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ERROR STATE */
+  .pdf-error-state {
+    position: relative;
+    z-index: 2;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-0);
+  }
+
+  .error-icon {
+    font-size: 2.2rem;
+  }
+
+  :host ::ng-deep .pdf-dark .ng2-pdf-viewer-container {
+    background: #0d0f14 !important;   /* темна позадина */
+    height: auto !important;            /* растегни се колку што треба */
+    overflow: visible !important;       /* без inner scroll */
+  }
+
+  /* инверзија за темна позадина + светол текст */
+  :host ::ng-deep .pdf-dark canvas {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  /* текст-слој дополнително да е светол */
+  :host ::ng-deep .pdf-dark .textLayer span {
+    color: #f5f5f5 !important;
+    mix-blend-mode: screen;
+  }
+
+  @media (max-width: 768px) {
+    .card-body {
+      padding: 0.75rem;
+    }
+
+    .pdf-shell {
+      max-width: 100%;
+      height: 65vh;
+    }
+  }
   }
 
 
+  /* PDF dark mode */
+  :host ::ng-deep .pdf-dark canvas {
+  filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(0.95);
+  }
 
-/* ng2-pdf-viewer – внатрешни елементи (потребен е ::ng-deep) */
-:host ::ng-deep .pdf-dark .ng2-pdf-viewer-container {
-  background: #0d0f14 !important;   /* темна позадина */
-  height: auto !important;            /* растегни се колку што треба */
-  overflow: visible !important;       /* без inner scroll */
-}
-
-/* инверзија за темна позадина + светол текст */
-:host ::ng-deep .pdf-dark canvas {
-  filter: invert(1) hue-rotate(180deg);
-}
-
-/* текст-слој дополнително да е светол */
-:host ::ng-deep .pdf-dark .textLayer span {
-  color: #f5f5f5 !important;
+  /* Text layer да биде светол */
+  :host ::ng-deep .pdf-dark .textLayer span {
+  color: #ffffff !important;
   mix-blend-mode: screen;
-}
-
-@media (max-width: 768px) {
-  .card-body {
-    padding: 0.75rem;
   }
-
-  .pdf-shell {
-    max-width: 100%;
-    height: 65vh;
-  }
-}
-}
-
-
-/* PDF dark mode */
-:host ::ng-deep .pdf-dark canvas {
-filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(0.95);
-}
-
-/* Text layer да биде светол */
-:host ::ng-deep .pdf-dark .textLayer span {
-color: #ffffff !important;
-mix-blend-mode: screen;
-}
-

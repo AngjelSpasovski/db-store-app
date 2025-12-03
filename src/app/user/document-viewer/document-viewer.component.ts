@@ -1,9 +1,9 @@
-// src/app/user/PRIVACY/document-viewer/document-viewer.component.ts
-import { Component, OnInit } from '@angular/core';
+// src/app/user/document-viewer/document-viewer.component.ts
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { PdfViewerModule, PDFProgressData } from 'ng2-pdf-viewer';
 
 type PolicyDocType =
   | 'privacy-policy'
@@ -19,7 +19,6 @@ type PolicyDocType =
   templateUrl: './document-viewer.component.html',
   styleUrls: ['./document-viewer.component.scss']
 })
-
 export class DocumentViewerComponent implements OnInit {
 
   docType!: PolicyDocType;
@@ -27,10 +26,19 @@ export class DocumentViewerComponent implements OnInit {
 
   pdfSrc = '';
 
+  // zoom
   zoom = 1;
   private readonly zoomStep = 0.2;
   private readonly minZoom = 0.6;
   private readonly maxZoom = 2.0;
+
+  // loading / error / fullscreen state
+  isLoading = true;
+  isError = false;
+  loadProgress = 0;   // 0–100
+  isFullscreen = false;
+
+  @ViewChild('pdfShell', { static: false }) pdfShell?: ElementRef<HTMLDivElement>;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,14 +56,12 @@ export class DocumentViewerComponent implements OnInit {
 
     this.updatePdfSrc();
 
-    // ако менуваш јазик runtime и сакаш да се смени PDF-то:
     this.translate.onLangChange.subscribe(() => this.updatePdfSrc());
   }
 
   private updatePdfSrc(): void {
     const lang = (this.translate.currentLang || 'en').toUpperCase();
 
-    // мапирање на i18n lang → наши суфикси EN / IT / MK
     const culture =
       lang.startsWith('MK') ? 'MK' :
       lang.startsWith('IT') ? 'IT' :
@@ -63,29 +69,29 @@ export class DocumentViewerComponent implements OnInit {
 
     this.pdfSrc = this.buildPdfPath(this.docType, culture);
 
-    //console.log(this.pdfSrc);
+    // секогаш кога менуваме документ, ресетирај state
+    this.isLoading = true;
+    this.isError = false;
+    this.loadProgress = 0;
+    this.zoom = 1;
   }
 
   private buildPdfPath(docType: PolicyDocType, culture: string): string {
     switch (docType) {
       case 'privacy-policy':
         return `../../../../assets/privacy/privacy-policy/privacy-policy-${culture}.pdf`;
-
       case 'terms':
         return `../../../../assets/privacy/terms/terms-${culture}.pdf`;
-
       case 'cookies':
         return `../../../../assets/privacy/cookies/cookies-${culture}.pdf`;
-
       case 'refund-policy':
         return `../../../../assets/privacy/refund-policy/refund-policy-${culture}.pdf`;
-
       case 'service-delivery-policy':
         return `../../../../assets/privacy/service-delivery/service-delivery-policy-${culture}.pdf`;
     }
   }
 
-  // zoom controls
+  // ───── Zoom controls ─────
   zoomIn(): void {
     this.zoom = Math.min(this.zoom + this.zoomStep, this.maxZoom);
   }
@@ -97,5 +103,31 @@ export class DocumentViewerComponent implements OnInit {
   resetZoom(): void {
     this.zoom = 1;
   }
-}
 
+  // ───── PDF events ─────
+  onPdfLoadComplete(): void {
+    this.isLoading = false;
+    this.isError = false;
+    this.loadProgress = 100;
+  }
+
+  onPdfError(error: any): void {
+    console.error('PDF error', error);
+    this.isLoading = false;
+    this.isError = true;
+  }
+
+  onPdfProgress(progress: PDFProgressData): void {
+    if (progress.total) {
+      this.loadProgress = Math.round((progress.loaded / progress.total) * 100);
+    } else {
+      // ако нема total, нека оди до максимум 90%
+      this.loadProgress = Math.min(90, this.loadProgress + 5);
+    }
+  }
+
+  // ───── Fullscreen (CSS-based) ─────
+  //toggleFullscreen(): void {
+  //  this.isFullscreen = !this.isFullscreen;
+  //}
+}

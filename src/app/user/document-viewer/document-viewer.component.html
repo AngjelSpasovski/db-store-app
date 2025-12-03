@@ -1,8 +1,21 @@
-<section class="container privacy-page py-3">
-  <div class="privacy-card mx-auto">
+<!-- src/app/user/document-viewer/document-viewer.component.html -->
+<section class="container privacy-page py-3" [class.is-fullscreen]="isFullscreen">
+  <div class="privacy-card mx-auto" [class.fullscreen]="isFullscreen">
 
-    <div class="card-header">
-      <!-- <span>{{ titleKey | translate }}</span> -->
+    <!-- HEADER -->
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <!--<span>{{ titleKey | translate }}</span>-->
+
+      <!-- fullscreen toggle копче -->
+      <!--<button
+        type="button"
+        class="btn btn-sm btn-outline-light d-flex align-items-center gap-1"
+        (click)="toggleFullscreen()">
+        <i class="bi" [ngClass]="isFullscreen ? 'bi-fullscreen-exit' : 'bi-fullscreen'"></i>
+        <span class="d-none d-sm-inline">
+          {{ isFullscreen ? ('EXIT_FULLSCREEN' | translate:{ default:'Exit' }) : ('FULLSCREEN' | translate:{ default:'Fullscreen' }) }}
+        </span>
+      </button>-->
     </div>
 
     <div class="card-body">
@@ -10,7 +23,6 @@
       <!-- ZOOM TOOLBAR -->
       <div class="pdf-toolbar d-flex justify-content-end align-items-center mb-3">
         <div class="btn-group btn-group-sm">
-
           <button
             type="button"
             class="btn btn-outline-light"
@@ -36,16 +48,46 @@
         </div>
       </div>
 
-      <!-- PDF VIEWER -->
-      <div class="pdf-shell pdf-dark mx-auto">
+      <!-- CONTENT WRAPPER: loading / error / pdf -->
+      <div class="pdf-shell pdf-dark mx-auto" #pdfShell [class.loaded]="!isLoading && !isError" [class.has-error]="isError">
+
+        <!-- LOADING STATE -->
+        <div *ngIf="isLoading && !isError" class="pdf-loading-overlay">
+          <div class="spinner-border spinner-border-lg mb-2" role="status" aria-hidden="true"></div>
+          <div class="small text-muted">
+            {{ 'LOADING_DOCUMENT' | translate:{ default:'Loading document…' } }}
+            <span *ngIf="loadProgress > 0">({{ loadProgress }}%)</span>
+          </div>
+
+          <!-- skeleton „страна“ во позадина -->
+          <div class="pdf-skeleton mt-3"></div>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div *ngIf="isError" class="pdf-error-state text-center p-4">
+          <div class="error-icon mb-2">⚠️</div>
+          <p class="mb-1">
+            {{ 'PDF_LOAD_ERROR' | translate:{ default:'We could not load this document.' } }}
+          </p>
+          <p class="small text-muted mb-3">
+            {{ 'PDF_LOAD_ERROR_HINT' | translate:{ default:'Please try again later or contact support if the issue persists.' } }}
+          </p>
+        </div>
+
+        <!-- PDF VIEWER (се рендерира само ако нема error) -->
         <pdf-viewer
+          *ngIf="!isError"
           [src]="pdfSrc"
           [render-text]="true"
           [original-size]="false"
           style="height: 55vh;"
           [zoom]="zoom"
-          [show-all]="true">
+          [show-all]="true"
+          (after-load-complete)="onPdfLoadComplete()"
+          (error)="onPdfError($event)"
+          (progress)="onPdfProgress($event)">
         </pdf-viewer>
+
       </div>
 
     </div>
