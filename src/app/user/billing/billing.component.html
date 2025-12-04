@@ -157,7 +157,7 @@
                 <strong>Pkg credits:</strong> {{ row.packageCredits }}
               </p>
               <p class="mb-1">
-                <strong>Pkg price:</strong> {{ row.packagePrice }} €
+                <strong>Pkg price:</strong> {{ row.packagePrice | number:'1.0-0' }} €
               </p>
               <p class="mb-1">
                 <strong>Discount:</strong> {{ row.packageDiscountPercentage }}

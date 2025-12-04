@@ -247,7 +247,12 @@ export class BillingComponent implements OnInit {
         headerName: 'Pkg price',
         minWidth: 120,
         valueFormatter: (p: any) =>
-          p.value == null ? '' : `${Number(p.value).toFixed(0)} €`,
+          p.value == null
+            ? ''
+            : `${Number(p.value).toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })} €`,
       },
       {
         field: 'packageDiscountPercentage',
@@ -291,9 +296,14 @@ export class BillingComponent implements OnInit {
         field: 'amount',
         colId: 'amount',
         headerName: this.translate.instant('AMOUNT'),
-        valueFormatter: (p: any) =>
-          p.value == null ? '' : `${Number(p.value).toFixed(0)} €`,
         minWidth: 120,
+        valueFormatter: (p: any) =>
+          p.value == null
+            ? ''
+            : `${Number(p.value).toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })} €`,
       },
       {
         field: 'status',
@@ -387,6 +397,12 @@ export class BillingComponent implements OnInit {
 
   /** Спој payments + invoices → package meta + статус PAID → SUCCESS */
   private mergeInvoicesIntoPayments(payments: BillingRow[]): BillingRow[] {
+    // helper: cents -> euros
+    const toEuros = (cents: any): number | null => {
+      const n = Number(cents);
+      return Number.isFinite(n) ? n / 100 : null;
+    };
+
     return payments.map((p) => {
       const inv =
         p.stripeSessionId && this.invoiceBySession.has(p.stripeSessionId)
@@ -404,19 +420,31 @@ export class BillingComponent implements OnInit {
         ...p,
         status: mappedStatus,
 
+        // 🔹 amount (payment) во евра
+        amount: toEuros((p as any).amount),
+
+        // 🔹 package meta
         packageName: pkg?.name ?? '',
         packageCredits: pkg?.credits ?? (p as any)['packageCredits'],
-        packagePrice: pkg?.price ?? (p as any)['packagePrice'],
+
+        // 🔹 package price во евра
+        packagePrice: toEuros(
+          pkg?.price ?? (p as any)['packagePrice']
+        ),
+
         packageDiscountPercentage:
           pkg?.discountPercentage ??
           (p as any)['packageDiscountPercentage'],
+
         packageIsActive:
           pkg?.isActive ?? (p as any)['packageIsActive'] ?? false,
+
         packageCreatedAt: pkg?.createdAt ?? (p as any)['packageCreatedAt'],
         packageUpdatedAt: pkg?.updatedAt ?? (p as any)['packageUpdatedAt'],
       } as BillingRow;
     });
   }
+
 
   openInvoice(inv: InvoiceDto | null | undefined): void {
     if (!inv?.receiptUrl) {
