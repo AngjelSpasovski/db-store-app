@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-
+import { environment } from 'src/environments/environment';
 export interface UserPackageDto {
   id: number;
   name: string;
@@ -22,28 +22,18 @@ export interface UserPackagesResponse {
 
 @Injectable({ providedIn: 'root' })
 export class UserPackagesApi {
-  private readonly baseUrl = '/api/v1';
+  // 👇 секогаш од environment
+  private readonly baseUrl = environment.baseApiUrl;
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * GET /api/v1/packages
-   * Params: perPage, page
-   * Backend враќа: { list: UserPackageDto[], total: number }
-   */
   getPackages(perPage = 50, page = 1): Observable<UserPackagesResponse> {
     const params = new HttpParams()
       .set('perPage', perPage)
       .set('page', page);
 
     return this.http
-      .get<UserPackagesResponse>(`${this.baseUrl}/packages`, { params })
-      .pipe(
-        map(res => {
-          const list = res?.list ?? [];
-          const total = typeof res?.total === 'number' ? res.total : list.length;
-          return { list, total };
-        })
-      );
+      .get<UserPackagesResponse>(`${this.baseUrl}/packages`, { params });
   }
 }
+

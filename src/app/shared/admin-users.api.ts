@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 export interface AdminUserSummary {
   id: number;
@@ -17,7 +18,6 @@ export interface AdminUserDetails extends AdminUserSummary {
   phone?: string | null;
   createdAt?: string;
   updatedAt?: string;
-  // тука можеш да додадеш уште полиња според Swagger
 }
 
 export interface AdminUsersListResponse {
@@ -27,7 +27,8 @@ export interface AdminUsersListResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AdminUsersApi {
-  private readonly baseUrl = '/api/v1/admin/users';
+  // 👇 наместо '/api/v1/admin/users'
+  private readonly baseUrl = `${environment.baseApiUrl}/admin/users`;
 
   constructor(private http: HttpClient) {}
 
@@ -44,7 +45,7 @@ export class AdminUsersApi {
   }
 
   updateStatus(id: number, isActive: boolean): Observable<AdminUserSummary> {
-    // според Swagger: PATCH /api/v1/admin/users/{id}/status
+    // PATCH /api/v1/admin/users/{id}/status
     return this.http.patch<AdminUserSummary>(
       `${this.baseUrl}/${id}/status`,
       { isActive }
