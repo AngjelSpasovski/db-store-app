@@ -1,29 +1,47 @@
+<!-- src/app/user/buy-credits/buy-credits.component.html -->
 <section class="container credits-page py-3">
   <div class="container-fluid px-0 h-100">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+
+    <!-- Loading -->
+    <div *ngIf="loadingPackages" class="packages-state text-center py-5">
+      <div class="spinner-border" role="status"></div>
+      <div class="mt-2 small text-muted">
+        Loading credit packages...
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loadingPackages && packagesError" class="packages-state text-center py-5 text-danger">
+      {{ packagesError }}
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loadingPackages && !packagesError && packages.length === 0" class="packages-state text-center py-5">
+      No credit packages are available at the moment.
+      <br />
+      Please try again later or contact support.
+    </div>
+
+    <!-- Cards -->
+    <div *ngIf="!loadingPackages && !packagesError && packages.length > 0" class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
 
       <div class="col" *ngFor="let pkg of packages; trackBy: trackByPkg">
         <div class="card acc-card credit-card h-100">
           <div class="card-header">
-            {{ pkg.displayPrice }}
+            <!-- можеш да прикажеш цена поубаво, пример: -->
+            {{ pkg.price | number:'1.0-0' }}€
           </div>
 
           <div class="card-body text-center">
 
-            <!-- small warning кога нема линк -->
-            <div *ngIf="!canBuy(pkg)" class="hint-error">
-              Payment link not configured yet.
-            </div>
-
             <div class="price mb-1">
-              {{ pkg.credits | number }} <span class="price-desc">{{ 'CREDITS' | translate }}</span>
+              {{ pkg.credits | number }}
+              <span class="price-desc">{{ 'CREDITS' | translate }}</span>
             </div>
 
-            <!-- Stripe mode badge -->
+            <!-- Badge за тест/production -->
             <div class="mb-3">
-              <span
-                *ngIf="environment.production; else testMode"
-                class="mode-pill">
+              <span *ngIf="environment.production; else testMode" class="mode-pill">
                 One-time purchase
               </span>
               <ng-template #testMode>
@@ -39,7 +57,7 @@
               (click)="purchase(pkg)">
 
               <ng-container *ngIf="loadingId!==pkg.id; else loadingTpl">
-                {{ canBuy(pkg) ? 'Buy now' : 'Work in progress' }}
+                {{ canBuy(pkg) ? 'Buy now' : 'Not available' }}
               </ng-container>
 
               <ng-template #loadingTpl>
@@ -54,5 +72,6 @@
       </div>
 
     </div>
+
   </div>
 </section>

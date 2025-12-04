@@ -1,7 +1,7 @@
 // src/app/superadmin/admins/admins.component.ts
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminApi, AdminRow } from '../../shared/admin.api';
 import { ToastService } from '../../shared/toast.service';
 
@@ -9,121 +9,105 @@ import { ToastService } from '../../shared/toast.service';
   standalone: true,
   selector: 'app-superadmin-admins',
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-  <div class="p-4">
-    <h2 class="mb-4">Superadmin ▸ Admins</h2>
-
-    <form [formGroup]="form" (ngSubmit)="save()" class="grid gap-3 md:grid-cols-6 items-end mb-4">
-      <div>
-        <label class="form-label">First name</label>
-        <input class="form-control" formControlName="firstName">
-      </div>
-      <div>
-        <label class="form-label">Last name</label>
-        <input class="form-control" formControlName="lastName">
-      </div>
-      <div class="md:col-span-2">
-        <label class="form-label">Email</label>
-        <input class="form-control" formControlName="email">
-      </div>
-      <div class="md:col-span-2">
-        <label class="form-label">Company</label>
-        <input class="form-control" formControlName="companyName">
-      </div>
-
-      <div class="md:col-span-6 flex items-center gap-3">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="active" formControlName="isActive">
-          <label class="form-check-label" for="active">Active</label>
-        </div>
-
-        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
-          {{ editId ? 'Update' : 'Create' }}
-        </button>
-        <button *ngIf="editId" type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
-      </div>
-    </form>
-
-    <div class="table-responsive">
-      <table class="table table-dark table-striped align-middle">
-        <thead>
-          <tr>
-            <th>#</th><th>Name</th><th>Email</th><th>Company</th><th>Active</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let a of rows()">
-            <td>{{a.id}}</td>
-            <td>{{a.firstName}} {{a.lastName}}</td>
-            <td>{{a.email}}</td>
-            <td>{{a.companyName}}</td>
-            <td>
-              <span class="badge" [class.bg-success]="a.isActive" [class.bg-secondary]="!a.isActive">
-                {{ a.isActive ? 'Yes' : 'No' }}
-              </span>
-            </td>
-            <td class="text-end">
-              <button class="btn btn-sm btn-outline-info me-2" (click)="edit(a)">Edit</button>
-              <button class="btn btn-sm btn-outline-warning me-2" (click)="toggle(a)" [disabled]="saving">
-                {{ a.isActive ? 'Deactivate' : 'Activate' }}
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="remove(a)" [disabled]="saving">
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="d-flex justify-content-between mt-3">
-      <button class="btn btn-outline-light" [disabled]="page<=1" (click)="prev()">Prev</button>
-      <div>Page {{page}} / {{totalPages}}</div>
-      <button class="btn btn-outline-light" [disabled]="page>=totalPages" (click)="next()">Next</button>
-    </div>
-  </div>
-  `,
+  templateUrl: './admins.component.html',
+  styleUrls: ['./admins.component.scss']
 })
 export class AdminsComponent implements OnInit {
-  rows = signal<AdminRow[]>([]);
+
+  admins: AdminRow[] = [];
+  loading = false;
   saving = false;
-  editId: number | null = null;
+  error: string | null = null;
 
   perPage = 20;
   page = 1;
   total = 0;
   get totalPages() { return Math.max(1, Math.ceil(this.total / this.perPage)); }
 
+  // modal state
+  modalOpen = false;
+  editId: number | null = null;
+
   form = this.fb.nonNullable.group({
-    firstName:   this.fb.nonNullable.control('', { validators: [Validators.required] }),
-    lastName:    this.fb.nonNullable.control('', { validators: [Validators.required] }),
-    email:       this.fb.nonNullable.control('', { validators: [Validators.required, Validators.email] }),
-    companyName: this.fb.nonNullable.control(''),
-    isActive:    this.fb.nonNullable.control(true),
+    firstName:   ['', [Validators.required]],
+    lastName:    ['', [Validators.required]],
+    email:       ['', [Validators.required, Validators.email]],
+    companyName: [''],
+    isActive:    [true]
   });
 
-  constructor(private api: AdminApi, private fb: FormBuilder, private toast: ToastService) {}
+  constructor(
+    private api: AdminApi,
+    private fb: FormBuilder,
+    private toast: ToastService
+  ) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
-  load() {
+  load(): void {
+    this.loading = true;
+    this.error = null;
+
     this.api.listAdmins(this.perPage, this.page).subscribe({
       next: res => {
-        // ако бекендот не е paged, адаптирај:
-        if (Array.isArray((res as any))) {
-          this.rows.set(res as any);
-          this.total = (res as any).length ?? this.rows().length;
+        // бекендот може да враќа или array или { list, total }
+        if (Array.isArray(res as any)) {
+          this.admins = res as any;
+          this.total = this.admins.length;
         } else {
-          this.rows.set(res.list || []);
-          this.total = res.total || this.rows().length;
+          const r: any = res;
+          this.admins = r.list || [];
+          this.total = r.total || this.admins.length;
         }
+        this.loading = false;
       },
-      error: () => this.toast.error('Failed to load admins')
+      error: () => {
+        this.loading = false;
+        this.error = 'Failed to load admins';
+        this.toast.error('Failed to load admins');
+      }
     });
   }
 
-  save() {
-    if (this.form.invalid) return;
+  // ---------- MODAL ----------
+
+  openCreateModal(): void {
+    this.editId = null;
+    this.form.reset({
+      firstName: '',
+      lastName: '',
+      email: '',
+      companyName: '',
+      isActive: true
+    });
+    this.modalOpen = true;
+  }
+
+  openEditModal(a: AdminRow): void {
+    this.editId = a.id;
+    this.form.reset({
+      firstName:   a.firstName ?? '',
+      lastName:    a.lastName ?? '',
+      email:       a.email ?? '',
+      companyName: a.companyName ?? '',
+      isActive:    !!a.isActive
+    });
+    this.modalOpen = true;
+  }
+
+  closeModal(): void {
+    this.modalOpen = false;
+  }
+
+  // ---------- SAVE / CRUD ----------
+
+  save(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     const v = this.form.getRawValue();
     const body = {
@@ -131,60 +115,71 @@ export class AdminsComponent implements OnInit {
       lastName: v.lastName.trim(),
       email: v.email.trim().toLowerCase(),
       companyName: v.companyName.trim() || undefined,
-      isActive: !!v.isActive,
+      isActive: !!v.isActive
     };
 
     this.saving = true;
-    const req = this.editId
+
+    const req$ = this.editId
       ? this.api.patchAdmin(this.editId, body)
       : this.api.createAdmin(body);
 
-    req.subscribe({
+    req$.subscribe({
       next: () => {
-        this.toast.success(this.editId ? 'Admin updated' : 'Admin created');
+        this.toast.success(this.editId ? 'Admin updated' : 'Admin created', { position: 'top-end' });
         this.saving = false;
-        this.cancelEdit();
+        this.closeModal();
         this.load();
       },
-      error: () => { this.toast.error('Save failed'); this.saving = false; }
+      error: () => {
+        this.toast.error('Save failed', { position: 'top-end' });
+        this.saving = false;
+      }
     });
   }
 
-  edit(a: AdminRow) {
-    this.editId = a.id;
-    this.form.setValue({
-      firstName: a.firstName ?? '',
-      lastName: a.lastName ?? '',
-      email: a.email ?? '',
-      companyName: a.companyName ?? '',
-      isActive: !!a.isActive,
-    });
-  }
-
-  cancelEdit() {
-    this.editId = null;
-    this.form.setValue({
-      firstName: '', lastName: '', email: '', companyName: '', isActive: true
-    });
-  }
-
-  toggle(a: AdminRow) {
+  toggleActive(a: AdminRow): void {
     this.saving = true;
     this.api.patchAdmin(a.id, { isActive: !a.isActive }).subscribe({
-      next: () => { this.toast.success('Status updated'); this.saving = false; this.load(); },
-      error: () => { this.toast.error('Update failed'); this.saving = false; }
+      next: () => {
+        this.toast.success('Status updated', { position: 'top-end' });
+        this.saving = false;
+        this.load();
+      },
+      error: () => {
+        this.toast.error('Update failed');
+        this.saving = false;
+      }
     });
   }
 
-  remove(a: AdminRow) {
+  delete(a: AdminRow): void {
     if (!confirm(`Delete admin ${a.firstName} ${a.lastName}?`)) return;
     this.saving = true;
     this.api.deleteAdmin(a.id).subscribe({
-      next: () => { this.toast.success('Admin deleted'); this.saving = false; this.load(); },
-      error: () => { this.toast.error('Delete failed'); this.saving = false; }
+      next: () => {
+        this.saving = false;
+        this.load();
+        this.toast.success('Admin deleted successfully', { position: 'top-end' });
+      },
+      error: () => {
+        this.toast.error('Delete failed', { position: 'top-end' });
+        this.saving = false;
+      }
     });
   }
 
-  prev(){ if (this.page > 1) { this.page--; this.load(); } }
-  next(){ if (this.page < this.totalPages) { this.page++; this.load(); } }
+  prev(): void {
+    if (this.page > 1) {
+      this.page--;
+      this.load();
+    }
+  }
+
+  next(): void {
+    if (this.page < this.totalPages) {
+      this.page++;
+      this.load();
+    }
+  }
 }

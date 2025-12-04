@@ -1,0 +1,73 @@
+/* src/app/superadmin/packages/packages.component.scss */
+
+.superadmin-packages {
+  --bg-0: #0f1216;
+  --bg-1: #141922;
+  --bg-2: #1b212b;
+  --text-0: #e9eef6;
+  --text-1: #c7cfda;
+  --border: rgba(255, 255, 255, 0.08);
+
+  color: var(--text-0);
+
+  .card {
+    background: var(--bg-2);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .card-header {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+
+    .card-title {
+      font-size: 0.85rem;
+    }
+  }
+
+  table {
+    font-size: 0.85rem;
+
+    thead {
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding-inline: 0.6rem;
+  }
+
+  /* Modal стилови */
+
+  .modal-backdrop-custom {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1040;
+  }
+
+  .modal-custom {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .form-card {
+    width: 100%;
+    max-width: 520px;
+  }
+}

@@ -1,12 +1,12 @@
 // src/app/user/buy-credits/buy-credits.component.ts
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { ToastService } from '../../shared/toast.service';
 
 import { AuthService, AuthUser } from '../../auth/auth.service';
 import { PaymentsService } from '../../shared/payments.service';
-import { CREDIT_PACKAGES, CreditPackage } from './credit-packages.config';
+import { CreditPackage } from './credit-packages.config';
 import { CreditsService } from './credit.service';
 
 import { environment } from 'src/environments/environment';
@@ -25,10 +25,11 @@ export class BuyCreditsComponent implements OnInit {
 
   public credits$ = this.creditsSvc.credits$;
 
-  // ✅ единствен извор на пакети
-  public packages = CREDIT_PACKAGES;
-  public loadingId: string | null = null;
+  public packages: CreditPackage[] = [];
+  public loadingPackages = false;
+  public packagesError: string | null = null;
 
+  public loadingId: string | null = null;
   public environment = environment;
 
   constructor(
@@ -36,6 +37,7 @@ export class BuyCreditsComponent implements OnInit {
     private payments: PaymentsService,
     private toast: ToastService,
     private creditsSvc: CreditsService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   public ngOnInit(): void {
@@ -47,7 +49,6 @@ export class BuyCreditsComponent implements OnInit {
 
     if (qp.get('success') === '1') {
       this.toast.success('Payment completed successfully.', { position: 'top-end' });
-      // ✅ после успешно плаќање – рефреш кредити
       this.creditsSvc.refreshFromApi();
     }
 
@@ -55,17 +56,33 @@ export class BuyCreditsComponent implements OnInit {
       history.replaceState({}, '', window.location.pathname);
     }
 
-    // ✅ секое влегување во /user/buy-credits ќе си ги повлече кредитите
     this.creditsSvc.refreshFromApi();
+    this.loadPackagesFromBackend();
+  }
+
+  private loadPackagesFromBackend(): void {
+    this.loadingPackages = true;
+    this.packagesError = null;
+
+    this.creditsSvc.loadPackages().subscribe({
+      next: pkgs => {
+        this.packages = pkgs;
+        this.loadingPackages = false;
+        this.cdr.markForCheck();           // OnPush
+      },
+      error: () => {
+        this.packages = [];
+        this.loadingPackages = false;
+        this.packagesError = 'We could not load credit packages at the moment. Please try again later.';
+        this.cdr.markForCheck();           // OnPush
+      }
+    });
   }
 
   public trackByPkg = (_: number, pkg: CreditPackage) => pkg.id;
 
   public canBuy(pkg: CreditPackage): boolean {
-    if (environment.paymentsMode === 'paymentLinks') {
-      return !!pkg.paymentLinkUrl;
-    }
-    // 'api' mode → мора да има валиден backendId
+    // API mode → само проверуваме дали имаме backendId
     return typeof pkg.backendId === 'number';
   }
 
@@ -76,11 +93,10 @@ export class BuyCreditsComponent implements OnInit {
 
     try {
       this.payments.start({
-        packageId: pkg.backendId!,
-        paymentLinkUrl: pkg.paymentLinkUrl ?? '',
+        packageId: pkg.backendId!,        // backend ID
+        paymentLinkUrl: '',               // не користиме paymentLinks во овој flow
       });
     } finally {
-      // ако не нè редиректира (грешка), копчето да не остане заглавено
       setTimeout(() => {
         if (this.loadingId === pkg.id) {
           this.loadingId = null;
@@ -88,5 +104,4 @@ export class BuyCreditsComponent implements OnInit {
       }, 4000);
     }
   }
-
 }

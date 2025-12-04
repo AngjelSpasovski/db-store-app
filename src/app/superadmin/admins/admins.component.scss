@@ -1,0 +1,72 @@
+.superadmin-admins {
+  --bg-0: #0f1216;
+  --bg-1: #141922;
+  --bg-2: #1b212b;
+  --text-0: #e9eef6;
+  --text-1: #c7cfda;
+  --border: rgba(255, 255, 255, 0.08);
+
+  .card {
+    background: var(--bg-2);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    color: var(--text-0);
+  }
+
+  .card-header {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .list-card .card-body {
+    padding: 0;
+  }
+
+  table {
+    font-size: 0.85rem;
+
+    thead {
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  .card-footer {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  /* ---------- Custom modal ---------- */
+
+  .modal-backdrop-custom {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 5vh;
+    z-index: 1050;
+  }
+
+  .modal-dialog-custom {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 1rem;
+  }
+
+  .modal-card {
+    border-radius: 18px;
+  }
+
+  .btn-close {
+    filter: invert(1);
+  }
+}

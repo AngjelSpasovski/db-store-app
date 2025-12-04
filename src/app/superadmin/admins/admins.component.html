@@ -1,3 +1,191 @@
-<p>
-  admins works!
-</p>
+<section class="superadmin-admins container py-3">
+
+  <div class="row g-3">
+
+    <div class="col-12">
+      <div class="card list-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Admins</span>
+
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge rounded-pill bg-secondary small">
+              TOTAL: {{ total }}
+            </span>
+
+            <button class="btn btn-sm btn-primary"
+                    type="button"
+                    (click)="openCreateModal()">
+              + New admin
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+
+          <div *ngIf="loading" class="p-3 small text-muted">
+            Loading admins...
+          </div>
+
+          <div *ngIf="!loading && error" class="p-3 text-danger small">
+            {{ error }}
+          </div>
+
+          <div class="table-responsive" *ngIf="!loading && !error">
+            <table class="table table-dark table-sm mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Company</th>
+                  <th>Active</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let a of admins">
+                  <td>{{ a.id }}</td>
+                  <td>{{ a.firstName }} {{ a.lastName }}</td>
+                  <td>{{ a.email }}</td>
+                  <td>{{ a.companyName }}</td>
+                  <td>
+                    <span class="badge"
+                          [ngClass]="a.isActive ? 'bg-success' : 'bg-secondary'">
+                      {{ a.isActive ? 'Yes' : 'No' }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-light me-2"
+                            (click)="openEditModal(a)">
+                      Edit
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-warning me-2"
+                            (click)="toggleActive(a)"
+                            [disabled]="saving">
+                      {{ a.isActive ? 'Deactivate' : 'Activate' }}
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            (click)="delete(a)"
+                            [disabled]="saving">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+
+                <tr *ngIf="admins.length === 0 && !loading">
+                  <td colspan="6"
+                      class="text-center small text-muted py-3">
+                    No admins yet.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <div class="card-footer small text-muted d-flex justify-content-between align-items-center">
+          <div>
+            Page {{ page }} / {{ totalPages }}
+          </div>
+          <div class="btn-group btn-group-sm">
+            <button type="button"
+                    class="btn btn-outline-light"
+                    [disabled]="page <= 1"
+                    (click)="prev()">
+              Prev
+            </button>
+            <button type="button"
+                    class="btn btn-outline-light"
+                    [disabled]="page >= totalPages"
+                    (click)="next()">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== MODAL ========== -->
+  <div class="modal-backdrop-custom"
+       *ngIf="modalOpen">
+    <div class="modal-dialog-custom">
+      <div class="card modal-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span *ngIf="!editId">Create admin</span>
+          <span *ngIf="editId">Edit admin</span>
+          <button type="button"
+                  class="btn-close btn-close-white"
+                  aria-label="Close"
+                  (click)="closeModal()"></button>
+        </div>
+
+        <div class="card-body">
+          <form [formGroup]="form" (ngSubmit)="save()">
+
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <label class="form-label">First name</label>
+                <input class="form-control form-control-sm"
+                       formControlName="firstName">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last name</label>
+                <input class="form-control form-control-sm"
+                       formControlName="lastName">
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Email</label>
+              <input class="form-control form-control-sm"
+                     formControlName="email">
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Company</label>
+              <input class="form-control form-control-sm"
+                     formControlName="companyName">
+            </div>
+
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input"
+                     type="checkbox"
+                     id="isActiveAdmin"
+                     formControlName="isActive">
+              <label class="form-check-label" for="isActiveAdmin">
+                Active
+              </label>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <button type="button"
+                      class="btn btn-outline-secondary btn-sm"
+                      (click)="closeModal()">
+                Cancel
+              </button>
+
+              <button type="submit"
+                      class="btn btn-primary btn-sm"
+                      [disabled]="saving || form.invalid">
+                <span *ngIf="!saving">
+                  {{ editId ? 'Save changes' : 'Create admin' }}
+                </span>
+                <span *ngIf="saving">
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                  Saving...
+                </span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>

@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+/* истите променливи како кај new-research */
+.admin-page-wrapper {
+  --bg: #141922;
+  --bg-card: #1b212b;
+  --text: #e9eef6;
+  --text-muted: #99a3b3;
+  --border: rgba(255, 255, 255, 0.08);
+  --brand: #0d6efd;
+
+  padding: 1.5rem;
+  color: var(--text);
+}
+
+/* card стил – усогласен со user card-овите */
+.admin-table-card {
+  background: var(--bg-card);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.admin-table-card .card-header,
+.admin-table-card .card-footer {
+  background-color: #15151a;
+  border-color: var(--border);
+}
+
+.admin-table-card .card-header h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* табела */
+
+.table-users thead {
+  background-color: #111;
+}
+
+.table-users th,
+.table-users td {
+  vertical-align: middle;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Actions колона – уредни, линеарни копчиња */
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.actions-buttons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* малку поцврсти граници како во user делот */
+.actions-buttons .btn {
+  min-width: 90px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Modal styles – како кај packages/admins */
+.custom-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-modal-dialog {
+  max-width: 600px;
+  width: 100%;
+  padding: 1rem;
+}
+
+.custom-modal-content {
+  background-color: #18181f;
+  color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+.custom-modal-header,
+.custom-modal-footer {
+  padding: 0.75rem 1.25rem;
+  background-color: #11111a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.custom-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.custom-modal-body {
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.65);
+}
+
+/* мал responsive tweak – на помали екрани копчињата да се кршат во 2 реда */
+@media (max-width: 768px) {
+  .actions-buttons {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

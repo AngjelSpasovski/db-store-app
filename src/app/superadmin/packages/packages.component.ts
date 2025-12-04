@@ -1,173 +1,197 @@
 // src/app/superadmin/packages/packages.component.ts
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { AdminApi, PackageRow, CreatePackageDto } from '../../shared/admin.api';
-import { ToastService } from '../../shared/toast.service';
-
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { SuperadminPackagesApi, SuperadminPackageDto, PackagePayload } from '../../shared/superadmin-packages.api';
+import { ToastService } from 'src/app/shared/toast.service';
 
 @Component({
+  selector: 'app-superadmin-packages',
   standalone: true,
-  selector: 'app-packages',
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-  <div class="p-4">
-    <h2 class="mb-4">Superadmin ▸ Packages</h2>
-
-    <form [formGroup]="form" (ngSubmit)="save()" class="grid gap-3 md:grid-cols-6 items-end mb-4">
-      <div class="md:col-span-2">
-        <label class="form-label">Name</label>
-        <input class="form-control" formControlName="name">
-      </div>
-      <div class="md:col-span-2">
-        <label class="form-label">Description</label>
-        <input class="form-control" formControlName="description">
-      </div>
-      <div>
-        <label class="form-label">Price</label>
-        <input type="number" min="0" step="0.01" class="form-control" formControlName="price">
-      </div>
-      <div>
-        <label class="form-label">Credits</label>
-        <input type="number" min="1" step="1" class="form-control" formControlName="credits">
-      </div>
-      <div>
-        <label class="form-label">Duration (days)</label>
-        <input type="number" min="1" step="1" class="form-control" formControlName="durationDays">
-      </div>
-      <div class="md:col-span-6 flex items-center gap-3">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="active" formControlName="active">
-          <label class="form-check-label" for="active">Active</label>
-        </div>
-        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
-          {{ editId ? 'Update' : 'Create' }}
-        </button>
-        <button *ngIf="editId" type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
-      </div>
-    </form>
-
-    <div class="table-responsive">
-      <table class="table table-dark table-striped align-middle">
-        <thead>
-          <tr>
-            <th>#</th><th>Name</th><th>Price</th><th>Credits</th><th>Days</th><th>Active</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let p of rows()">
-            <td>{{p.id}}</td>
-            <td>{{p.name}}</td>
-            <td>{{p.price | number:'1.2-2'}}</td>
-            <td>{{p.credits}}</td>
-            <td>{{p.durationDays}}</td>
-            <td>
-              <span class="badge" [class.bg-success]="p.active" [class.bg-secondary]="!p.active">
-                {{ p.active ? 'Yes' : 'No' }}
-              </span>
-            </td>
-            <td class="text-end">
-              <button class="btn btn-sm btn-outline-info me-2" (click)="edit(p)">Edit</button>
-              <button class="btn btn-sm btn-outline-warning" (click)="toggle(p)" [disabled]="saving">Toggle</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-  `,
+  templateUrl: './packages.component.html',
+  styleUrls: ['./packages.component.scss']
 })
 export class PackagesComponent implements OnInit {
-  rows = signal<PackageRow[]>([]);
+  packages: SuperadminPackageDto[] = [];
+  total = 0;
+
+  loading = false;
   saving = false;
-  editId: number | null = null;
+  error: string | null = null;
 
-  // ✦ Non-nullable форма со точни типови
-  form = this.fb.nonNullable.group({
-    name:         this.fb.nonNullable.control('', { validators: [Validators.required] }),
-    description:  this.fb.nonNullable.control(''),
-    price:        this.fb.nonNullable.control(0,  { validators: [Validators.required, Validators.min(0)] }),
-    credits:      this.fb.nonNullable.control(100,{ validators: [Validators.required, Validators.min(1)] }),
-    durationDays: this.fb.nonNullable.control(30, { validators: [Validators.required, Validators.min(1)] }),
-    active:       this.fb.nonNullable.control(true),
-  });
+  perPage = 50;
+  page = 1;
 
-  constructor(private api: AdminApi, private fb: FormBuilder, private toast: ToastService) {}
+  form!: FormGroup;
+  editingPackage: SuperadminPackageDto | null = null;
+  showFormModal = false;
 
-  ngOnInit() { this.load(); }
+  constructor(
+    private api: SuperadminPackagesApi,
+    private fb: FormBuilder,
+    private toast: ToastService
+  ) {}
 
-  load() {
-    this.api.listPackages().subscribe({
-      next: res => this.rows.set(res.list || []),
-      error: () => this.toast.error('Failed to load packages')
+  ngOnInit(): void {
+    this.buildForm();
+    this.loadPackages();
+  }
+
+  private buildForm(): void {
+    this.form = this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      description: [''],
+      credits: [0, [Validators.required, Validators.min(0)]],
+      price: [0, [Validators.required, Validators.min(0)]],
+      discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
+      isActive: [true]
     });
   }
 
-  save() {
-    if (this.form.invalid) return;
+  private buildPayload(): PackagePayload {
+    const v = this.form.value;
+    return {
+      name: v.name,
+      description: v.description || null,
+      credits: Number(v.credits) || 0,
+      price: Number(v.price) || 0,
+      discountPercentage: Number(v.discountPercentage) || 0,
+      isActive: !!v.isActive
+    };
+  }
 
-    const v = this.form.getRawValue();
+  loadPackages(): void {
+    this.loading = true;
+    this.error = null;
 
-// CREATE: сите полиња со конкретни вредности (без undefined)
-const createBody: CreatePackageDto = {
-  name: v.name.trim(),
-  description: v.description.trim(),         // празно е "" (string), не undefined
-  price: Number(v.price),
-  credits: Number(v.credits),
-  durationDays: Number(v.durationDays),
-  active: !!v.active,
-};
-
-// PATCH: можеш да користиш Partial ако сакаш, или истото тело
-const patchBody: Partial<CreatePackageDto> = {
-  name: v.name.trim(),
-  description: v.description.trim() || undefined, // за patch може и да го изоставиш
-  price: Number(v.price),
-  credits: Number(v.credits),
-  durationDays: Number(v.durationDays),
-  active: !!v.active,
-};
-
-this.saving = true;
-const req = this.editId
-  ? this.api.patchPackage(this.editId, patchBody)
-  : this.api.createPackage(createBody);
-
-    req.subscribe({
-      next: () => {
-        this.toast.success(this.editId ? 'Package updated' : 'Package created');
-        this.saving = false;
-        this.editId = null;
-        this.form.setValue({ name: '', description: '', price: 0, credits: 100, durationDays: 30, active: true });
-        this.load();
+    this.api.getPackages(this.perPage, this.page).subscribe({
+      next: res => {
+        this.packages = res.list;
+        this.total = res.total;
+        this.loading = false;
       },
-      error: () => { this.toast.error('Save failed'); this.saving = false; }
+      error: err => {
+        console.error(err);
+        this.error = 'Failed to load packages';
+        this.loading = false;
+      }
     });
   }
 
-  edit(p: PackageRow) {
-    this.editId = p.id;
-    this.form.setValue({
-      name: p.name ?? '',
-      description: p.description ?? '',
-      price: p.price ?? 0,
-      credits: p.credits ?? 0,
-      durationDays: p.durationDays ?? 0,
-      active: !!p.active
+  openCreateModal(): void {
+    this.editingPackage = null;
+    this.resetForm();
+    this.showFormModal = true;
+  }
+
+  openEditModal(pkg: SuperadminPackageDto): void {
+    this.editingPackage = pkg;
+    this.form.reset({
+      name: pkg.name,
+      description: pkg.description,
+      credits: pkg.credits,
+      price: pkg.price,
+      discountPercentage: pkg.discountPercentage,
+      isActive: pkg.isActive
+    });
+    this.showFormModal = true;
+  }
+
+  closeModal(): void {
+    this.showFormModal = false;
+  }
+
+  resetForm(): void {
+    this.form.reset({
+      name: '',
+      description: '',
+      credits: 0,
+      price: 0,
+      discountPercentage: 0,
+      isActive: true
     });
   }
 
-  cancelEdit() {
-    this.editId = null;
-    this.form.reset({ name: '', description: '', price: 0, credits: 100, durationDays: 30, active: true });
-  }
+  submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-  toggle(p: PackageRow) {
+    const payload = this.buildPayload();
     this.saving = true;
-    this.api.patchPackage(p.id, { active: !p.active }).subscribe({
-      next: () => { this.toast.success('Status updated'); this.saving = false; this.load(); },
-      error: () => { this.toast.error('Update failed'); this.saving = false; }
+    this.error = null;
+
+    if (this.editingPackage) {
+      // UPDATE
+      this.api.updatePackage(this.editingPackage.id, payload).subscribe({
+        next: (updated: SuperadminPackageDto) => {
+          const idx = this.packages.findIndex(p => p.id === updated.id);
+          if (idx !== -1) {
+            this.packages[idx] = { ...updated };
+            this.loadPackages();
+            this.toast.success('Package updated successfully', { position: 'top-end' });
+          }
+          this.saving = false;
+          this.closeModal();
+        },
+        error: err => {
+          console.error(err);
+          this.error = 'Failed to update package';
+          this.saving = false;
+          this.toast.error('Failed to update package', { position: 'top-end' });
+        }
+      });
+    } else {
+      // CREATE
+      this.api.createPackage(payload).subscribe({
+        next: (created: SuperadminPackageDto) => {
+          this.packages = [created, ...this.packages];
+          this.total++;
+          this.saving = false;
+          this.closeModal();
+          this.loadPackages();
+          this.toast.success('Package created successfully', { position: 'top-end' });
+        },
+        error: err => {
+          console.error(err);
+          this.error = 'Failed to create package';
+          this.saving = false;
+          this.toast.error('Failed to create package', { position: 'top-end' });
+        }
+      });
+    }
+  }
+
+  deletePackage(pkg: SuperadminPackageDto): void {
+    if (!confirm(`Delete package "${pkg.name}"?`)) {
+      return;
+    }
+
+    this.saving = true;
+    this.error = null;
+
+    this.api.deletePackage(pkg.id).subscribe({
+      next: () => {
+        this.packages = this.packages.filter(p => p.id !== pkg.id);
+        this.total = Math.max(0, this.total - 1);
+
+        if (this.editingPackage && this.editingPackage.id === pkg.id) {
+          this.closeModal();
+          this.editingPackage = null;
+          this.loadPackages();
+          this.toast.success('Package deleted successfully', { position: 'top-end' });
+        }
+
+        this.saving = false;
+      },
+      error: err => {
+        console.error(err);
+        this.error = 'Failed to delete package';
+        this.saving = false;
+        this.toast.error('Failed to delete package', { position: 'top-end' });
+      }
     });
   }
 }

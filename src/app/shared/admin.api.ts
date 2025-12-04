@@ -36,6 +36,7 @@ export interface AdminRow {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  password: string;
 }
 
 export type CreatePackageDto = Omit<PackageRow, 'id'|'createdAt'|'updatedAt'>;

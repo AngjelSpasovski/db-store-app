@@ -14,24 +14,19 @@ export const appRoutes: Routes = [
   { path: 'home',            loadComponent: () => import('./home/home.page').then(m => m.HomePage),
     data: { title: 'HOME' }
   },
-
   { path: 'login',           loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent),
     canActivate: [guestGuard],
     data: { title: 'LOGIN' }
   },
-
   { path: 'confirm-email',   loadComponent: () => import('./auth/login/confirm-email/confirm-email.component').then(m => m.ConfirmEmailComponent),
     data: { title: 'CONFIRM_EMAIL' }
   },
-
   { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
     data: { title: 'FORGOT_PASSWORD' }
   },
-
   { path: 'reset-password',  loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
     data: { title: 'RESET_PASSWORD' }
   },
-
   {
     path: 'user',
     loadChildren:  () => import('./user/user.module').then(m => m.UserModule),
@@ -46,33 +41,26 @@ export const appRoutes: Routes = [
     path: 'admin',
     canActivate: [authGuard, roleGuard],
     data: { roles: ['superadmin'], title: 'ADMIN' },
-    loadComponent: () =>
-      import('./admin/admin-shell/admin-shell.component')
-        .then(m => m.AdminShellComponent),
+    loadComponent: () =>       import('./admin/admin-shell/admin-shell.component').then(m => m.AdminShellComponent),
     children: [
-      { path: '', pathMatch: 'full',
-        loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component')
-          .then(m => m.AdminDashboardComponent),
+      {
+        path: '', pathMatch: 'full',      loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
         data: { title: { prefix: 'Admin', main: 'Dashboard' } }
       },
-      { path: 'user-details',
-        loadComponent: () => import('./admin/user-details/user-details.component')
-          .then(m => m.AdminUserDetailsComponent),
+      {
+        path: 'user-details',             loadComponent: () => import('./admin/user-details/user-details.component').then(m => m.AdminUserDetailsComponent),
         data: { title: { prefix: 'Admin', main: 'User Details' } }
       },
-      { path: 'billing-users',
-        loadComponent: () => import('./admin/billing-users/billing-users.component')
-          .then(m => m.AdminBillingUsersComponent),
+      {
+        path: 'billing-users',            loadComponent: () => import('./admin/billing-users/billing-users.component').then(m => m.AdminBillingUsersComponent),
         data: { title: { prefix: 'Admin', main: 'Billing by Users' } }
       },
-      { path: 'package-management',
-        loadComponent: () => import('./admin/package-management/package-management.component')
-          .then(m => m.AdminPackageManagementComponent),
+      {
+        path: 'package-management',       loadComponent: () => import('./admin/package-management/package-management.component').then(m => m.AdminPackageManagementComponent),
         data: { title: { prefix: 'Admin', main: 'Package Management' } }
       },
-      { path: 'users',
-        loadComponent: () => import('./admin/users-list/users-list.component')
-        .then(m => m.AdminUsersListComponent),
+      {
+        path: 'users',                    loadComponent: () => import('./admin/users-list/users-list.component').then(m => m.AdminUsersListComponent),
         data: { title: { prefix: 'Admin', main: 'Users' } }
       },
     ]

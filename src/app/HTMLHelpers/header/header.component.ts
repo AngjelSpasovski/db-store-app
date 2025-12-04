@@ -26,9 +26,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // icons
   public faSignOutAlt = faSignOutAlt;
 
-  @Input() viewMode: 'home' | 'login' | 'forgot-password' | 'reset-password' | 'user' | 'admin' = 'home';
-  @Input() isLoggedIn = false;
-  @Input() userEmail = '';
+  public viewMode: 'home' | 'login' | 'forgot-password' | 'reset-password' | 'user' | 'admin' = 'home';
+  public isLoggedIn = false;
+  public userEmail = '';
 
   public showSettingsMenu = false;
 
@@ -53,16 +53,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // A) Синхроно земи го тековниот корисник (BehaviorSubject.value)
     const u = this.auth.currentUser$?.value;
     this.isLoggedIn = !!u;
     this.userEmail = u?.email ?? '';
 
-    // B) Сетирај viewMode ИТНО според моменталниот URL (пред да стигнат router events)
     this.viewMode = this.mapUrlToViewMode(this.router.url);
     this.ready = true;
 
-    // C) После тоа – слушај ги промените на URL (NavigationEnd)
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd), takeUntil(this.destroy$))
       .subscribe((e: any) => {
@@ -70,25 +67,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.viewMode = this.mapUrlToViewMode(url);
       });
 
-    // D) Следи ги идните промени на корисникот
     this.auth.currentUser$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(u2 => {
-        this.isLoggedIn = !!u2;
-        this.userEmail = u2?.email ?? '';
-      });
-
-      //
-      this.auth.currentUser$.subscribe(u => {
-        this.isSuperadmin = (u?.role?.toLowerCase() === 'superadmin');
+      .subscribe(user => {
+        this.isLoggedIn  = !!user;
+        this.userEmail   = user?.email ?? '';
+        this.isSuperadmin = (user?.role?.toLowerCase() === 'superadmin');
       });
   }
+
 
   private mapUrlToViewMode(url: string): typeof this.viewMode {
     if (url.includes('/login')) return 'login';
     if (url.includes('/forgot-password')) return 'forgot-password';
     if (url.includes('/reset-password')) return 'reset-password';
-    if (url.includes('/admin')) return 'admin';
+    if (url.includes('/admin') || url.includes('/superadmin')) {
+      return 'admin';
+    }
     if (url.includes('/user')) return 'user';
     return 'home';
   }
