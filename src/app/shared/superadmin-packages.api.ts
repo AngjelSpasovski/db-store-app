@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 export interface SuperadminPackageDto {
   id: number;
@@ -31,24 +32,28 @@ export interface PackagePayload {
 
 @Injectable({ providedIn: 'root' })
 export class SuperadminPackagesApi {
-  private readonly baseUrl = '/api/v1/superadmin/packages';
+  // baseApiUrl:
+  //  - dev: '/api/v1'
+  //  - prod: 'https://web-society.kps-dev.com/api/v1'
+  private readonly apiBase = (environment.baseApiUrl ?? '').replace(/\/+$/, '');
+  private readonly baseUrl = `${this.apiBase}/superadmin/packages`;
 
   constructor(private http: HttpClient) {}
 
   getPackages(perPage = 50, page = 1): Observable<PackagesListResponse> {
     const params = new HttpParams()
-      .set('perPage', perPage)
-      .set('page', page);
+      .set('perPage', String(perPage))
+      .set('page', String(page));
 
     return this.http.get<PackagesListResponse>(this.baseUrl, { params });
   }
 
-  // 🔹 CREATE: враќа директно SuperadminPackageDto
+  /** CREATE */
   createPackage(payload: PackagePayload): Observable<SuperadminPackageDto> {
     return this.http.post<SuperadminPackageDto>(this.baseUrl, payload);
   }
 
-  // 🔹 UPDATE: исто
+  /** UPDATE */
   updatePackage(id: number, payload: PackagePayload): Observable<SuperadminPackageDto> {
     return this.http.patch<SuperadminPackageDto>(
       `${this.baseUrl}/${id}`,
@@ -56,7 +61,7 @@ export class SuperadminPackagesApi {
     );
   }
 
-  // 🔹 DELETE: URL-от да не има двојно /packages
+  /** DELETE */
   deletePackage(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
