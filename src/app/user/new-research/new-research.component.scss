@@ -80,6 +80,51 @@
     opacity: 1;
   }
 
+  .custom-file-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .real-file-input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .custom-file-label {
+      background: #202632;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+      cursor: pointer;
+      font-size: 0.9rem;
+
+      .choose {
+        font-weight: 500;
+        color: var(--brand);
+        margin-right: 0.75rem;
+        white-space: nowrap;
+      }
+
+      .filename {
+        color: var(--text-muted);
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: right;
+      }
+    }
+  }
+
   .validation-slot {
     min-height: 1.2rem;
     margin-top: 0.25rem;

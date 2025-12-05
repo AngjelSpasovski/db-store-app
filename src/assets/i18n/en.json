@@ -279,5 +279,27 @@
     "N_A": "N/A",
 
     "PAYMENT_CANCELED": "Payment canceled.",
-    "PAYMENT_COMPLETED_TEST": "Payment completed (test). Credits will appear once backend confirms."
+    "PAYMENT_COMPLETED_TEST": "Payment completed (test). Credits will appear once backend confirms.",
+
+    "BULK_SEARCH_TITLE" : "Bulk Search",
+    "ID_MUST_BE_16_CHARS": "ID must be 16 characters",
+    "SEARCH_HISTORY": "Search history",
+    "CREATED_AT": "Created",
+    "EXPIRES_AT": "Expires",
+    "ACTIONS": "Actions",
+    "UPLOADING": "Uploading...",
+    "DOWNLOAD": "Download",
+    "NO_RESULTS_FOR_REQUEST_FILE_EMPTY": "No results for this request. File is empty.",
+    "NO_VALID_ROWS_IN_CSV": "No valid rows in CSV. Download skipped.",
+    "COULD_NOT_READ_CSV_FILE": "Could not read the CSV file.",
+    "DOWNLOAD_FAILED_TRY_AGAIN": "Download failed. Please try again later.",
+
+    "NO_MATCHES_FILE_NOT_GENERATED": "No matches found, file not generated.",
+    "REQUEST_CREATED": "Request #{{id}} created.",
+    "SEARCH_FAILED": "Search failed. Please try again later.",
+    "DATA_REQUEST_CREATED": "Data request created successfully.",
+    "FAILED_TO_CREATE_DATA_REQUEST": "Failed to create data request.",
+    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt formats"
+
+
 }

@@ -13,9 +13,9 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-import { DataRequestApi } from 'src/app/shared/data-request.api';
+import { DataRequestApi, DataRequestRow } from 'src/app/shared/data-request.api';
 
 import { SearchHistoryService } from './new-search-history.service';
 import { AuthService } from '../../auth/auth.service';
@@ -44,6 +44,7 @@ export class NewResearchComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private translate: TranslateService,
     private historyStore: SearchHistoryService,
     private auth: AuthService,
     private toasts: ToastService,
@@ -72,7 +73,9 @@ export class NewResearchComponent implements OnInit {
 
   // ===== SINGLE ID SEARCH (како request со 1 ID) =====
   submit() {
-    if (this.searchForm.invalid || this.searching) return;
+    if (this.searchForm.invalid || this.searching) {
+      return;
+    }
 
     const id = this.searchForm.value.id.trim();
 
@@ -89,44 +92,37 @@ export class NewResearchComponent implements OnInit {
         finalize(() => {
           this.searching = false;
           this.searchForm.enable();
-          this.cdr.markForCheck();
 
           // 🔹 РЕСЕТ НА ФОРМАТА + СОСТОЈБА
           this.searchForm.reset();
           this.searchForm.markAsPristine();
           this.searchForm.markAsUntouched();
+
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (res) => {
-          const row = res.dataRequest;
+          const row = res.dataRequest as DataRequestRow;
           console.log('[SingleSearch] response ➜', row);
 
-          this.toasts.success(`Request #${row.id} created.`);
+          // ❌ НИКАКОВ download тука!
+          if (row.matchesCount === 0) {
+            this.toasts.error(this.translate.instant('NO_MATCHES_FILE_NOT_GENERATED'));
+          } else {
+            this.toasts.success(this.translate.instant('REQUEST_CREATED', { id: row.id }));
+          }
+
+
           this.auth.deductCredits(1);
           this.creditsSvc.refreshFromApi?.();
 
           // освежи ја history табелата од backend
           this.historyStore.reload();
-
-          // опционално: auto-download CSV за single
-          this.dataReqApi.download(row.id).subscribe({
-            next: (blob: Blob) => {
-              const url = URL.createObjectURL(blob);
-              const a = this.doc.createElement('a');
-              a.href = url;
-              a.download = `search-${id}.csv`;
-              this.doc.body.appendChild(a);
-              a.click();
-              a.remove();
-              URL.revokeObjectURL(url);
-            },
-            error: (err) => console.error('Auto-download failed', err),
-          });
         },
         error: (err) => {
           console.error('Single search failed', err);
-          this.toasts.error('Search failed. Please try again later.');
+          this.toasts.error(this.translate.instant('SEARCH_FAILED'));
         },
       });
   }
@@ -161,7 +157,7 @@ export class NewResearchComponent implements OnInit {
           const row = res.dataRequest;
           console.log('[BulkSearch] response ➜', row);
 
-          this.toasts.success('Data request created successfully.');
+          this.toasts.success(this.translate.instant('DATA_REQUEST_CREATED'));
 
           // 🔹 reset локална референца
           this.bulkFile = null;
@@ -179,7 +175,7 @@ export class NewResearchComponent implements OnInit {
         },
         error: (err) => {
           console.error('Bulk upload failed', err);
-          this.toasts.error('Failed to create data request.');
+          this.toasts.error(this.translate.instant('FAILED_TO_CREATE_DATA_REQUEST'));
         },
       });
   }

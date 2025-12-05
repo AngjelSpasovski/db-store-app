@@ -10,6 +10,7 @@ export interface DataRequestRow {
   createdAt: string;
   updatedAt: string;
   expiredAt: string | null;
+  matchesCount?: number | null;
 }
 
 // POST response

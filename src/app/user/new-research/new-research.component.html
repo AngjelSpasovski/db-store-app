@@ -54,14 +54,22 @@
         <label class="form-label small">
           {{ 'BULK_SEARCH_TITLE' | translate:{ default:'Bulk search from file' } }}
         </label>
-        <div class="input-group">
+        <div class="input-group custom-file-wrapper">
           <input
             id="bulkFileInput"
             type="file"
-            class="form-control"
+            class="real-file-input"
             (change)="onBulkFileChange($event)"
             accept=".txt,.csv"
           />
+
+          <label for="bulkFileInput" class="custom-file-label">
+            <span class="choose">{{ 'CHOOSE_FILE' | translate }}</span>
+            <span class="filename">
+              {{ bulkFile?.name || ('NO_FILE_CHOSEN_SEARCH' | translate) }}
+            </span>
+          </label>
+
           <button
             type="button"
             class="btn btn-outline-primary"
@@ -77,6 +85,7 @@
             </ng-template>
           </button>
         </div>
+
         <div class="form-text text-muted small mt-1">
           {{
             'BULK_SEARCH_DESC'

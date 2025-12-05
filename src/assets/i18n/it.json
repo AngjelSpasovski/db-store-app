@@ -279,6 +279,26 @@
     "N_A": "N/A",
 
     "PAYMENT_CANCELED": "Pagamento annullato.",
-    "PAYMENT_COMPLETED_TEST": "Pagamento completato (test). I crediti appariranno una volta confermato dal backend."
+    "PAYMENT_COMPLETED_TEST": "Pagamento completato (test). I crediti appariranno una volta confermato dal backend.",
+
+    "BULK_SEARCH_TITLE" : "Ricerca in blocc",
+    "ID_MUST_BE_16_CHARS": "Il codice deve contenere 16 caratteri",
+    "SEARCH_HISTORY": "Cronologia delle ricerche",
+    "CREATED_AT": "Creato",
+    "EXPIRES_AT": "Scade",
+    "ACTIONS": "Azioni",
+    "UPLOADING": "Caricamento...",
+    "DOWNLOAD": "Scarica",
+    "NO_RESULTS_FOR_REQUEST_FILE_EMPTY": "Nessun risultato per questa richiesta. Il file è vuoto.",
+    "NO_VALID_ROWS_IN_CSV": "Nessuna riga valida nel CSV. Download annullato.",
+    "COULD_NOT_READ_CSV_FILE": "Impossibile leggere il file CSV.",
+    "DOWNLOAD_FAILED_TRY_AGAIN": "Download non riuscito. Riprova più tardi.",
+
+    "NO_MATCHES_FILE_NOT_GENERATED": "Nessuna corrispondenza trovata, il file non è stato generato.",
+    "REQUEST_CREATED": "Richiesta #{{id}} creata.",
+    "SEARCH_FAILED": "La ricerca non è riuscita. Riprovare più tardi.",
+    "DATA_REQUEST_CREATED": "Richiesta di dati creata con successo.",
+    "FAILED_TO_CREATE_DATA_REQUEST": "Impossibile creare la richiesta di dati.",
+    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt formati"
 
 }
