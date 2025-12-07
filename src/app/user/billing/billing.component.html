@@ -1,37 +1,29 @@
 <!-- src/app/user/billing/billing.component.html -->
 <section class="container billing-page p-4">
-  <!-- PAGE TITLE -->
-  <!--  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">{{ 'BILLING_TITLE' | translate }}</h3>
-  </div> -->
-
-  <!-- CARD WRAPPER (ист стил како Search history card) -->
   <div class="card-block billing-card">
 
-    <!-- TOOLBAR: filters + export + columns -->
+    <!-- TOOLBAR -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 billing-toolbar">
 
-      <!-- LEFT SIDE: description -->
       <div class="form-label small mb-0">
         {{ 'BILLING_HISTORY' | translate:{ default:'Billing history of packages purchased' } }}
       </div>
 
-      <!-- RIGHT SIDE: grouped controls -->
       <div class="d-flex flex-wrap align-items-stretch gap-3 justify-content-end">
 
         <!-- SORTING GROUP -->
         <div class="toolbar-section">
-          <span class="toolbar-label">Sorting</span>
-          <div  class="btn-group btn-group-sm billing-filters"
-                role="group"
-                aria-label="Filter by status">
+          <span class="toolbar-label">
+            {{ 'SORTING' | translate:{ default:'Sorting' } }}
+          </span>
 
+          <div class="btn-group btn-group-sm billing-filters" role="group" aria-label="Filter by status">
             <button
               type="button"
               class="btn btn-filter"
               [class.active]="statusFilter === 'ALL'"
               (click)="setStatusFilter('ALL')">
-              ALL
+              {{ 'FILTER_ALL' | translate:{ default:'All' } }}
             </button>
 
             <button
@@ -39,7 +31,7 @@
               class="btn btn-filter"
               [class.active]="statusFilter === 'SUCCESS'"
               (click)="setStatusFilter('SUCCESS')">
-              SUCCESS
+              {{ 'FILTER_SUCCESS' | translate:{ default:'Success' } }}
             </button>
 
             <button
@@ -47,48 +39,51 @@
               class="btn btn-filter"
               [class.active]="statusFilter === 'FAILED'"
               (click)="setStatusFilter('FAILED')">
-              FAILED
+              {{ 'FILTER_FAILED' | translate:{ default:'Failed' } }}
             </button>
           </div>
         </div>
 
         <!-- DOWNLOAD GROUP -->
         <div class="toolbar-section">
-          <span class="toolbar-label">Download</span>
-          <div
-            class="btn-group btn-group-sm billing-export"
-            role="group"
-            aria-label="Export">
+          <span class="toolbar-label">
+            {{ 'DOWNLOAD' | translate:{ default:'Download' } }}
+          </span>
+
+          <div class="btn-group btn-group-sm billing-export" role="group" aria-label="Export">
             <button
               type="button"
               class="btn btn-export"
               (click)="exportCsv()">
-              CSV
+              {{ 'EXPORT_CSV' | translate:{ default:'CSV' } }}
             </button>
             <button
               type="button"
               class="btn btn-export"
               (click)="exportExcel()">
-              EXCEL
+              {{ 'EXPORT_EXCEL' | translate:{ default:'Excel' } }}
             </button>
           </div>
         </div>
 
         <!-- TABLE VIEW / COLUMNS GROUP -->
         <div class="toolbar-section">
-          <span class="toolbar-label">Table View</span>
+          <span class="toolbar-label">
+            {{ 'TABLE_VIEW' | translate:{ default:'Table view' } }}
+          </span>
+
           <div class="billing-column-chooser">
             <button
               type="button"
               class="btn btn-export btn-sm"
               (click)="toggleColumnPanel()">
-              COLUMNS
+              {{ 'COLUMNS' | translate:{ default:'Columns' } }}
             </button>
 
-            <div
-              class="billing-column-panel mt-2"
-              *ngIf="showColumnPanel">
-              <div class="small fw-semibold mb-1">Visible columns</div>
+            <div class="billing-column-panel mt-2" *ngIf="showColumnPanel">
+              <div class="small fw-semibold mb-1">
+                {{ 'VISIBLE_COLUMNS' | translate:{ default:'Visible columns' } }}
+              </div>
 
               <div
                 *ngFor="let col of columnChooser"
@@ -101,7 +96,9 @@
                   (change)="onToggleColumn(col, $event)">
                 <label class="form-check-label">
                   {{ col.label }}
-                  <span *ngIf="col.lock" class="text-muted">(fixed)</span>
+                  <span *ngIf="col.lock" class="text-muted">
+                    ({{ 'FIXED' | translate:{ default:'fixed' } }})
+                  </span>
                 </label>
               </div>
             </div>
@@ -111,8 +108,7 @@
       </div>
     </div>
 
-
-    <!-- DESKTOP: ag-Grid во card -->
+    <!-- DESKTOP GRID -->
     <div *ngIf="!isMobile" class="billing-grid-wrapper">
       <ag-grid-angular
         [theme]="theme"
@@ -127,65 +123,116 @@
       </ag-grid-angular>
     </div>
 
-    <!-- MOBILE: accordion cards (оставено како што имаше) -->
-    <div *ngIf="isMobile" class="billing-mobile-list mt-3">
-      <div class="accordion" id="billingAccordion">
+  <!-- MOBILE: accordion cards -->
+  <div *ngIf="isMobile" class="billing-mobile-list mt-3">
+    <div class="accordion" id="billingAccordion">
+      <div
+        class="accordion-item"
+        *ngFor="let row of rowData; let i = index">
+        <h2 class="accordion-header" [id]="'heading' + i">
+          <button
+            class="accordion-button collapsed mobile-acc-btn"
+            type="button"
+            data-bs-toggle="collapse"
+            [attr.data-bs-target]="'#collapse' + i"
+            aria-expanded="false"
+            [attr.aria-controls]="'collapse' + i">
+
+            <div class="acc-main-line">
+              <span class="acc-id">#{{ row.id }}</span>
+              <span class="acc-amount">
+                {{ row.amount | number:'1.0-0' }} €
+              </span>
+            </div>
+
+            <div class="acc-sub-line">
+              {{ row.timestamp | date:'MM/dd/yyyy, HH:mm' }}
+            </div>
+          </button>
+        </h2>
+
         <div
-          class="accordion-item bg-dark text-light"
-          *ngFor="let row of rowData; let i = index">
-          <h2 class="accordion-header" [id]="'heading' + i">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              [attr.data-bs-target]="'#collapse' + i"
-              aria-expanded="false"
-              [attr.aria-controls]="'collapse' + i">
-              #{{ row.id }} ·
-              {{ row.timestamp | date:'MM/dd/yyyy, HH:mm' }} ·
-              {{ row.amount | number:'1.0-0' }} €
-            </button>
-          </h2>
-          <div
-            [id]="'collapse' + i"
-            class="accordion-collapse collapse"
-            [attr.aria-labelledby]="'heading' + i"
-            data-bs-parent="#billingAccordion">
-            <div class="accordion-body">
-              <p class="mb-1"><strong>Package:</strong> {{ row.packageName }}</p>
-              <p class="mb-1">
-                <strong>Pkg credits:</strong> {{ row.packageCredits }}
-              </p>
-              <p class="mb-1">
-                <strong>Pkg price:</strong> {{ row.packagePrice | number:'1.0-0' }} €
-              </p>
-              <p class="mb-1">
-                <strong>Discount:</strong> {{ row.packageDiscountPercentage }}
-              </p>
-              <p class="mb-1">
-                <strong>Credits:</strong> {{ row.credits }}
-              </p>
-              <p class="mb-1">
-                <strong>Status:</strong>
+          [id]="'collapse' + i"
+          class="accordion-collapse collapse"
+          [attr.aria-labelledby]="'heading' + i"
+          data-bs-parent="#billingAccordion">
+          <div class="accordion-body">
+
+            <div class="acc-row">
+              <span class="acc-label">
+                {{ 'PACKAGE_NAME' | translate }}
+              </span>
+              <span class="acc-value">
+                {{ row.packageName }}
+              </span>
+            </div>
+
+            <div class="acc-row">
+              <span class="acc-label">
+                {{ 'PACKAGE_CREDITS' | translate }}
+              </span>
+              <span class="acc-value">
+                {{ row.packageCredits }}
+              </span>
+            </div>
+
+            <div class="acc-row">
+              <span class="acc-label">
+                {{ 'PACKAGE_PRICE' | translate }}
+              </span>
+              <span class="acc-value">
+                {{ row.packagePrice | number:'1.0-0' }} €
+              </span>
+            </div>
+
+            <div class="acc-row">
+              <span class="acc-label">
+                {{ 'DISCOUNT_PERCENT' | translate }}
+              </span>
+              <span class="acc-value">
+                {{ row.packageDiscountPercentage }} %
+              </span>
+            </div>
+
+            <div class="acc-row">
+              <span class="acc-label">
+                {{ 'CREDITS' | translate }}
+              </span>
+              <span class="acc-value">
+                {{ row.credits }}
+              </span>
+            </div>
+
+            <div class="acc-row">
+              <span class="acc-label">
+                {{ 'STATUS' | translate }}
+              </span>
+              <span class="acc-value">
                 <span class="badge bg-success" *ngIf="row.status === 'SUCCESS'">
-                  Success
+                  {{ 'FILTER_SUCCESS' | translate }}
                 </span>
                 <span class="badge bg-danger" *ngIf="row.status === 'FAILED'">
-                  Failed
+                  {{ 'FILTER_FAILED' | translate }}
                 </span>
-              </p>
+              </span>
+            </div>
 
+            <div class="acc-row acc-row-button">
               <button
                 type="button"
-                class="btn btn-outline-light btn-sm mt-2"
+                class="btn btn-outline-light btn-sm"
                 (click)="openInvoiceFromRow(row)">
-                Invoice details
+                {{ 'INVOICE_DETAILS' | translate }}
               </button>
             </div>
+
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-  </div> <!-- /card-block -->
+
+
+  </div>
 </section>

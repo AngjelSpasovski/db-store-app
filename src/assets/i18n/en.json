@@ -299,7 +299,36 @@
     "SEARCH_FAILED": "Search failed. Please try again later.",
     "DATA_REQUEST_CREATED": "Data request created successfully.",
     "FAILED_TO_CREATE_DATA_REQUEST": "Failed to create data request.",
-    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt formats"
+    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt formats",
+
+    "BILLING_HISTORY": "Billing history of packages purchased",
+    "SORTING": "Sorting",
+    "FILTER_ALL": "All",
+    "FILTER_SUCCESS": "Success",
+    "FILTER_FAILED": "Failed",
+    "EXPORT_CSV": "CSV",
+    "EXPORT_EXCEL": "Excel",
+    "TABLE_VIEW": "Table view",
+    "COLUMNS": "Columns",
+    "VISIBLE_COLUMNS": "Visible columns",
+    "FIXED": "fixed",
+
+    "PACKAGE_NAME": "Package",
+    "PACKAGE_CREDITS": "Pkg credits",
+    "PACKAGE_PRICE": "Pkg price",
+    "DISCOUNT_PERCENT": "Discount %",
+    "PACKAGE_ACTIVE": "Pkg active",
+    "PACKAGE_CREATED_AT": "Pkg created",
+    "PACKAGE_UPDATED_AT": "Pkg updated",
+
+    "DOWNLOAD_LABEL": "Download",
+    "INVOICE_DETAILS": "Invoice details",
+
+    "PAYMENT_COMPLETED_PENDING_CONFIRMATION": "Payment completed. Credits will be added after server confirmation.",
+    "BILLING_HISTORY_LOAD_FAILED": "Failed to load billing history.",
+    "INVOICE_NOT_AVAILABLE_FOR_PAYMENT": "Invoice not available for this payment.",
+
+    "AMOUNT": "Amount"
 
 
 }

@@ -298,6 +298,35 @@
     "SEARCH_FAILED": "Пребарувањето не успеа. Обидете се повторно подоцна.",
     "DATA_REQUEST_CREATED": "Барањето за податоци е успешно креирано.",
     "FAILED_TO_CREATE_DATA_REQUEST": "Барањето за податоци не успеа да се креира.",
-    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt формати"
+    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt формати",
+
+    "BILLING_HISTORY": "Фактурирање за купени пакети",
+  "SORTING": "Подредување",
+  "FILTER_ALL": "Сите",
+  "FILTER_SUCCESS": "Успешни",
+  "FILTER_FAILED": "Неуспешни",
+  "EXPORT_CSV": "CSV",
+  "EXPORT_EXCEL": "Excel",
+  "TABLE_VIEW": "Преглед на табела",
+  "COLUMNS": "Колони",
+  "VISIBLE_COLUMNS": "Видливи колони",
+  "FIXED": "фиксирано",
+
+  "PACKAGE_NAME": "Пакет",
+  "PACKAGE_CREDITS": "Кредити на пакет",
+  "PACKAGE_PRICE": "Цена на пакет",
+  "DISCOUNT_PERCENT": "Попуст %",
+  "PACKAGE_ACTIVE": "Пакет активен",
+  "PACKAGE_CREATED_AT": "Пакет креиран",
+  "PACKAGE_UPDATED_AT": "Пакет ажуриран",
+
+  "DOWNLOAD_LABEL": "Преземи",
+  "INVOICE_DETAILS": "Детали за фактура",
+
+  "PAYMENT_COMPLETED_PENDING_CONFIRMATION": "Плаќањето е завршено. Кредитите ќе бидат додадени по потврда од серверот.",
+  "BILLING_HISTORY_LOAD_FAILED": "Не можевме да ја вчитаме историјата на фактурирање.",
+  "INVOICE_NOT_AVAILABLE_FOR_PAYMENT": "Нема достапна фактура за ова плаќање.",
+
+  "AMOUNT": "Износ"
 
 }

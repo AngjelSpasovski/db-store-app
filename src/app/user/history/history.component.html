@@ -1,25 +1,99 @@
 <!-- src/app/user/history/history.component.html -->
 <section class="history-root">
+
   <div class="history-header d-flex justify-content-between align-items-center mb-2">
     <div class="form-label small">
-        {{ 'SEARCH_HISTORY' | translate:{ default:'Search history' } }}
+      {{ 'SEARCH_HISTORY' | translate:{ default:'Search history' } }}
     </div>
   </div>
 
-  <ag-grid-angular
-    [theme]="theme"
-    [columnDefs]="columnDefs"
-    [defaultColDef]="defaultColDef"
-    [rowData]="rowData"
-    [pagination]="true"
-    [paginationPageSize]="20"
-    (gridReady)="onGridReady($event)"
+  <!-- DESKTOP: ag-Grid -->
+  <div *ngIf="!isMobile" class="history-grid-wrapper">
+    <ag-grid-angular
+      [theme]="theme"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [rowData]="rowData"
+      [pagination]="true"
+      [paginationPageSize]="20"
+      (gridReady)="onGridReady($event)"
 
-    [rowSelection]="'single'"
-    [suppressRowClickSelection]="true"
-    [suppressCellFocus]="true"
+      [rowSelection]="'single'"
+      [suppressRowClickSelection]="true"
+      [suppressCellFocus]="true"
 
-    style="width: 100%; height: 40vh"
-  >
-  </ag-grid-angular>
+      style="width: 100%; height: 40vh">
+    </ag-grid-angular>
+  </div>
+
+<!-- MOBILE: accordion cards (унифицирано со Billing) -->
+<div *ngIf="isMobile" class="history-mobile-list mt-3">
+  <div class="accordion" id="historyAccordion">
+    <div
+      class="accordion-item"
+      *ngFor="let row of rowData; let i = index">
+      <h2 class="accordion-header" [id]="'history-heading' + i">
+        <button
+          class="accordion-button collapsed history-acc-btn"
+          type="button"
+          data-bs-toggle="collapse"
+          [attr.data-bs-target]="'#history-collapse' + i"
+          aria-expanded="false"
+          [attr.aria-controls]="'history-collapse' + i">
+
+          <div class="acc-main-line">
+            <span class="acc-id">#{{ row.id }}</span>
+            <span class="acc-created">
+              {{ row.createdAt | date:'MM/dd/yyyy, HH:mm' }}
+            </span>
+          </div>
+
+          <div class="acc-sub-line">
+            {{ 'EXPIRES_AT' | translate }}:
+            {{ row.expiredAt | date:'MM/dd/yyyy, HH:mm' }}
+          </div>
+        </button>
+      </h2>
+
+      <div
+        [id]="'history-collapse' + i"
+        class="accordion-collapse collapse"
+        [attr.aria-labelledby]="'history-heading' + i"
+        data-bs-parent="#historyAccordion">
+        <div class="accordion-body">
+
+          <div class="acc-row">
+            <span class="acc-label">
+              {{ 'CREATED_AT' | translate }}
+            </span>
+            <span class="acc-value">
+              {{ row.createdAt | date:'MM/dd/yyyy, HH:mm' }}
+            </span>
+          </div>
+
+          <div class="acc-row">
+            <span class="acc-label">
+              {{ 'EXPIRES_AT' | translate }}
+            </span>
+            <span class="acc-value">
+              {{ row.expiredAt | date:'MM/dd/yyyy, HH:mm' }}
+            </span>
+          </div>
+
+          <div class="acc-row acc-row-button">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              (click)="download(row)">
+              {{ 'DOWNLOAD' | translate }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </section>

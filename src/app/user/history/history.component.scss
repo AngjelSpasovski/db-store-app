@@ -238,3 +238,95 @@ $table-bulk: #ffc107; // 👈 жолта за bulk
     padding: 0.1rem 0.25rem;
   }
 }
+
+
+// под .history-root, можеш веднаш после него
+.history-grid-wrapper {
+  margin-top: 0.25rem;
+}
+
+/* ===== MOBILE – accordion look (унифициран со billing) ===== */
+.history-mobile-list {
+  margin-top: 1rem;
+
+  .accordion-item {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #151921;
+
+    & + .accordion-item {
+      margin-top: 0.75rem;
+    }
+  }
+
+  .history-acc-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    background: #1d2330;
+    color: #e9eef6;
+    font-size: 0.85rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+
+  .acc-main-line {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .acc-id {
+    opacity: 0.9;
+  }
+
+  .acc-created {
+    color: #e5f0ff;
+  }
+
+  .acc-sub-line {
+    font-size: 0.75rem;
+    color: #99a3b3;
+  }
+
+  .accordion-body {
+    background: #151921;
+    font-size: 0.8rem;
+    color: #e9eef6;
+  }
+
+  .acc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.15rem 0;
+  }
+
+  .acc-label {
+    font-size: 0.78rem;
+    color: #99a3b3;
+  }
+
+  .acc-value {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #e9eef6;
+    text-align: right;
+  }
+
+  .acc-row-button {
+    justify-content: center;
+    margin-top: 0.3rem;
+  }
+
+  .btn-outline-light.btn-sm {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+  }
+}

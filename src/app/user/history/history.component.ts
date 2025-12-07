@@ -5,6 +5,7 @@ import {
   OnDestroy,
   ChangeDetectorRef,
   ChangeDetectionStrategy,
+  HostListener,
   Inject,
 } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
@@ -17,6 +18,7 @@ import {
   ColDef,
   ValueFormatterParams,
   CellClickedEvent,
+  GridApi,
   GridReadyEvent,
 } from 'ag-grid-community';
 
@@ -61,6 +63,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   private dataSub!: Subscription;
   private langSub!: Subscription;
+
+  isMobile = window.innerWidth < 768;
 
   constructor(
     private historyStore: SearchHistoryService,
@@ -146,7 +150,12 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.langSub?.unsubscribe();
   }
 
-  private download(row: DataRequestRow) {
+  @HostListener('window:resize')
+  onResize() {
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  download(row: DataRequestRow) {
     this.dataReqApi.download(row.id).subscribe({
       next: (blob: Blob) => {
         blob
@@ -196,4 +205,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
       },
     });
   }
+
+
 }

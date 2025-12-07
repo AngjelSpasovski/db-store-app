@@ -299,6 +299,35 @@
     "SEARCH_FAILED": "La ricerca non è riuscita. Riprovare più tardi.",
     "DATA_REQUEST_CREATED": "Richiesta di dati creata con successo.",
     "FAILED_TO_CREATE_DATA_REQUEST": "Impossibile creare la richiesta di dati.",
-    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt formati"
+    "NO_FILE_CHOSEN_SEARCH" : ".csv / .txt formati",
+
+    "BILLING_HISTORY": "Storico di fatturazione dei pacchetti acquistati",
+    "SORTING": "Ordina",
+    "FILTER_ALL": "Tutti",
+    "FILTER_SUCCESS": "Riusciti",
+    "FILTER_FAILED": "Non riusciti",
+    "EXPORT_CSV": "CSV",
+    "EXPORT_EXCEL": "Excel",
+    "TABLE_VIEW": "Vista tabella",
+    "COLUMNS": "Colonne",
+    "VISIBLE_COLUMNS": "Colonne visibili",
+    "FIXED": "fissa",
+
+    "PACKAGE_NAME": "Pacchetto",
+    "PACKAGE_CREDITS": "Crediti del pacchetto",
+    "PACKAGE_PRICE": "Prezzo del pacchetto",
+    "DISCOUNT_PERCENT": "Sconto %",
+    "PACKAGE_ACTIVE": "Pacchetto attivo",
+    "PACKAGE_CREATED_AT": "Pacchetto creato",
+    "PACKAGE_UPDATED_AT": "Pacchetto aggiornato",
+
+    "DOWNLOAD_LABEL": "Scarica",
+    "INVOICE_DETAILS": "Dettagli fattura",
+
+    "PAYMENT_COMPLETED_PENDING_CONFIRMATION": "Pagamento completato. I crediti verranno aggiunti dopo la conferma del server.",
+    "BILLING_HISTORY_LOAD_FAILED": "Impossibile caricare lo storico di fatturazione.",
+    "INVOICE_NOT_AVAILABLE_FOR_PAYMENT": "La fattura non è disponibile per questo pagamento.",
+
+    "AMOUNT": "Importo"
 
 }

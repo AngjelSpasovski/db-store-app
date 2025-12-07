@@ -27,23 +27,17 @@
     position: relative;
   }
 
-    .billing-toolbar {
-    position: relative;
+  /* spacing помеѓу копчињата во група */
+  .billing-filters .btn,
+  .billing-export .btn,
+  .billing-column-chooser .btn {
+    margin-right: 0.4rem;
   }
-
-    /* spacing between buttons inside each group */
-    .billing-filters .btn,
-    .billing-export .btn,
-    .billing-column-chooser .btn {
-      margin-right: 0.4rem; /* мал простор меѓу копчињата */
-    }
-
-    /* remove last margin so the group ends cleanly */
-    .billing-filters .btn:last-child,
-    .billing-export .btn:last-child,
-    .billing-column-chooser .btn:last-child {
-      margin-right: 0;
-    }
+  .billing-filters .btn:last-child,
+  .billing-export .btn:last-child,
+  .billing-column-chooser .btn:last-child {
+    margin-right: 0;
+  }
 
   /* wrapper за секоја „капсула“ (Sorting / Download / Table View) */
   .toolbar-section {
@@ -66,27 +60,27 @@
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--text-muted);
-    background: var(--bg-card); // да „исече“ од горниот раб
+    background: var(--bg-card);
   }
 
-  /* ===== FILTER & EXPORT BUTTONS – pill стил ===== */
+  /* FILTER & EXPORT копчиња – pill стил */
   .btn-filter,
   .btn-export {
     border-radius: 999px;
     padding: 0.35rem 1.1rem;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid var(--border);
     background: #202632;
     color: var(--text-muted);
     font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.06em;
     font-weight: 500;
     transition: background-color 0.15s ease, border-color 0.15s ease,
       color 0.15s ease, box-shadow 0.15s ease;
   }
 
-  /* hover за НЕактивните filter копчиња */
-  .btn-filter:not(.active):hover {
+  .btn-filter:not(.active):hover,
+  .btn-export:hover {
     background: #0b5ed7;
     border-color: var(--brand);
     color: #fff;
@@ -99,39 +93,6 @@
     box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.35);
   }
 
-  .btn-export:hover {
-    background: #0b5ed7;
-    border-color: var(--brand);
-    color: #fff;
-  }
-
-  /* ===== FILTER & EXPORT BUTTONS ===== */
-  .btn-filter,
-  .btn-export {
-    border-radius: 999px;
-    padding-inline: 0.9rem;
-    border: 1px solid var(--border);
-    background: #202632;
-    color: var(--text-muted);
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .btn-filter.active {
-    background: var(--brand);
-    border-color: var(--brand);
-    color: #fff;
-  }
-
-  .btn-export:hover {
-    /* НЕ користиме color.scale со CSS var – директно ставаме малку потемна боја */
-    background: #0b5ed7;
-    border-color: var(--brand);
-    color: #fff;
-  }
-
-  /* column chooser trigger */
   .billing-column-chooser {
     position: relative;
   }
@@ -147,14 +108,12 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     z-index: 1050;
-
     max-height: 260px;
     overflow-y: auto;
 
     .form-check-input {
       cursor: pointer;
     }
-
     .form-check-label {
       cursor: pointer;
       font-size: 0.8rem;
@@ -166,7 +125,7 @@
     margin-top: 0.5rem;
   }
 
-  /* ===== ag-Grid FINE TUNING (ист look како Search) ===== */
+  /* ===== ag-Grid (desktop) – веќе добро средено, не го менуваме многу ===== */
   :host ::ng-deep .ag-theme-alpine {
     background-color: transparent;
 
@@ -221,56 +180,155 @@
     }
   }
 
-  /* MOBILE ACCORDION slight polish */
+  /* ===== MOBILE – accordion look ===== */
   .billing-mobile-list {
+    margin-top: 1rem;
+
     .accordion-item {
       border-radius: 0.75rem;
       overflow: hidden;
       border: 1px solid var(--border);
       background: #151921;
+
       & + .accordion-item {
         margin-top: 0.75rem;
       }
     }
 
-    .accordion-button {
+    .mobile-acc-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
       background: #1d2330;
       color: var(--text);
+      font-size: 0.85rem;
+      padding-top: 0.6rem;
+      padding-bottom: 0.6rem;
+    }
+
+    .acc-main-line {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      font-weight: 600;
       font-size: 0.9rem;
+    }
+
+    .acc-id {
+      opacity: 0.9;
+    }
+
+    .acc-amount {
+      color: #e5f0ff;
+    }
+
+    .acc-sub-line {
+      font-size: 0.75rem;
+      color: var(--text-muted);
     }
 
     .accordion-body {
       background: #151921;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .acc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.15rem 0;
+    }
+
+    .acc-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .acc-value {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .acc-row-button {
+      justify-content: center;
+      margin-top: 0.3rem;
+    }
+
+    .btn-outline-light.btn-sm {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
     }
   }
+
+  /* 📱 Global mobile adjustments за toolbar/card */
+  @media (max-width: 768px) {
+    .card-block.billing-card {
+      padding: 1rem;
+    }
+
+    .billing-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
+    .toolbar-section {
+      width: 100%;
+      justify-content: center;   /* 👈 центрирај ги копчињата во „капсулата“ */
+      text-align: center;
+    }
+
+    .toolbar-label {
+      left: 50%;                 /* 👈 label во средина */
+      transform: translateX(-50%);
+      text-align: center;
+      font-size: 0.6rem;
+    }
+
+    /* да се центрираат групите од копчиња во рамките на секција */
+    .billing-filters,
+    .billing-export {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .btn-filter,
+    .btn-export {
+      padding: 0.25rem 0.7rem;
+      font-size: 0.7rem;
+    }
+  }
+
 }
 
-  /* --- Scrollbar styling за ag-Grid (Chrome/Edge/Opera) --- */
-  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
-  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-  }
+/* --- Scrollbar styling за grid (и хоризонтален и вертикален) --- */
+:host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar {
+  width: 8px;   /* вертикален */
+  height: 8px;  /* хоризонтален */
+}
 
-  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
-  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar-track {
-    background-color: #151823; /* позадина, блиску до card/bg */
-  }
+:host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar-track {
+  background-color: #151823; /* позадина, блиску до card/bg */
+}
 
-  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
-  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar-thumb {
-    background-color: #34384d; /* thumb боја */
-    border-radius: 4px;
-  }
+:host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar-thumb {
+  background-color: #34384d; /* thumb боја */
+  border-radius: 4px;
+}
 
-  :host ::ng-deep .billing-grid-wrapper .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb:hover,
-  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport::-webkit-scrollbar-thumb:hover {
-    background-color: #4a4f6a; /* hover малку посветло */
-  }
+:host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar-thumb:hover {
+  background-color: #4a4f6a; /* hover малку посветло */
+}
 
-  /* Firefox варијанта */
-  :host ::ng-deep .billing-grid-wrapper .ag-body-viewport {
-    scrollbar-width: thin;
-    scrollbar-color: #34384d #151823;
-  }
+/* Firefox варијанта – важи за сите scrollbars во wrapper-от */
+:host ::ng-deep .billing-grid-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: #34384d #151823;
+}

@@ -2,6 +2,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   HostListener,
   inject,
 } from '@angular/core';
@@ -12,7 +13,6 @@ import {
   themeAlpine,
   GridApi,
   GridReadyEvent,
-  RowDoubleClickedEvent,
 } from 'ag-grid-community';
 
 import { ToastService } from '../../shared/toast.service';
@@ -20,15 +20,14 @@ import { BILLING_API } from '../../shared/tokens.api';
 import { BillingApi, BillingRow } from '../../shared/billing.api';
 
 import { InvoiceApi, InvoiceDto } from '../../shared/invoice.api';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 
 interface ColumnChooserItem {
-  id: string;      // field/colId во ag-Grid
-  label: string;   // текст во колон chooser
+  id: string;
+  label: string;
   visible: boolean;
   lock?: boolean;
 }
-
 
 @Component({
   selector: 'app-billing',
@@ -37,36 +36,29 @@ interface ColumnChooserItem {
   styleUrls: ['./billing.component.scss'],
   imports: [CommonModule, TranslateModule, AgGridModule],
 })
-export class BillingComponent implements OnInit {
+export class BillingComponent implements OnInit, OnDestroy {
   private billingApi = inject<BillingApi>(BILLING_API);
 
   columnDefs: any[] = [];
   defaultColDef = { sortable: true, filter: true, resizable: true, flex: 1 };
 
-  /** сите rows од backend */
   private allRows: BillingRow[] = [];
-
-  /** rows што ги гледа grid-от (филтрирани) */
   rowData: BillingRow[] = [];
-
-  /** моментален филтер */
   statusFilter: 'ALL' | 'SUCCESS' | 'FAILED' = 'ALL';
 
-  /** ag-Grid API референца */
   private gridApi!: GridApi<BillingRow>;
 
-  /** Column chooser UI */
   columnChooser: ColumnChooserItem[] = [];
   showColumnPanel = false;
 
-  /** Responsive view */
   isMobile = window.innerWidth < 768;
 
-  /** Invoices кеш + map по session */
   private invoices: InvoiceDto[] = [];
   private invoiceBySession = new Map<string, InvoiceDto>();
 
   selectedRow: BillingRow | null = null;
+
+  private langSub?: Subscription;
 
   public theme = themeAlpine.withParams({
     backgroundColor: '#151821',
@@ -89,7 +81,6 @@ export class BillingComponent implements OnInit {
     private invoiceApi: InvoiceApi
   ) {}
 
-  // responsive flag
   @HostListener('window:resize')
   onResize() {
     this.isMobile = window.innerWidth < 768;
@@ -99,23 +90,28 @@ export class BillingComponent implements OnInit {
     const qp = new URLSearchParams(window.location.search);
     if (qp.get('success') === '1') {
       this.toast.success(
-        'Payment completed. Credits added after server confirmation.'
+        this.translate.instant('PAYMENT_COMPLETED_PENDING_CONFIRMATION')
       );
       history.replaceState({}, '', window.location.pathname);
     }
 
     this.buildColumns();
 
-    // 🔽 паралелно ги вчитуваме payments + invoices
+    // 🔄 обнови headers кога се менува јазикот
+    this.langSub = this.translate.onLangChange.subscribe(() => {
+      this.buildColumns();
+      if (this.gridApi) {
+        this.gridApi.setGridOption('columnDefs', this.columnDefs as any);
+      }
+    });
+
     forkJoin({
       payments: this.billingApi.listMyPayments(),
       invoices: this.invoiceApi.listMyInvoices(),
     }).subscribe({
-
       next: ({ payments, invoices }) => {
         this.invoices = invoices ?? [];
         this.buildInvoiceMap();
-        //this.allRows = this.mergeInvoicesIntoPayments(payments ?? []);
 
         this.allRows = this
           .mergeInvoicesIntoPayments(payments ?? [])
@@ -123,33 +119,34 @@ export class BillingComponent implements OnInit {
 
         this.applyFilter();
       },
-
       error: (err) => {
         console.error('Failed to load billing data', err);
-        this.toast.error('Failed to load billing history.');
+        this.toast.error(
+          this.translate.instant('BILLING_HISTORY_LOAD_FAILED')
+        );
         this.allRows = [];
         this.applyFilter();
       },
     });
   }
 
-  /** gridReady → чуваме api, ги применуваме visibility settings */
+  ngOnDestroy(): void {
+    this.langSub?.unsubscribe();
+  }
+
   onGridReady(event: GridReadyEvent<BillingRow>) {
     this.gridApi = event.api;
 
-    // apply column visibility from chooser
     this.columnChooser.forEach((c) => {
       this.gridApi.setColumnsVisible([c.id], c.visible);
     });
   }
 
-  /** смена на статус филтерот */
   setStatusFilter(filter: 'ALL' | 'SUCCESS' | 'FAILED') {
     this.statusFilter = filter;
     this.applyFilter();
   }
 
-  /** Export CSV */
   exportCsv() {
     if (!this.gridApi) return;
     this.gridApi.exportDataAsCsv({
@@ -157,7 +154,6 @@ export class BillingComponent implements OnInit {
     });
   }
 
-  /** Export "Excel" (CSV со .xlsx екстензија – ќе се отвори во Excel) */
   exportExcel() {
     if (!this.gridApi) return;
     this.gridApi.exportDataAsCsv({
@@ -165,7 +161,6 @@ export class BillingComponent implements OnInit {
     });
   }
 
-  /** toggle column visibility */
   toggleColumnPanel() {
     this.showColumnPanel = !this.showColumnPanel;
   }
@@ -182,7 +177,6 @@ export class BillingComponent implements OnInit {
     }
   }
 
-  /** helper за мобилен accordion / од grid */
   openInvoiceFromRow(row: BillingRow) {
     const inv =
       row.stripeSessionId && this.invoiceBySession.has(row.stripeSessionId)
@@ -190,7 +184,9 @@ export class BillingComponent implements OnInit {
         : null;
 
     if (!inv) {
-      this.toast.error('Invoice not available for this payment.');
+      this.toast.error(
+        this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PAYMENT')
+      );
       return;
     }
 
@@ -201,7 +197,6 @@ export class BillingComponent implements OnInit {
     this.selectedRow = null;
   }
 
-  /** ја применуваме логиката за филтрирање */
   private applyFilter() {
     if (this.statusFilter === 'ALL') {
       this.rowData = this.allRows;
@@ -232,19 +227,19 @@ export class BillingComponent implements OnInit {
       {
         field: 'packageName',
         colId: 'packageName',
-        headerName: 'Package',
+        headerName: this.translate.instant('PACKAGE_NAME'),
         minWidth: 140,
       },
       {
         field: 'packageCredits',
         colId: 'packageCredits',
-        headerName: 'Pkg credits',
+        headerName: this.translate.instant('PACKAGE_CREDITS'),
         minWidth: 120,
       },
       {
         field: 'packagePrice',
         colId: 'packagePrice',
-        headerName: 'Pkg price',
+        headerName: this.translate.instant('PACKAGE_PRICE'),
         minWidth: 120,
         valueFormatter: (p: any) =>
           p.value == null
@@ -257,13 +252,13 @@ export class BillingComponent implements OnInit {
       {
         field: 'packageDiscountPercentage',
         colId: 'packageDiscountPercentage',
-        headerName: 'Discount %',
+        headerName: this.translate.instant('DISCOUNT_PERCENT'),
         minWidth: 110,
       },
       {
         field: 'packageIsActive',
         colId: 'packageIsActive',
-        headerName: 'Pkg active',
+        headerName: this.translate.instant('PACKAGE_ACTIVE'),
         minWidth: 110,
         cellRenderer: (p: any) =>
           p.value
@@ -273,7 +268,7 @@ export class BillingComponent implements OnInit {
       {
         field: 'packageCreatedAt',
         colId: 'packageCreatedAt',
-        headerName: 'Pkg created',
+        headerName: this.translate.instant('PACKAGE_CREATED_AT'),
         minWidth: 130,
         valueFormatter: (p: any) =>
           p.value ? new Date(p.value).toLocaleDateString() : '',
@@ -281,7 +276,7 @@ export class BillingComponent implements OnInit {
       {
         field: 'packageUpdatedAt',
         colId: 'packageUpdatedAt',
-        headerName: 'Pkg updated',
+        headerName: this.translate.instant('PACKAGE_UPDATED_AT'),
         minWidth: 130,
         valueFormatter: (p: any) =>
           p.value ? new Date(p.value).toLocaleDateString() : '',
@@ -314,13 +309,13 @@ export class BillingComponent implements OnInit {
           const ok = p.value === 'SUCCESS';
           const pending = p.value === 'PENDING';
 
-          let text = p.value;
+          let text: string;
           if (ok) {
             text = this.translate.instant('SUCCESS');
           } else if (pending) {
-            text = this.translate.instant('PENDING') || 'PENDING';
+            text = this.translate.instant('PENDING');
           } else {
-            text = this.translate.instant('FAILED') || 'FAILED';
+            text = this.translate.instant('FAILED');
           }
 
           const cls = ok
@@ -333,7 +328,7 @@ export class BillingComponent implements OnInit {
         },
       },
       {
-        headerName: 'Receipt',
+        headerName: this.translate.instant('RECEIPT'),
         field: 'receiptUrl',
         colId: 'receiptUrl',
         minWidth: 140,
@@ -343,23 +338,23 @@ export class BillingComponent implements OnInit {
           const url: string | null = params.data?.receiptUrl;
           const status: string = params.data?.status;
 
-          // ако немаме URL, но статусот е SUCCESS → покажи disable-нато копче
+          const btnLabel = this.translate.instant('DOWNLOAD');
+
           if (!url) {
             if (status === 'SUCCESS') {
               return `
                 <button class="btn btn-sm btn-secondary ag-btn-download" disabled>
-                  Download
+                  ${btnLabel}
                 </button>
               `;
             }
             return `<span class="text-muted">N/A</span>`;
           }
 
-          // реално download копче
           return `
             <button class="btn btn-sm btn-outline-light ag-btn-download"
                     data-url="${url}">
-              Download
+              ${btnLabel}
             </button>
           `;
         },
@@ -377,7 +372,6 @@ export class BillingComponent implements OnInit {
       },
     ];
 
-    // Column chooser base
     this.columnChooser = this.columnDefs.map((c) => ({
       id: c.colId || c.field,
       label: c.headerName ?? c.field,
@@ -395,9 +389,7 @@ export class BillingComponent implements OnInit {
     }
   }
 
-  /** Спој payments + invoices → package meta + статус PAID → SUCCESS */
   private mergeInvoicesIntoPayments(payments: BillingRow[]): BillingRow[] {
-    // helper: cents -> euros
     const toEuros = (cents: any): number | null => {
       const n = Number(cents);
       return Number.isFinite(n) ? n / 100 : null;
@@ -419,36 +411,28 @@ export class BillingComponent implements OnInit {
       return {
         ...p,
         status: mappedStatus,
-
-        // 🔹 amount (payment) во евра
         amount: toEuros((p as any).amount),
-
-        // 🔹 package meta
         packageName: pkg?.name ?? '',
         packageCredits: pkg?.credits ?? (p as any)['packageCredits'],
-
-        // 🔹 package price во евра
         packagePrice: toEuros(
           pkg?.price ?? (p as any)['packagePrice']
         ),
-
         packageDiscountPercentage:
           pkg?.discountPercentage ??
           (p as any)['packageDiscountPercentage'],
-
         packageIsActive:
           pkg?.isActive ?? (p as any)['packageIsActive'] ?? false,
-
         packageCreatedAt: pkg?.createdAt ?? (p as any)['packageCreatedAt'],
         packageUpdatedAt: pkg?.updatedAt ?? (p as any)['packageUpdatedAt'],
       } as BillingRow;
     });
   }
 
-
   openInvoice(inv: InvoiceDto | null | undefined): void {
     if (!inv?.receiptUrl) {
-      this.toast.error('Invoice not available for this payment.');
+      this.toast.error(
+        this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PAYMENT')
+      );
       return;
     }
     window.open(inv.receiptUrl, '_blank', 'noopener');
@@ -457,5 +441,4 @@ export class BillingComponent implements OnInit {
   hasReceipt(inv: InvoiceDto): boolean {
     return inv.status === 'SUCCESS' && !!inv.receiptUrl;
   }
-
 }
