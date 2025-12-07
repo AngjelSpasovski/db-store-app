@@ -125,6 +125,18 @@
     margin-top: 0.5rem;
   }
 
+  /* скриен grid на мобилен, но сепак инстанциран за export */
+  .billing-grid-wrapper.grid-hidden {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
   /* ===== ag-Grid (desktop) – веќе добро средено, не го менуваме многу ===== */
   :host ::ng-deep .ag-theme-alpine {
     background-color: transparent;

@@ -441,4 +441,18 @@ export class BillingComponent implements OnInit, OnDestroy {
   hasReceipt(inv: InvoiceDto): boolean {
     return inv.status === 'SUCCESS' && !!inv.receiptUrl;
   }
+
+  downloadReceipt(row: BillingRow) {
+    const url = (row as any).receiptUrl;
+
+    if (!url) {
+      this.toast.error(
+        this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PAYMENT')
+      );
+      return;
+    }
+
+    window.open(url, '_blank', 'noopener');
+  }
+
 }

@@ -66,8 +66,8 @@
           </div>
         </div>
 
-        <!-- TABLE VIEW / COLUMNS GROUP -->
-        <div class="toolbar-section">
+        <!-- TABLE VIEW / COLUMNS GROUP – momentalno disabled -->
+        <div class="toolbar-section d-none d-md-flex">
           <span class="toolbar-label">
             {{ 'TABLE_VIEW' | translate:{ default:'Table view' } }}
           </span>
@@ -108,8 +108,8 @@
       </div>
     </div>
 
-    <!-- DESKTOP GRID -->
-    <div *ngIf="!isMobile" class="billing-grid-wrapper">
+    <!-- DESKTOP GRID (hidden on mobile, но постои за export) -->
+    <div class="billing-grid-wrapper" [class.grid-hidden]="isMobile">
       <ag-grid-angular
         [theme]="theme"
         [columnDefs]="columnDefs"
@@ -123,116 +123,115 @@
       </ag-grid-angular>
     </div>
 
-  <!-- MOBILE: accordion cards -->
-  <div *ngIf="isMobile" class="billing-mobile-list mt-3">
-    <div class="accordion" id="billingAccordion">
-      <div
-        class="accordion-item"
-        *ngFor="let row of rowData; let i = index">
-        <h2 class="accordion-header" [id]="'heading' + i">
-          <button
-            class="accordion-button collapsed mobile-acc-btn"
-            type="button"
-            data-bs-toggle="collapse"
-            [attr.data-bs-target]="'#collapse' + i"
-            aria-expanded="false"
-            [attr.aria-controls]="'collapse' + i">
 
-            <div class="acc-main-line">
-              <span class="acc-id">#{{ row.id }}</span>
-              <span class="acc-amount">
-                {{ row.amount | number:'1.0-0' }} €
-              </span>
-            </div>
-
-            <div class="acc-sub-line">
-              {{ row.timestamp | date:'MM/dd/yyyy, HH:mm' }}
-            </div>
-          </button>
-        </h2>
-
+    <!-- MOBILE: accordion cards -->
+    <div *ngIf="isMobile" class="billing-mobile-list mt-3">
+      <div class="accordion" id="billingAccordion">
         <div
-          [id]="'collapse' + i"
-          class="accordion-collapse collapse"
-          [attr.aria-labelledby]="'heading' + i"
-          data-bs-parent="#billingAccordion">
-          <div class="accordion-body">
+          class="accordion-item"
+          *ngFor="let row of rowData; let i = index">
+          <h2 class="accordion-header" [id]="'heading' + i">
+            <button
+              class="accordion-button collapsed mobile-acc-btn"
+              type="button"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#collapse' + i"
+              aria-expanded="false"
+              [attr.aria-controls]="'collapse' + i">
 
-            <div class="acc-row">
-              <span class="acc-label">
-                {{ 'PACKAGE_NAME' | translate }}
-              </span>
-              <span class="acc-value">
-                {{ row.packageName }}
-              </span>
-            </div>
-
-            <div class="acc-row">
-              <span class="acc-label">
-                {{ 'PACKAGE_CREDITS' | translate }}
-              </span>
-              <span class="acc-value">
-                {{ row.packageCredits }}
-              </span>
-            </div>
-
-            <div class="acc-row">
-              <span class="acc-label">
-                {{ 'PACKAGE_PRICE' | translate }}
-              </span>
-              <span class="acc-value">
-                {{ row.packagePrice | number:'1.0-0' }} €
-              </span>
-            </div>
-
-            <div class="acc-row">
-              <span class="acc-label">
-                {{ 'DISCOUNT_PERCENT' | translate }}
-              </span>
-              <span class="acc-value">
-                {{ row.packageDiscountPercentage }} %
-              </span>
-            </div>
-
-            <div class="acc-row">
-              <span class="acc-label">
-                {{ 'CREDITS' | translate }}
-              </span>
-              <span class="acc-value">
-                {{ row.credits }}
-              </span>
-            </div>
-
-            <div class="acc-row">
-              <span class="acc-label">
-                {{ 'STATUS' | translate }}
-              </span>
-              <span class="acc-value">
-                <span class="badge bg-success" *ngIf="row.status === 'SUCCESS'">
-                  {{ 'FILTER_SUCCESS' | translate }}
+              <div class="acc-main-line">
+                <span class="acc-id">#{{ row.id }}</span>
+                <span class="acc-amount">
+                  {{ row.amount | number:'1.0-0' }} €
                 </span>
-                <span class="badge bg-danger" *ngIf="row.status === 'FAILED'">
-                  {{ 'FILTER_FAILED' | translate }}
+              </div>
+
+              <div class="acc-sub-line">
+                {{ row.timestamp | date:'MM/dd/yyyy, HH:mm' }}
+              </div>
+            </button>
+          </h2>
+
+          <div
+            [id]="'collapse' + i"
+            class="accordion-collapse collapse"
+            [attr.aria-labelledby]="'heading' + i"
+            data-bs-parent="#billingAccordion">
+            <div class="accordion-body">
+
+              <div class="acc-row">
+                <span class="acc-label">
+                  {{ 'PACKAGE_NAME' | translate }}
                 </span>
-              </span>
-            </div>
+                <span class="acc-value">
+                  {{ row.packageName }}
+                </span>
+              </div>
 
-            <div class="acc-row acc-row-button">
-              <button
-                type="button"
-                class="btn btn-outline-light btn-sm"
-                (click)="openInvoiceFromRow(row)">
-                {{ 'INVOICE_DETAILS' | translate }}
-              </button>
-            </div>
+              <div class="acc-row">
+                <span class="acc-label">
+                  {{ 'PACKAGE_CREDITS' | translate }}
+                </span>
+                <span class="acc-value">
+                  {{ row.packageCredits }}
+                </span>
+              </div>
 
+              <div class="acc-row">
+                <span class="acc-label">
+                  {{ 'PACKAGE_PRICE' | translate }}
+                </span>
+                <span class="acc-value">
+                  {{ row.packagePrice | number:'1.0-0' }} €
+                </span>
+              </div>
+
+              <div class="acc-row">
+                <span class="acc-label">
+                  {{ 'DISCOUNT_PERCENT' | translate }}
+                </span>
+                <span class="acc-value">
+                  {{ row.packageDiscountPercentage }} %
+                </span>
+              </div>
+
+              <div class="acc-row">
+                <span class="acc-label">
+                  {{ 'CREDITS' | translate }}
+                </span>
+                <span class="acc-value">
+                  {{ row.credits }}
+                </span>
+              </div>
+
+              <div class="acc-row">
+                <span class="acc-label">
+                  {{ 'STATUS' | translate }}
+                </span>
+                <span class="acc-value">
+                  <span class="badge bg-success" *ngIf="row.status === 'SUCCESS'">
+                    {{ 'FILTER_SUCCESS' | translate }}
+                  </span>
+                  <span class="badge bg-danger" *ngIf="row.status === 'FAILED'">
+                    {{ 'FILTER_FAILED' | translate }}
+                  </span>
+                </span>
+              </div>
+
+              <div class="acc-row acc-row-button">
+                <button
+                  type="button"
+                  class="btn btn-outline-light btn-sm"
+                  (click)="downloadReceipt(row)">
+                  {{ 'DOWNLOAD' | translate:{ default:'Download' } }}
+                </button>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-
 
   </div>
 </section>
