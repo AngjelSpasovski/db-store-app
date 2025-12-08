@@ -7,8 +7,8 @@ import { AuthService } from '../../auth/auth.service';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-
+import { faUser, faUserCircle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { UserMenuSyncService } from '../../shared/user-menu-sync.service';
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -25,6 +25,7 @@ import { faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 export class HeaderComponent implements OnInit, OnDestroy {
   // icons
   public faSignOutAlt = faSignOutAlt;
+  public faUserCircle = faUserCircle;
 
   public viewMode: 'home' | 'login' | 'forgot-password' | 'reset-password' | 'user' | 'admin' = 'home';
   public isLoggedIn = false;
@@ -49,7 +50,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private auth: AuthService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private menuSync: UserMenuSyncService
   ) {}
 
   ngOnInit(): void {
@@ -73,6 +75,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.isLoggedIn  = !!user;
         this.userEmail   = user?.email ?? '';
         this.isSuperadmin = (user?.role?.toLowerCase() === 'superadmin');
+      });
+
+        this.menuSync.sidebarOpen$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(isSidebarOpen => {
+        // ако се отвори sidebar додека сме во USER view → затвори го user header менито
+        if (this.viewMode === 'user' && isSidebarOpen && this.isUserNavOpen) {
+          this.isUserNavOpen = false;
+          this.menuSync.setHeaderMenuOpen(false);
+        }
       });
   }
 
@@ -99,7 +111,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   // togglers
-  toggleUserNav()  { this.isUserNavOpen  = !this.isUserNavOpen; }
+  toggleUserNav()  {
+    this.isUserNavOpen  = !this.isUserNavOpen;
+    this.menuSync.setHeaderMenuOpen(this.isUserNavOpen);
+  }
   toggleHomeNav()  { this.isHomeNavOpen  = !this.isHomeNavOpen; }
   toggleAdminNav() { this.isAdminNavOpen = !this.isAdminNavOpen; }
 

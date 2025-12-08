@@ -1,33 +1,56 @@
+<!-- src/app/user/side-bar/side-bar.component.html -->
+
 <aside class="sidebar" [class.open]="isOpen" [class.closed]="!isOpen">
+  <!-- HEADER: toggle + user info (мало модерно картче) -->
   <div class="sidebar__header">
-    <button class="sidebar__toggle" (click)="toggle()">
-      <i class="fas" [ngClass]="isOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+    <button class="sidebar__toggle navbar-toggler" type="button" (click)="toggle()">
+      <fa-icon [icon]="isOpen ? faToggleOpen : faToggleClosed"></fa-icon>
     </button>
+
+    <div class="sidebar__profile" *ngIf="currentUser">
+      <div class="avatar">
+        {{ (currentUser.email || 'U')[0] | uppercase }}
+      </div>
+      <div class="info">
+        <div class="email" title="{{ currentUser.email }}">
+          {{ currentUser.email }}
+        </div>
+        <div class="role" *ngIf="currentUser.role">
+          {{ currentUser.role | uppercase }}
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- MAIN MENU -->
   <ul class="sidebar__menu">
-    <li *ngFor="let item of menuItems" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    <li *ngFor="let item of menuItems"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }">
       <a [routerLink]="item.route" (click)="onMenuItemClick()">
-        <span class="icon">{{ item.icon }}</span>
+        <fa-icon [icon]="item.icon" class="icon"></fa-icon>
         <span class="label" *ngIf="isOpen">{{ item.label | translate }}</span>
       </a>
     </li>
 
-    <!-- Credits indicator when closed -->
-    <li class="credits-indicator" *ngIf="!isOpen && (credits$ | async) as credits"
-      [attr.aria-label]="credits + ' credits'">
+    <!-- Credits indicator кога sidebar е затворен -->
+    <li class="credits-indicator"
+        *ngIf="!isOpen && (credits$ | async) as credits"
+        [attr.aria-label]="credits + ' credits'">
       <a>
-        <span class="icon">💰</span>
-        <span class="count">
-          {{ credits }}
-        </span>
+        <fa-icon [icon]="faCredits" class="icon"></fa-icon>
+        <span class="count">{{ credits }}</span>
       </a>
     </li>
   </ul>
 
-  <!-- footer со кредити -->
-  <div class="sidebar__footer px-3 py-2 small text-muted" *ngIf="credits$ | async as credits">
-    {{ 'Remaining Credits' | translate }}: {{ credits }}
+  <!-- FOOTER со кредити кога е отворен -->
+  <div class="sidebar__footer px-3 py-2 small text-muted"
+       *ngIf="isOpen && (credits$ | async) as credits">
+    <div class="footer-line">
+      <span>{{ 'Remaining Credits' | translate }}:</span>
+      <span class="value">{{ credits }}</span>
+    </div>
 
     <div *ngIf="credits === 0" class="mt-2">
       <a routerLink="/user/buy-credits" class="btn btn-secondary w-100" (click)="onMenuItemClick()">
@@ -37,4 +60,5 @@
   </div>
 </aside>
 
+<!-- Backdrop (се рендерира од user.component, ова останува како што беше ако го имаш) -->
 <div class="sidebar-backdrop" *ngIf="isMobile && isOpen" aria-hidden="true" role="presentation"></div>

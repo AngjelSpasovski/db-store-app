@@ -20,14 +20,13 @@ html,body,ion-app {
 }
 
 #content-wrap {
-    flex: 1 1 auto;
-    //height: 95vh;
-    overflow-y: hidden;
-    position: absolute;
-    top: 64px;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  flex: 1 1 auto;
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;     // ✅ ОВДЕ СЕ СКРОЛА ЦЕЛА APP
 }
 
 app-logout-warning {

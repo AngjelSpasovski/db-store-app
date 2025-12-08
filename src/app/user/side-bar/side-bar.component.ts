@@ -12,15 +12,33 @@ import {
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { AuthService } from 'src/app/auth/auth.service';
 import type { AuthUser } from 'src/app/auth/auth.service';
 import { CreditsService } from '../buy-credits/credit.service';
 
+// FontAwesome икони
+import {
+  faCartShopping,
+  faMagnifyingGlass,
+  faFileInvoiceDollar,
+  faCircleQuestion,
+  faUser,
+  faChevronLeft,
+  faBars,
+  faCoins,
+} from '@fortawesome/free-solid-svg-icons';
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterModule, CommonModule, TranslateModule],
+  imports: [
+    RouterModule,
+    CommonModule,
+    TranslateModule,
+    FontAwesomeModule,   // 👈 важно
+  ],
   templateUrl: './side-bar.component.html',
   styleUrls: ['./side-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,12 +60,18 @@ export class SidebarComponent implements OnInit {
   /** Stream со кредити од сервисот (се слуша со async pipe во template) */
   public credits$ = this.creditsSvc.credits$;
 
+  // FontAwesome icons за toggle и кредити
+  public faToggleOpen = faChevronLeft;
+  public faToggleClosed = faBars;
+  public faCredits = faCoins;
+
+  // Менито – веќе не се emoji, туку FontAwesome објекти
   public menuItems = [
-    { label: 'BUY_CREDITS', icon: '🛒', route: '/user/buy-credits' },
-    { label: 'SEARCH', icon: '🔍', route: '/user/new-research' },
-    { label: 'BILLING', icon: '💳', route: '/user/billing' },
-    { label: 'FAQS', icon: '❓', route: '/user/faqs' },
-    { label: 'ACCOUNT', icon: '👤', route: '/user/account' },
+    { label: 'BUY_CREDITS', icon: faCartShopping,     route: '/user/buy-credits' },
+    { label: 'SEARCH',      icon: faMagnifyingGlass,  route: '/user/new-research' },
+    { label: 'BILLING',     icon: faFileInvoiceDollar,route: '/user/billing' },
+    { label: 'FAQS',        icon: faCircleQuestion,   route: '/user/faqs' },
+    { label: 'ACCOUNT',     icon: faUser,             route: '/user/account' },
   ];
 
   constructor(
@@ -56,13 +80,9 @@ export class SidebarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Влечи кредити на влегување во апликацијата
     this.creditsSvc.refreshFromApi();
-
-    // Корисник за header делот
     this.currentUser = this.auth.getCurrentUser();
 
-    // initial state за мобилно/desktop
     this.isMobile = window.innerWidth < 992;
     if (this.isMobile) {
       this.isOpen = false;

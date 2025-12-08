@@ -64,16 +64,18 @@
   </div>
 
   <!-- USER VIEW -->
-  <nav *ngIf="viewMode === 'user'" class="navbar navbar-expand-lg navbar-dark w-100 bg-dark">
+  <nav *ngIf="viewMode === 'user'"
+        class="navbar navbar-expand-lg navbar-dark w-100 bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand">DBStore</a>
 
       <!-- Angular-only toggler -->
       <button class="navbar-toggler"
-              type="button"
-              (click)="isUserNavOpen = !isUserNavOpen"
-              [attr.aria-expanded]="isUserNavOpen">
-        <span class="navbar-toggler-icon"></span>
+        type="button"
+        (click)="toggleUserNav()"
+        [attr.aria-expanded]="isUserNavOpen">
+
+              <fa-icon [icon]="faUserCircle"></fa-icon>
       </button>
 
       <div id="userNavbarContent"

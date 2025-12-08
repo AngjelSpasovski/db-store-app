@@ -1,6 +1,15 @@
+<!-- src/app/user/user.component.html -->
+
 <!-- Mobile “hamburger” only when sidebar closed -->
-<nav class="mobile-nav bg-dark" *ngIf="isMobile && !sidebarIsOpen">
-  <button class="btn" (click)="sidebarIsOpen = true"><i class="fa-solid fa-arrows-turn-right"></i></button>
+<nav class="mobile-nav navbar navbar-dark bg-dark"
+     *ngIf="isMobile && !sidebarIsOpen">
+
+  <button class="navbar-toggler"
+          type="button"
+          (click)="sidebarIsOpen = true">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
 </nav>
 
 <!-- Updated sidebar binding -->

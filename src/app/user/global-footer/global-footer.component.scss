@@ -1,3 +1,5 @@
+// src/app/user/global-footer/global-footer.component.scss
+
 $dark:       #222428;
 $darker:     #1e1e1e;
 $light:      #ffffff;
@@ -7,22 +9,21 @@ $primary-blue: #00509e;
 $primary-blue-light: #00a8ff;
 $purple: #6262b2;
 
-
 .global-footer {
-  color: var(--light);
+  color: $light;
   text-align: center;
   padding: 0.5rem;
 
   .footer-nav {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    font-size: 0.9rem;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    justify-content: center;
 
-    a {
-      color: var(--light);
+    .privacy-btn {
+      color: $light;
       text-decoration: none;
-      transition: text-decoration 0.2s;
 
       &:hover,
       &.active {
@@ -32,3 +33,4 @@ $purple: #6262b2;
     }
   }
 }
+
