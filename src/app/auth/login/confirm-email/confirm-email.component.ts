@@ -1,16 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';      
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RouterModule } from '@angular/router';      
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
   selector: 'app-confirm-email',
   imports: [
-    CommonModule, 
-    RouterModule
-  ],             
+    CommonModule,
+    RouterModule,
+    TranslateModule
+  ],
   templateUrl: './confirm-email.component.html',
   styleUrls: ['./confirm-email.component.scss']
 })
@@ -21,7 +23,8 @@ export class ConfirmEmailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {

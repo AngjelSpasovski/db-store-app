@@ -436,7 +436,7 @@
                      [attr.aria-describedby]="signupSubmitted && signupForm.get('privacyPolicy')?.invalid ? 'privacyPolicyErr' : null" />
               <label class="form-check-label" for="privacyPolicy">
                 {{ 'ACCEPT_TERMS_1' | translate }}
-                <a href="../../../assets/privacy/privacy-policy/privacy-policy-IT.pdf"
+                <a [href]="privacyPolicyUrl"
                    target="_blank"
                    rel="noopener noreferrer">
                   {{ 'PRIVACY_POLICY' | translate }}
@@ -511,8 +511,14 @@
         </div>
 
         <!-- Submit -->
-        <button type="submit" class="btn btn-primary w-100 mt-2">
-          {{ 'SIGNUP' | translate }}
+        <button type="submit" class="btn btn-primary w-100 mt-2" [disabled]="signupForm.invalid || signupInProgress">
+          <ng-container *ngIf="!signupInProgress; else suLoading">
+            {{ 'SIGNUP' | translate }}
+          </ng-container>
+          <ng-template #suLoading>
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            {{ 'SIGNING_UP' | translate:{ default:'Signing up...' } }}
+          </ng-template>
         </button>
       </form>
 

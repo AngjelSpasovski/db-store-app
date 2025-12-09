@@ -8,7 +8,7 @@
     </div>
     <div *ngSwitchCase="'fail'" class="text-danger">
       <p>{{ message }}</p>
-      <a routerLink="/login" [queryParams]="{ tab: 'login' }">Back to Login</a>
+      <a routerLink="/login" [queryParams]="{ tab: 'login' }">{{ 'BACK_LOGIN' | translate }}</a>
     </div>
   </ng-container>
 </div>

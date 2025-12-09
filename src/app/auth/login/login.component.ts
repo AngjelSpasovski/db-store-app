@@ -167,6 +167,20 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
+  get privacyPolicyUrl(): string {
+    const lang = (this.translate.currentLang || 'en').toLowerCase();
+
+    switch (lang) {
+      case 'it':
+        return 'assets/privacy/privacy-policy/privacy-policy-IT.pdf';
+      case 'mk':
+        return 'assets/privacy/privacy-policy/privacy-policy-MK.pdf';
+      case 'en':
+      default:
+        return 'assets/privacy/privacy-policy/privacy-policy-EN.pdf';
+    }
+  }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
@@ -271,6 +285,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    this.signupInProgress = true;
+
     const v = this.signupForm.value;
     const stateOrNation = v.state; // за сега исто поле
 
@@ -318,17 +334,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     // 4) Backend sign-up (JSON)
     this.auth.signUp(payload).subscribe({
       next: async () => {
-        // побарај backend да прати верификациски е-мејл
-        const v = this.signupForm.value;
-        this.auth.confirmEmailSend(v.email).subscribe({
-          next: () => console.log('Confirm e-mail sent'),
-          error: (e) => console.warn('Confirm e-mail send failed (ignored):', e)
-        });
-
-        // 🔔 инфо-тост: кажи му на корисникот што следува
         this.toast.info(this.translate.instant('EMAIL_NOT_VERIFIED_INFO'), { position: 'top-end' });
 
         await this.handleEmailStepAndGoLogin();
+        this.signupInProgress = false;
       },
       error: (err) => {
         this.signupInProgress = false;
