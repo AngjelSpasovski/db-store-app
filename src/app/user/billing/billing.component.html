@@ -147,7 +147,7 @@
               </div>
 
               <div class="acc-sub-line">
-                {{ row.timestamp | date:'MM/dd/yyyy, HH:mm' }}
+                {{ row.timestamp | date:'dd/MM/yyyy, HH:mm' }}
               </div>
             </button>
           </h2>
@@ -218,12 +218,10 @@
                 </span>
               </div>
 
-              <div class="acc-row acc-row-button">
-                <button
-                  type="button"
-                  class="btn btn-outline-light btn-sm"
-                  (click)="downloadReceipt(row)">
-                  {{ 'DOWNLOAD' | translate:{ default:'Download' } }}
+              <div class="acc-row acc-row-button d-flex gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm w-100"
+                  (click)="downloadInvoiceCsv(row)">
+                  {{ 'INVOICE' | translate:{ default:'Invoice' } }}
                 </button>
               </div>
 

@@ -22,19 +22,21 @@ import { BillingApi, BillingRow } from '../../shared/billing.api';
 import { InvoiceApi, InvoiceDto } from '../../shared/invoice.api';
 import { forkJoin, Subscription } from 'rxjs';
 
+import { DatePipe } from '@angular/common';
+
 interface ColumnChooserItem {
   id: string;
   label: string;
   visible: boolean;
   lock?: boolean;
 }
-
 @Component({
   selector: 'app-billing',
   standalone: true,
   templateUrl: './billing.component.html',
   styleUrls: ['./billing.component.scss'],
   imports: [CommonModule, TranslateModule, AgGridModule],
+  providers: [DatePipe]
 })
 export class BillingComponent implements OnInit, OnDestroy {
   private billingApi = inject<BillingApi>(BILLING_API);
@@ -78,7 +80,8 @@ export class BillingComponent implements OnInit, OnDestroy {
   constructor(
     private translate: TranslateService,
     private toast: ToastService,
-    private invoiceApi: InvoiceApi
+    private invoiceApi: InvoiceApi,
+    private datePipe: DatePipe
   ) {}
 
   @HostListener('window:resize')
@@ -214,28 +217,34 @@ export class BillingComponent implements OnInit, OnDestroy {
         headerName: this.translate.instant('ID_NUMBER'),
         minWidth: 120,
       },
+
       {
         field: 'timestamp',
         colId: 'timestamp',
         headerName: this.translate.instant('TIMESTAMP'),
         filter: 'agDateColumnFilter',
         valueFormatter: (p: any) =>
-          p.value ? new Date(p.value).toLocaleString() : '',
+          p.value
+            ? this.datePipe.transform(p.value, 'dd/MM/yyyy, HH:mm') ?? ''
+            : '',
         sort: 'desc',
         minWidth: 190,
       },
+
       {
         field: 'packageName',
         colId: 'packageName',
         headerName: this.translate.instant('PACKAGE_NAME'),
         minWidth: 140,
       },
+
       {
         field: 'packageCredits',
         colId: 'packageCredits',
         headerName: this.translate.instant('PACKAGE_CREDITS'),
         minWidth: 120,
       },
+
       {
         field: 'packagePrice',
         colId: 'packagePrice',
@@ -249,12 +258,14 @@ export class BillingComponent implements OnInit, OnDestroy {
                 maximumFractionDigits: 0,
               })} €`,
       },
+
       {
         field: 'packageDiscountPercentage',
         colId: 'packageDiscountPercentage',
         headerName: this.translate.instant('DISCOUNT_PERCENT'),
         minWidth: 110,
       },
+
       {
         field: 'packageIsActive',
         colId: 'packageIsActive',
@@ -265,28 +276,36 @@ export class BillingComponent implements OnInit, OnDestroy {
             ? '<span class="text-success">✔</span>'
             : '<span class="text-muted">✖</span>',
       },
+
       {
         field: 'packageCreatedAt',
         colId: 'packageCreatedAt',
         headerName: this.translate.instant('PACKAGE_CREATED_AT'),
         minWidth: 130,
         valueFormatter: (p: any) =>
-          p.value ? new Date(p.value).toLocaleDateString() : '',
+          p.value
+            ? this.datePipe.transform(p.value, 'dd/MM/yyyy') ?? ''
+            : '',
       },
+
       {
         field: 'packageUpdatedAt',
         colId: 'packageUpdatedAt',
         headerName: this.translate.instant('PACKAGE_UPDATED_AT'),
         minWidth: 130,
         valueFormatter: (p: any) =>
-          p.value ? new Date(p.value).toLocaleDateString() : '',
+          p.value
+            ? this.datePipe.transform(p.value, 'dd/MM/yyyy') ?? ''
+            : '',
       },
+
       {
         field: 'credits',
         colId: 'credits',
         headerName: this.translate.instant('CREDITS'),
         minWidth: 100,
       },
+
       {
         field: 'amount',
         colId: 'amount',
@@ -300,6 +319,7 @@ export class BillingComponent implements OnInit, OnDestroy {
                 maximumFractionDigits: 0,
               })} €`,
       },
+
       {
         field: 'status',
         colId: 'status',
@@ -327,49 +347,28 @@ export class BillingComponent implements OnInit, OnDestroy {
           return `<span class="${cls}">${text}</span>`;
         },
       },
+
       {
-        headerName: this.translate.instant('RECEIPT'),
-        field: 'receiptUrl',
-        colId: 'receiptUrl',
-        minWidth: 140,
+        headerName: this.translate.instant('INVOICE'),
+        field: 'id',
+        colId: 'invoiceCsv',
+        minWidth: 150,
         sortable: false,
         filter: false,
-        cellRenderer: (params: any) => {
-          const url: string | null = params.data?.receiptUrl;
-          const status: string = params.data?.status;
-
-          const btnLabel = this.translate.instant('DOWNLOAD');
-
-          if (!url) {
-            if (status === 'SUCCESS') {
-              return `
-                <button class="btn btn-sm btn-secondary ag-btn-download" disabled>
-                  ${btnLabel}
-                </button>
-              `;
-            }
-            return `<span class="text-muted">N/A</span>`;
-          }
-
+        cellRenderer: () => {
+          const label = this.translate.instant('DOWNLOAD');
           return `
-            <button class="btn btn-sm btn-outline-light ag-btn-download"
-                    data-url="${url}">
-              ${btnLabel}
+            <button class="btn btn-sm btn-outline-secondary ag-btn-invoice">
+              ${label}
             </button>
           `;
         },
-
         onCellClicked: (params: any) => {
-          let target = params.event?.target as HTMLElement | null;
-          while (target && !target.dataset['url']) {
-            target = target.parentElement;
-          }
-          const url = target?.dataset['url'];
-          if (url) {
-            window.open(url, '_blank', 'noopener');
-          }
+          const row = params.data as BillingRow;
+          this.downloadInvoiceCsv(row);
         },
       },
+
     ];
 
     this.columnChooser = this.columnDefs.map((c) => ({
@@ -454,5 +453,79 @@ export class BillingComponent implements OnInit, OnDestroy {
 
     window.open(url, '_blank', 'noopener');
   }
+
+    // === SINGLE INVOICE CSV DOWNLOAD ===
+    downloadInvoiceCsv(row: BillingRow): void {
+      if (!row) {
+        return;
+      }
+
+      // ако сакаш да дозволиш само за SUCCESS
+      if (row.status !== 'SUCCESS') {
+        this.toast.error(
+          this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PAYMENT')
+        );
+        return;
+      }
+
+      const invoiceId = row.id ?? '';
+      const createdAt = row.timestamp
+        ? new Date(row.timestamp).toISOString()
+        : '';
+
+      const csvHeader = [
+        'invoiceNumber',
+        'date',
+        'packageName',
+        'packageCredits',
+        'packagePriceEur',
+        'discountPercent',
+        'creditsPurchased',
+        'amountPaidEur',
+        'status',
+        'stripeSessionId',
+        'stripeReceiptUrl',
+      ];
+
+      const csvRow = [
+        `INV-${invoiceId}`,
+        createdAt,
+        row.packageName ?? '',
+        String(row.packageCredits ?? ''),
+        String(row.packagePrice ?? ''),
+        String(row.packageDiscountPercentage ?? ''),
+        String(row.credits ?? ''),
+        String(row.amount ?? ''),
+        row.status ?? '',
+        (row as any).stripeSessionId ?? '',
+        (row as any).receiptUrl ?? '',
+      ];
+
+      const allRows = [csvHeader, csvRow];
+
+      const csv = allRows
+        .map((r) =>
+          r
+            .map((v) =>
+              `"${String(v ?? '')
+                .replace(/"/g, '""')
+                .trim()}"`
+            )
+            .join(',')
+        )
+        .join('\r\n');
+
+      const blob = new Blob([csv], {
+        type: 'text/csv;charset=utf-8;',
+      });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `invoice-${invoiceId}.csv`;
+      link.click();
+
+      URL.revokeObjectURL(url);
+    }
 
 }

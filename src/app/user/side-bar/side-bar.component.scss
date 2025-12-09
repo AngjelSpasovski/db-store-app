@@ -30,7 +30,8 @@ $header-total-height-margin: 70px;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    //border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 18px rgba(0, 0, 0, .55);
 
     .email {
       cursor: pointer;
@@ -165,7 +166,8 @@ $header-total-height-margin: 70px;
     font-size: 0.8rem;
     color: $light !important;
     background: $darker;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    //border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 18px rgba(0, 0, 0, .55);
 
     .footer-line {
       display: flex;

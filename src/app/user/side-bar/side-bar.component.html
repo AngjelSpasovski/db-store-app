@@ -16,7 +16,7 @@
           {{ currentUser.email }}
         </div>
         <div class="role" *ngIf="currentUser.role">
-          {{ currentUser.role | uppercase }}
+          {{ (currentUser.role | uppercase) | translate  }}
         </div>
       </div>
     </div>
@@ -48,7 +48,7 @@
   <div class="sidebar__footer px-3 py-2 small text-muted"
        *ngIf="isOpen && (credits$ | async) as credits">
     <div class="footer-line">
-      <span>{{ 'Remaining Credits' | translate }}:</span>
+      <span>{{ 'REMAINING_CREDITS' | translate }}:</span>
       <span class="value">{{ credits }}</span>
     </div>
 

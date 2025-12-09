@@ -6,29 +6,34 @@
     <div *ngIf="loadingPackages" class="packages-state text-center py-5">
       <div class="spinner-border" role="status"></div>
       <div class="mt-2 small text-muted">
-        Loading credit packages...
+        {{ 'LOADING_CREDIT_PACKAGES' | translate:{ default:'Loading credit packages...' } }}
       </div>
     </div>
 
     <!-- Error -->
-    <div *ngIf="!loadingPackages && packagesError" class="packages-state text-center py-5 text-danger">
+    <div
+      *ngIf="!loadingPackages && packagesError"
+      class="packages-state text-center py-5 text-danger">
       {{ packagesError }}
     </div>
 
     <!-- Empty -->
-    <div *ngIf="!loadingPackages && !packagesError && packages.length === 0" class="packages-state text-center py-5">
-      No credit packages are available at the moment.
+    <div
+      *ngIf="!loadingPackages && !packagesError && packages.length === 0"
+      class="packages-state text-center py-5">
+      {{ 'NO_CREDIT_PACKAGES_AVAILABLE' | translate:{ default:'No credit packages are available at the moment.' } }}
       <br />
-      Please try again later or contact support.
+      {{ 'TRY_LATER_OR_CONTACT_SUPPORT' | translate:{ default:'Please try again later or contact support.' } }}
     </div>
 
     <!-- Cards -->
-    <div *ngIf="!loadingPackages && !packagesError && packages.length > 0" class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+    <div
+      *ngIf="!loadingPackages && !packagesError && packages.length > 0"
+      class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
 
       <div class="col" *ngFor="let pkg of packages; trackBy: trackByPkg">
         <div class="card acc-card credit-card h-100">
           <div class="card-header">
-            <!-- можеш да прикажеш цена поубаво, пример: -->
             {{ pkg.price | number:'1.0-0' }}€
           </div>
 
@@ -42,11 +47,11 @@
             <!-- Badge за тест/production -->
             <div class="mb-3">
               <span *ngIf="environment.production; else testMode" class="mode-pill">
-                One-time purchase
+                {{ 'ONE_TIME_PURCHASE' | translate:{ default:'One-time purchase' } }}
               </span>
               <ng-template #testMode>
                 <span class="mode-pill mode-pill-test">
-                  Stripe test mode
+                  {{ 'STRIPE_TEST_MODE' | translate:{ default:'Stripe test mode' } }}
                 </span>
               </ng-template>
             </div>
@@ -57,13 +62,16 @@
               (click)="purchase(pkg)">
 
               <ng-container *ngIf="loadingId!==pkg.id; else loadingTpl">
-                {{ canBuy(pkg) ? 'Buy now' : 'Not available' }}
+                {{ canBuy(pkg)
+                    ? ('BUY_NOW' | translate:{ default:'Buy now' })
+                    : ('NOT_AVAILABLE' | translate:{ default:'Not available' })
+                }}
               </ng-container>
 
               <ng-template #loadingTpl>
                 <span class="d-inline-flex align-items-center gap-2">
                   <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  Processing...
+                  {{ 'PROCESSING' | translate:{ default:'Processing...' } }}
                 </span>
               </ng-template>
             </button>

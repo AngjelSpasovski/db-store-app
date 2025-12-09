@@ -141,11 +141,23 @@ export class AccountComponent implements OnInit {
     if (password?.trim()?.length >= 8) body.password = password.trim();
 
     this.api.updateMe(body)
-      .pipe(finalize(() => (this.saving = false)))
-      .subscribe({
-        next: () => { this.toast.success('Profile updated', { position: 'top-end' }); this.editMode = false; this.refresh(); },
-        error: () => this.toast.error('Update failed', { position: 'top-end' })
-      });
+    .pipe(finalize(() => (this.saving = false)))
+    .subscribe({
+      next: () => {
+        this.toast.success(
+          this.translate.instant('PROFILE_UPDATED'),
+          { position: 'top-end' }
+        );
+        this.editMode = false;
+        this.refresh();
+      },
+      error: () => {
+        this.toast.error(
+          this.translate.instant('PROFILE_UPDATE_FAILED'),
+          { position: 'top-end' }
+        );
+      }
+    });
   }
 
   private matchIfProvided(pwdKey: string, confirmKey: string) {
@@ -174,11 +186,14 @@ export class AccountComponent implements OnInit {
         next: d => {
           this.data = d;
           this.credits$ = this.creditsSvc.credits$;
-          console.log(this.credits$);
         },
-        error: () => this.toast.error('Failed to load account details', { position: 'top-end' })
+        error: () => this.toast.error(
+          this.translate.instant('ACCOUNT_DETAILS_LOAD_FAILED'),
+          { position: 'top-end' }
+        )
       });
   }
+
 
   /**
  * Го враќа најновиот SUCCESS invoice за даден packageId (ако постои и има receiptUrl).
@@ -201,7 +216,9 @@ export class AccountComponent implements OnInit {
 
   openInvoice(inv: InvoiceDto | null | undefined): void {
     if (!inv?.receiptUrl) {
-      this.toast.error('Invoice not available for this package.');
+      this.toast.error(
+        this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PACKAGE')
+      );
       return;
     }
     window.open(inv.receiptUrl, '_blank', 'noopener');

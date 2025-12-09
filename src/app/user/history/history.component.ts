@@ -8,7 +8,7 @@ import {
   HostListener,
   Inject,
 } from '@angular/core';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule, DOCUMENT, DatePipe } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AgGridModule } from 'ag-grid-angular';
 import { Subscription } from 'rxjs';
@@ -33,6 +33,7 @@ import { ToastService } from '../../shared/toast.service';
   standalone: true,
   imports: [CommonModule, TranslateModule, AgGridModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [DatePipe]
 })
 export class HistoryComponent implements OnInit, OnDestroy {
   public theme = themeAlpine.withParams({
@@ -72,7 +73,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private dataReqApi: DataRequestApi,
     private toasts: ToastService,
-    @Inject(DOCUMENT) private doc: Document
+    @Inject(DOCUMENT) private doc: Document,
+    private datePipe: DatePipe
   ) {}
 
   ngOnInit(): void {
@@ -113,13 +115,17 @@ export class HistoryComponent implements OnInit, OnDestroy {
         field: 'createdAt',
         headerName: this.translate.instant('CREATED_AT'),
         valueFormatter: (p: ValueFormatterParams) =>
-          p.value ? new Date(p.value as string).toLocaleString() : '',
+          p.value
+            ? this.datePipe.transform(p.value as string, 'dd/MM/yyyy, HH:mm') ?? ''
+            : '',
       },
       {
         field: 'expiredAt',
         headerName: this.translate.instant('EXPIRES_AT'),
         valueFormatter: (p: ValueFormatterParams) =>
-          p.value ? new Date(p.value as string).toLocaleString() : '',
+          p.value
+            ? this.datePipe.transform(p.value as string, 'dd/MM/yyyy, HH:mm') ?? ''
+            : '',
       },
       {
         headerName: this.translate.instant('ACTIONS'),

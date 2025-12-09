@@ -1,7 +1,7 @@
 // src/app/user/buy-credits/buy-credits.component.ts
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../shared/toast.service';
 
 import { AuthService, AuthUser } from '../../auth/auth.service';
@@ -38,17 +38,24 @@ export class BuyCreditsComponent implements OnInit {
     private toast: ToastService,
     private creditsSvc: CreditsService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
   public ngOnInit(): void {
     const qp = new URLSearchParams(window.location.search);
 
     if (qp.get('canceled') === '1') {
-      this.toast.info('Payment canceled.', { position: 'top-end' });
+      this.toast.info(
+        this.translate.instant('PAYMENT_CANCELED'),
+        { position: 'top-end' }
+      );
     }
 
     if (qp.get('success') === '1') {
-      this.toast.success('Payment completed successfully.', { position: 'top-end' });
+      this.toast.success(
+        this.translate.instant('PAYMENT_COMPLETED_SUCCESSFULLY'),
+        { position: 'top-end' }
+      );
       this.creditsSvc.refreshFromApi();
     }
 
@@ -73,10 +80,13 @@ export class BuyCreditsComponent implements OnInit {
       error: () => {
         this.packages = [];
         this.loadingPackages = false;
-        this.packagesError = 'We could not load credit packages at the moment. Please try again later.';
+        this.packagesError = this.translate.instant(
+          'CREDIT_PACKAGES_LOAD_FAILED'
+        );
         this.cdr.markForCheck();           // OnPush
       }
     });
+
   }
 
   public trackByPkg = (_: number, pkg: CreditPackage) => pkg.id;
