@@ -204,26 +204,37 @@
 
     <!-- Statistics Section -->
     <section id="statistics" class="statistics-container py-5 section-scroll bg-dark">
-        <div class="container numbers">
-            <div class="row text-center">
-                <div class="col-md-3">
-                    <span class="stat-number">13+</span>
-                    <h4 class="my-3">{{ 'REGISTERED_USERS' | translate }}</h4>
-                </div>
-                <div class="col-md-3">
-                    <span class="stat-number">75+</span>
-                    <h4 class="my-3">{{ 'DOWNLOAD_COMPLETED' | translate }}</h4>
-                </div>
-                <div class="col-md-3">
-                    <span class="stat-number">24+</span>
-                    <h4 class="my-3">{{ 'SOFTWARE_UPDATES' | translate }}</h4>
-                </div>
-                <div class="col-md-3">
-                    <span class="stat-number">6+</span>
-                    <h4 class="my-3">{{ 'INTEGRATION_PARTNERS' | translate }}</h4>
-                </div>
+      <div class="container numbers">
+        <div class="row text-center">
+          <div class="col-md-3">
+            <div class="stat-card">
+              <span class="stat-number" data-target="13">0+</span>
+              <h4 class="my-3">{{ 'REGISTERED_USERS' | translate }}</h4>
             </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="stat-card">
+              <span class="stat-number" data-target="75">0+</span>
+              <h4 class="my-3">{{ 'DOWNLOAD_COMPLETED' | translate }}</h4>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="stat-card">
+              <span class="stat-number" data-target="24">0+</span>
+              <h4 class="my-3">{{ 'SOFTWARE_UPDATES' | translate }}</h4>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="stat-card">
+              <span class="stat-number" data-target="6">0+</span>
+              <h4 class="my-3">{{ 'INTEGRATION_PARTNERS' | translate }}</h4>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Showcase Section -->

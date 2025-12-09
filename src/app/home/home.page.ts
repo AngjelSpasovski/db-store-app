@@ -10,8 +10,8 @@ import { filter } from 'rxjs/operators';
   selector: 'app-home',
   standalone: true,
   imports: [
-    IonicModule, 
-    CommonModule, 
+    IonicModule,
+    CommonModule,
     TranslateModule
   ],
   templateUrl: './home.page.html',
@@ -29,7 +29,7 @@ export class HomePage implements OnInit, OnDestroy {
     street:   'ADDRESS_NAME',
     city:     'CITY_NAME',
     state:    'STATE_NAME',
-    zip:      '1000', 
+    zip:      '1000',
     phone:    '+389 71 311 127',
     email:    'contact@dbstore.online',
     email2:   'info@dbstore.online',
@@ -59,13 +59,13 @@ export class HomePage implements OnInit, OnDestroy {
       });
     }, { threshold: 0.2 });
 
-    document.querySelectorAll('.section_scroll').forEach((el) => {
+    document.querySelectorAll('.section-scroll').forEach((el) => {
       observer.observe(el);
     });
   }
 
   ngAfterViewInit(){
-    const sections = document.querySelectorAll('.section_scroll');
+    const sections = document.querySelectorAll('.section-scroll');
     sections.forEach((section) => {
       section.classList.add('section-visible');
     });
@@ -103,8 +103,36 @@ export class HomePage implements OnInit, OnDestroy {
         });
       });
     }, { root, threshold: 0.5 });
+
     document.querySelectorAll<HTMLElement>('.section-scroll').forEach(sec => sectionObserver.observe(sec));
     this.obsSubs.push(sectionObserver);
+
+    this.obsSubs.push(animateObserver);
+    this.obsSubs.push(sectionObserver);
+
+    // === Statistics count-up observer ===
+    const statsObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+
+        const card = entry.target as HTMLElement;
+        const nums = card.querySelectorAll<HTMLElement>('.stat-number');
+
+        nums.forEach(el => {
+          const target = Number(el.dataset['target'] || '0');
+          this.animateNumber(el, target);
+        });
+
+        // еднаш по card
+        statsObserver.unobserve(card);
+      });
+    }, { root, threshold: 0.6 });
+
+    document
+      .querySelectorAll<HTMLElement>('#statistics .stat-card')
+      .forEach(card => statsObserver.observe(card));
+
+    this.obsSubs.push(statsObserver);
   }
 
   public scrollToSection(id: string, ev: Event): void {
@@ -112,7 +140,7 @@ export class HomePage implements OnInit, OnDestroy {
 
     const root = document.getElementById('content-wrap');         // Get the root element for scrolling
     const sec = document.getElementById(id);                      // Get the target section element by ID
-    
+
     if (!root || !sec) return;                                    // If root or section is not found, exit
 
     sec.scrollIntoView({ behavior: 'smooth', block: 'start' });   // Scroll to the section smoothly
@@ -133,4 +161,25 @@ export class HomePage implements OnInit, OnDestroy {
     sessionStorage.clear();
     this.router.navigate(['/home']);
   }
+
+  private animateNumber(el: HTMLElement, target: number) {
+    const duration = 1400; // ms
+    let start: number | null = null;
+
+    const step = (timestamp: number) => {
+      if (start === null) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      const value = Math.floor(progress * target);
+      el.textContent = `${value}+`;
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = `${target}+`;
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
 }
