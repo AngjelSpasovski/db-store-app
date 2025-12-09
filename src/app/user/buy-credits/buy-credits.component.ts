@@ -1,5 +1,5 @@
 // src/app/user/buy-credits/buy-credits.component.ts
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef  } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostListener   } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../shared/toast.service';
@@ -41,6 +41,14 @@ export class BuyCreditsComponent implements OnInit {
     private translate: TranslateService,
   ) {}
 
+  @HostListener('window:pageshow', ['$event'])
+  onPageShow(_event: PageTransitionEvent) {
+    // Кога се враќаме од Stripe со browser Back,
+    // осигурај се дека нема повеќе "PROCESSING..." блокирани копчиња
+    this.loadingId = null;
+    this.cdr.markForCheck();
+  }
+
   public ngOnInit(): void {
     const qp = new URLSearchParams(window.location.search);
 
@@ -62,6 +70,9 @@ export class BuyCreditsComponent implements OnInit {
     if (qp.has('canceled') || qp.has('success')) {
       history.replaceState({}, '', window.location.pathname);
     }
+
+    // за секој случај – и на fresh load да е null
+    this.loadingId = null;
 
     this.creditsSvc.refreshFromApi();
     this.loadPackagesFromBackend();
