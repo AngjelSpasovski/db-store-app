@@ -76,7 +76,7 @@ export class AccountComponent implements OnInit {
   private loadInvoices(): void {
     this.invoiceApi.listMyInvoices().subscribe({
       next: (list) => {
-        this.invoices = list || [];
+        this.invoices = list ?? [];
       },
       error: (err) => {
         console.error('Failed to load invoices', err);

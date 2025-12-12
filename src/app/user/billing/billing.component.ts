@@ -19,10 +19,19 @@ import { ToastService } from '../../shared/toast.service';
 import { BILLING_API } from '../../shared/tokens.api';
 import { BillingApi, BillingRow } from '../../shared/billing.api';
 
-import { InvoiceApi, InvoiceDto } from '../../shared/invoice.api';
+import {
+  InvoiceApi,
+  InvoiceDto,
+  InvoiceBillingDetails,
+  InvoicesResponse
+} from '../../shared/invoice.api';
+
 import { forkJoin, Subscription } from 'rxjs';
 
 import { DatePipe } from '@angular/common';
+
+import { UserService } from '../user.service';
+import { InvoicePdfService } from '../../shared/invoice-pdf.service';
 
 interface ColumnChooserItem {
   id: string;
@@ -58,6 +67,8 @@ export class BillingComponent implements OnInit, OnDestroy {
   private invoices: InvoiceDto[] = [];
   private invoiceBySession = new Map<string, InvoiceDto>();
 
+  private billingDetails: InvoiceBillingDetails | null = null;
+
   selectedRow: BillingRow | null = null;
 
   private langSub?: Subscription;
@@ -81,7 +92,9 @@ export class BillingComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private toast: ToastService,
     private invoiceApi: InvoiceApi,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private invoicePdfService: InvoicePdfService,
+    private userApi: UserService,
   ) {}
 
   @HostListener('window:resize')
@@ -111,9 +124,12 @@ export class BillingComponent implements OnInit, OnDestroy {
     forkJoin({
       payments: this.billingApi.listMyPayments(),
       invoices: this.invoiceApi.listMyInvoices(),
+      details: this.userApi.getMeDetails(),
     }).subscribe({
-      next: ({ payments, invoices }) => {
+      next: ({ payments, invoices, details }) => {
         this.invoices = invoices ?? [];
+        this.billingDetails = (details as any)?.user?.billingDetails ?? null;
+
         this.buildInvoiceMap();
 
         this.allRows = this
@@ -124,13 +140,12 @@ export class BillingComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Failed to load billing data', err);
-        this.toast.error(
-          this.translate.instant('BILLING_HISTORY_LOAD_FAILED')
-        );
+        this.toast.error(this.translate.instant('BILLING_HISTORY_LOAD_FAILED'));
         this.allRows = [];
         this.applyFilter();
       },
     });
+
   }
 
   ngOnDestroy(): void {
@@ -365,7 +380,7 @@ export class BillingComponent implements OnInit, OnDestroy {
         },
         onCellClicked: (params: any) => {
           const row = params.data as BillingRow;
-          this.downloadInvoiceCsv(row);
+          this.downloadInvoicePdf(row);
         },
       },
 
@@ -441,91 +456,40 @@ export class BillingComponent implements OnInit, OnDestroy {
     return inv.status === 'SUCCESS' && !!inv.receiptUrl;
   }
 
-  downloadReceipt(row: BillingRow) {
-    const url = (row as any).receiptUrl;
+  // === SINGLE INVOICE PDF DOWNLOAD ===
+  downloadInvoicePdf(row: BillingRow): void {
+    if (!row) return;
 
-    if (!url) {
+    if (row.status !== 'SUCCESS') {
       this.toast.error(
         this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PAYMENT')
       );
       return;
     }
 
-    window.open(url, '_blank', 'noopener');
-  }
+    let inv: InvoiceDto | undefined | null = null;
 
-    // === SINGLE INVOICE CSV DOWNLOAD ===
-    downloadInvoiceCsv(row: BillingRow): void {
-      if (!row) {
-        return;
-      }
-
-      // ако сакаш да дозволиш само за SUCCESS
-      if (row.status !== 'SUCCESS') {
-        this.toast.error(
-          this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PAYMENT')
-        );
-        return;
-      }
-
-      const invoiceId = row.id ?? '';
-      const createdAt = row.timestamp
-        ? new Date(row.timestamp).toISOString()
-        : '';
-
-      const csvHeader = [
-        'invoiceNumber',
-        'date',
-        'packageName',
-        'packageCredits',
-        'packagePriceEur',
-        'discountPercent',
-        'creditsPurchased',
-        'amountPaidEur',
-        'status',
-        'stripeSessionId',
-        'stripeReceiptUrl',
-      ];
-
-      const csvRow = [
-        `INV-${invoiceId}`,
-        createdAt,
-        row.packageName ?? '',
-        String(row.packageCredits ?? ''),
-        String(row.packagePrice ?? ''),
-        String(row.packageDiscountPercentage ?? ''),
-        String(row.credits ?? ''),
-        String(row.amount ?? ''),
-        row.status ?? '',
-        (row as any).stripeSessionId ?? '',
-        (row as any).receiptUrl ?? '',
-      ];
-
-      const allRows = [csvHeader, csvRow];
-
-      const csv = allRows
-        .map((r) =>
-          r
-            .map((v) =>
-              `"${String(v ?? '')
-                .replace(/"/g, '""')
-                .trim()}"`
-            )
-            .join(',')
-        )
-        .join('\r\n');
-
-      const blob = new Blob([csv], {
-        type: 'text/csv;charset=utf-8;',
-      });
-      const url = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `invoice-${invoiceId}.csv`;
-      link.click();
-
-      URL.revokeObjectURL(url);
+    if (row.stripeSessionId && this.invoiceBySession.has(row.stripeSessionId)) {
+      inv = this.invoiceBySession.get(row.stripeSessionId)!;
+    } else {
+      inv = this.invoices.find(i => i.id === row.id) ?? null;
     }
 
+    if (!inv) {
+      this.toast.error(
+        this.translate.instant('INVOICE_NOT_AVAILABLE_FOR_PAYMENT')
+      );
+      return;
+    }
+
+    try {
+      // 🔹 сега PDF сервисот добива и billingDetails
+      this.invoicePdfService.generateInvoicePdf(inv, this.billingDetails);
+    } catch (e) {
+      console.error('Failed to generate invoice PDF', e);
+      this.toast.error(
+        this.translate.instant('INVOICE_GENERATION_FAILED')
+      );
+    }
+  }
 }

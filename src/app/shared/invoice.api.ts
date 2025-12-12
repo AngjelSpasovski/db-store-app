@@ -1,4 +1,3 @@
-// src/app/shared/invoice.api.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
@@ -12,7 +11,7 @@ export interface InvoicePackage {
   description?: string;
   credits: number;
   price: number;
-  discountPercentage?: string; // 👈 ако backend некаде го праќа
+  discountPercentage?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -24,8 +23,8 @@ export interface InvoiceBillingDetails {
   email: string;
   companyName: string;
   address1: string;
-  address2?: string;
-  buildingNumber?: string;
+  address2?: string | null;
+  buildingNumber?: string | null;
   zipcode: string;
   city: string;
   stateCode: string;
@@ -35,7 +34,6 @@ export interface InvoiceBillingDetails {
   updatedAt: string;
 }
 
-// според Swagger: GET /api/v1/users/me/invoices → { list: [...] }
 export interface InvoiceDto {
   id: number;
   userId: number;
@@ -48,16 +46,34 @@ export interface InvoiceDto {
   createdAt: string;
   updatedAt: string;
 
-  // нови полиња од backend (ги има во response-от)
   stripePaymentIntentId?: string | null;
   paymentMethod?: string | null;
 
   package: InvoicePackage | null;
+
+  // може да е null, зависи од backend
   billing_details: InvoiceBillingDetails | null;
+}
+
+/**
+ * Реален shape на response-от од GET /api/v1/users/me/invoices
+ * (од Network снимката): има invoices + billingDetails.
+ */
+interface InvoicesResponseRaw {
+  list?: InvoiceDto[];                          // ако некаде користат "list"
+  invoices?: InvoiceDto[];                      // real-world key
+  billingDetails?: InvoiceBillingDetails | null;
+  // има уште userPackages, transactions, customer... не ни се битни тука
+}
+
+export interface InvoicesResponse {
+  invoices: InvoiceDto[];
+  billingDetails: InvoiceBillingDetails | null;
 }
 
 interface ListInvoicesResponse {
   list: InvoiceDto[];
+  total?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -66,9 +82,12 @@ export class InvoiceApi {
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * Враќа и фактури и billingDetails од ист endpoint.
+   */
   listMyInvoices(): Observable<InvoiceDto[]> {
     return this.http
       .get<ListInvoicesResponse>(`${this.base}/users/me/invoices`)
-      .pipe(map(res => res.list ?? []));
+      .pipe(map(res => res?.list ?? []));
   }
 }

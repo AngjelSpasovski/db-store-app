@@ -368,6 +368,22 @@
   "STRIPE_TEST_MODE": "Modalità di test Stripe",
   "NOT_AVAILABLE": "Non disponibile",
   "PROCESSING": "Elaborazione in corso...",
-  "PAYMENT_COMPLETED_SUCCESSFULLY": "Pagamento completato con successo."
+  "PAYMENT_COMPLETED_SUCCESSFULLY": "Pagamento completato con successo.",
+
+  "INVOICE_TITLE": "FATTURA",
+  "INVOICE_NUMBER": "N. fattura",
+  "INVOICE_DATE": "Data",
+  "INVOICE_INTERNAL_ID": "ID interno",
+  "INVOICE_BILL_TO": "Dati di fatturazione:",
+  "INVOICE_COL_DESCRIPTION": "Descrizione",
+  "INVOICE_COL_QTY": "Q.tà",
+  "INVOICE_COL_UNIT_PRICE": "Prezzo unitario (€)",
+  "INVOICE_COL_TOTAL": "Totale (€)",
+  "INVOICE_TOTAL_PAID": "Totale pagato",
+  "INVOICE_VAT_NOTE": "Operazione non soggetta ad IVA ai sensi dell'art. XX, comma X, DPR 633/72.",
+  "INVOICE_DISCLAIMER": "Questo documento è generato dalla piattaforma DBStore. In caso di variazioni dei requisiti fiscali, fanno fede le registrazioni contabili ufficiali.",
+  "INVOICE_NO_BILLING_DETAILS": "Dati di fatturazione non disponibili",
+  "INVOICE_VAT_ID_LABEL": "Partita IVA / Codice fiscale",
+  "INVOICE_EMAIL_LABEL": "Email"
 
 }

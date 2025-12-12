@@ -367,6 +367,27 @@
   "STRIPE_TEST_MODE": "Stripe тест режим",
   "NOT_AVAILABLE": "Нема достапност",
   "PROCESSING": "Се обработува...",
-  "PAYMENT_COMPLETED_SUCCESSFULLY": "Плаќањето е успешно завршено."
+  "PAYMENT_COMPLETED_SUCCESSFULLY": "Плаќањето е успешно завршено.",
+
+  "INVOICE_TITLE": "ФАКТУРА",
+  "INVOICE_NUMBER": "Фактура бр.",
+  "INVOICE_DATE": "Датум",
+  "INVOICE_INTERNAL_ID": "Внатрешен ID",
+  "INVOICE_BILL_TO": "Се наплатува на:",
+  "INVOICE_COL_DESCRIPTION": "Опис",
+  "INVOICE_COL_QTY": "Кол.",
+  "INVOICE_COL_UNIT_PRICE": "Единечна цена (€)",
+  "INVOICE_COL_TOTAL": "Вкупно (€)",
+  "INVOICE_TOTAL_PAID": "Вкупно платено",
+  "INVOICE_VAT_NOTE": "Операцијата не е предмет на ДДВ согласно чл. XX, став X од DPR 633/72.",
+  "INVOICE_DISCLAIMER": "Овој документ е генериран од платформата DBStore. Доколку се променат даночните барања, важат официјалните сметководствени евиденции.",
+  "INVOICE_NO_BILLING_DETAILS": "Нема внесени податоци за фактурирање",
+  "INVOICE_VAT_ID_LABEL": "Даночен број (VAT / Tax ID)",
+  "INVOICE_EMAIL_LABEL": "Е-пошта",
+  "INVOICE_STATUS": "Статус",
+  "INVOICE_CURRENCY": "Валута",
+  "INVOICE_VAT": "ДДВ",
+  "INVOICE_PAYMENT_INFO": "Детали за плаќање",
+  "INVOICE_NO_BILLING": "Нема внесени податоци за наплата"
 
 }
