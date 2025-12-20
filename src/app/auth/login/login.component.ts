@@ -8,7 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../auth.service';
 import { EmailJsService } from '../mail-server/emailjs.service';
-import { Subscription, lastValueFrom } from 'rxjs';
+import { Subscription, lastValueFrom, finalize } from 'rxjs';
 import { PdfCompressorService } from '../mail-server/pdf-compressor.service';
 import { ToastService } from '../../shared/toast.service';
 import { RouterModule } from '@angular/router';
@@ -93,7 +93,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const target =
     role === 'superadmin' ? '/admin' :
-    /* adminUser и user одат исто */   '/user/buy-credits';
+    /* adminuser и user одат исто */   '/user/buy-credits';
 
     this.router.navigateByUrl(target, { replaceUrl: true });
     return;
@@ -207,7 +207,9 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     const { email, password, rememberMe } = this.loginForm.value;
     this.isSubmittingLogin = true; // ⟵ старт
 
-    this.auth.signIn({ email, password }, !!rememberMe).subscribe({
+    this.auth.signIn({ email, password }, !!rememberMe)
+    .pipe(finalize(() => this.isSubmittingLogin = false))
+    .subscribe({
       next: (res) => {
         this.needsEmailVerify = false;
 
@@ -215,24 +217,23 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
         const redirect = this.routeActive.snapshot.queryParamMap.get('redirect');
         if (redirect) {
           this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-          this.isSubmittingLogin = false;
           this.router.navigateByUrl(redirect);
           return;
         }
 
         // 2) приоритет: ако e-mail == angjel... => оди директно на /admin
-        const email = (res?.user?.email ?? '').toLowerCase();
-        if (email === 'angjel.spasovski@gmail.com') {
-          this.router.navigateByUrl('/admin', { replaceUrl: true });
-          this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-          this.isSubmittingLogin = false;
-          return;
-        }
+        // const email = (res?.user?.email ?? '').toLowerCase();
+        // if (email === 'angjel.spasovski@gmail.com') {
+        //   this.router.navigateByUrl('/admin', { replaceUrl: true });
+        //   this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
+        //   return;
+        // }
 
         // 3) инаку по улога во /user/*
         const role = (res.user.role || 'user').toLowerCase();
         switch (role) {
           case 'superadmin': this.router.navigateByUrl('/admin'); break;
+          //case 'adminuser': this.router.navigateByUrl('/admin'); break;
           // adminUser и user имаат ист дом
           default:           this.router.navigateByUrl('/user/buy-credits'); break;
         }
@@ -243,7 +244,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           this.lastLoginEmail = email;
           this.infoMessage = this.translate.instant('EMAIL_NOT_VERIFIED_INFO');
           this.toast.info(this.translate.instant('EMAIL_NOT_VERIFIED_INFO'), { position: 'top-end' });
-          this.isSubmittingLogin = false; // ⟵ стоп
           this.resendVerifyEmail(true);
           return;
         }
@@ -254,7 +254,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           err?.error?.message || this.translate.instant('VALIDATION_FAILED');
 
         this.toast.error(msg, { position: 'top-end' });
-        this.isSubmittingLogin = false; // ⟵ стоп
       }
     });
   }

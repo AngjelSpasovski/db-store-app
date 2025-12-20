@@ -1,185 +1,194 @@
-// src/app/superadmin/admins/admins.component.ts
-import { Component, OnInit } from '@angular/core';
+// scr/app/superadmin/admins/admins.component.ts
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AdminApi, AdminRow } from '../../shared/admin.api';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize, Subscription } from 'rxjs';
+
+import { SuperadminAdminsApi, SuperadminAdminDto } from '../../shared/superadmin-admins.api';
 import { ToastService } from '../../shared/toast.service';
 
+type CreateAdminForm = FormGroup<{
+  firstName: FormControl<string>;
+  lastName: FormControl<string>;
+  email: FormControl<string>;
+  companyName: FormControl<string>;
+  password: FormControl<string>;
+  isActive: FormControl<boolean>;
+}>;
+
 @Component({
-  standalone: true,
   selector: 'app-superadmin-admins',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './admins.component.html',
   styleUrls: ['./admins.component.scss']
 })
-export class AdminsComponent implements OnInit {
-
-  admins: AdminRow[] = [];
+export class AdminsComponent implements OnInit, OnDestroy {
   loading = false;
-  saving = false;
-  error: string | null = null;
 
   perPage = 20;
   page = 1;
   total = 0;
-  get totalPages() { return Math.max(1, Math.ceil(this.total / this.perPage)); }
 
-  // modal state
-  modalOpen = false;
-  editId: number | null = null;
+  admins: SuperadminAdminDto[] = [];
+  showCreateModal = false;
+  createForm!: CreateAdminForm;
 
-  form = this.fb.nonNullable.group({
-    firstName:   ['', [Validators.required]],
-    lastName:    ['', [Validators.required]],
-    email:       ['', [Validators.required, Validators.email]],
-    companyName: [''],
-    isActive:    [true]
-  });
+  private sub = new Subscription();
 
   constructor(
-    private api: AdminApi,
+    private api: SuperadminAdminsApi,
     private fb: FormBuilder,
     private toast: ToastService
   ) {}
 
   ngOnInit(): void {
+    this.createForm = this.fb.nonNullable.group({
+      firstName: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(60)]),
+      lastName: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(60)]),
+      email: this.fb.nonNullable.control('', [Validators.required, Validators.email, Validators.maxLength(120)]),
+      companyName: this.fb.nonNullable.control(''),
+      password: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(8), Validators.maxLength(128)]),
+      isActive: this.fb.nonNullable.control(true)
+    });
+
+    // ✅ ако бекенд ти даде emailExists, чисти го веднаш кога user ќе смени email
+    const emailSub = this.createForm.controls.email.valueChanges.subscribe(() => {
+      const c = this.createForm.controls.email;
+      if (c.hasError('emailExists')) {
+        const { emailExists, ...rest } = c.errors || {};
+        c.setErrors(Object.keys(rest).length ? rest : null);
+      }
+    });
+    this.sub.add(emailSub);
+
     this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   load(): void {
     this.loading = true;
-    this.error = null;
 
-    this.api.listAdmins(this.perPage, this.page).subscribe({
-      next: res => {
-        // бекендот може да враќа или array или { list, total }
-        if (Array.isArray(res as any)) {
-          this.admins = res as any;
-          this.total = this.admins.length;
-        } else {
-          const r: any = res;
-          this.admins = r.list || [];
-          this.total = r.total || this.admins.length;
-        }
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.error = 'Failed to load admins';
-        this.toast.error('Failed to load admins');
-      }
-    });
+    const s = this.api
+      .getAdmins(this.perPage, this.page)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (res) => {
+          this.admins = res.list || [];
+          this.total = res.total ?? this.admins.length ?? 0;
+        },
+        error: (err) => this.handleHttpError(err, 'Failed to load admins.')
+      });
+
+    this.sub.add(s);
   }
 
-  // ---------- MODAL ----------
-
-  openCreateModal(): void {
-    this.editId = null;
-    this.form.reset({
+  openCreate(): void {
+    this.createForm.reset({
       firstName: '',
       lastName: '',
       email: '',
       companyName: '',
+      password: '',
       isActive: true
     });
-    this.modalOpen = true;
+
+    this.showCreateModal = true;
   }
 
-  openEditModal(a: AdminRow): void {
-    this.editId = a.id;
-    this.form.reset({
-      firstName:   a.firstName ?? '',
-      lastName:    a.lastName ?? '',
-      email:       a.email ?? '',
-      companyName: a.companyName ?? '',
-      isActive:    !!a.isActive
-    });
-    this.modalOpen = true;
+  closeCreate(): void {
+    this.showCreateModal = false;
   }
 
-  closeModal(): void {
-    this.modalOpen = false;
-  }
-
-  // ---------- SAVE / CRUD ----------
-
-  save(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+  submitCreate(): void {
+    if (this.createForm.invalid) {
+      this.createForm.markAllAsTouched();
+      this.toast.show('Please fill all required fields correctly.', false, 3500, 'top-end');
       return;
     }
 
-    const v = this.form.getRawValue();
-    const body = {
-      firstName: v.firstName.trim(),
-      lastName: v.lastName.trim(),
-      email: v.email.trim().toLowerCase(),
-      companyName: v.companyName.trim() || undefined,
-      isActive: !!v.isActive
+    const payload = {
+      firstName: this.createForm.value.firstName?.trim() ?? '',
+      lastName: this.createForm.value.lastName?.trim() ?? '',
+      email: this.createForm.value.email?.trim() ?? '',
+      companyName: (this.createForm.value.companyName?.trim() || null) as string | null,
+      password: this.createForm.value.password ?? '',
+      isActive: !!this.createForm.value.isActive
     };
 
-    this.saving = true;
+    this.loading = true;
 
-    const req$ = this.editId
-      ? this.api.patchAdmin(this.editId, body)
-      : this.api.createAdmin(body);
+    const s = this.api
+      .createAdmin(payload)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          this.toast.show('Admin created successfully.', true, 2500, 'top-end');
+          this.closeCreate();
+          this.load();
+        },
+        error: (err) => this.handleHttpError(err, 'Save failed.')
+      });
 
-    req$.subscribe({
-      next: () => {
-        this.toast.success(this.editId ? 'Admin updated' : 'Admin created', { position: 'top-end' });
-        this.saving = false;
-        this.closeModal();
-        this.load();
-      },
-      error: () => {
-        this.toast.error('Save failed', { position: 'top-end' });
-        this.saving = false;
-      }
-    });
+    this.sub.add(s);
   }
 
-  toggleActive(a: AdminRow): void {
-    this.saving = true;
-    this.api.patchAdmin(a.id, { isActive: !a.isActive }).subscribe({
-      next: () => {
-        this.toast.success('Status updated', { position: 'top-end' });
-        this.saving = false;
-        this.load();
-      },
-      error: () => {
-        this.toast.error('Update failed');
-        this.saving = false;
-      }
-    });
+  deleteAdmin(row: SuperadminAdminDto): void {
+    if (!row?.id) return;
+
+    const ok = confirm(`Delete admin "${row.email}"?`);
+    if (!ok) return;
+
+    this.loading = true;
+
+    const s = this.api
+      .deleteAdmin(row.id)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          this.toast.show('Admin deleted.', true, 2000, 'top-end');
+          this.load();
+        },
+        error: (err) => this.handleHttpError(err, 'Delete failed.')
+      });
+
+    this.sub.add(s);
   }
 
-  delete(a: AdminRow): void {
-    if (!confirm(`Delete admin ${a.firstName} ${a.lastName}?`)) return;
-    this.saving = true;
-    this.api.deleteAdmin(a.id).subscribe({
-      next: () => {
-        this.saving = false;
-        this.load();
-        this.toast.success('Admin deleted successfully', { position: 'top-end' });
-      },
-      error: () => {
-        this.toast.error('Delete failed', { position: 'top-end' });
-        this.saving = false;
-      }
-    });
+  isTouchedInvalid(name: keyof CreateAdminForm['controls']): boolean {
+    const c = this.createForm.controls[name];
+    return !!(c.touched && c.invalid);
   }
 
-  prev(): void {
-    if (this.page > 1) {
-      this.page--;
-      this.load();
+  private handleHttpError(err: any, fallbackMsg: string) {
+    const apiErrors = err?.error?.errors;
+
+    // ✅ Специјален случај: email already exists -> inline error + toast
+    const emailMsg = apiErrors?.email;
+    if (emailMsg && typeof emailMsg === 'string' && /already exists/i.test(emailMsg)) {
+      const emailControl = this.createForm?.controls?.email;
+      if (emailControl) {
+        emailControl.setErrors({ ...(emailControl.errors || {}), emailExists: true });
+        emailControl.markAsTouched();
+      }
+      this.toast.show('Email already exists. Choose another email.', false, 4500, 'top-end');
+      return;
     }
-  }
 
-  next(): void {
-    if (this.page < this.totalPages) {
-      this.page++;
-      this.load();
+    // ✅ генерално прикажување на бекенд validation errors
+    if (apiErrors && typeof apiErrors === 'object') {
+      const parts: string[] = [];
+      for (const k of Object.keys(apiErrors)) {
+        parts.push(`${k}: ${String(apiErrors[k])}`);
+      }
+      this.toast.show(parts.join(' • '), false, 4500, 'top-end');
+      return;
     }
+
+    const msg = err?.error?.message || err?.message || fallbackMsg;
+    this.toast.show(String(msg), false, 4000, 'top-end');
   }
 }

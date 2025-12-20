@@ -1,12 +1,12 @@
 // src/app/auth/auth.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './auth.environment';
 
 /** === API types === */
-export type AuthRole = 'user' | 'adminUser' | 'superadmin';
+export type AuthRole = 'user' | 'adminuser' | 'superadmin';
 
 export interface AuthUser {
   id:          string;
@@ -63,21 +63,49 @@ export class AuthService {
   /** Emits whether we have a token present */
   public isAuthed$    = new BehaviorSubject<boolean>(!!(localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY)));
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(
+    private router: Router,
+    private http: HttpClient
+  ) {
+      // state from storage
+      this.syncAuthStateFromStorage();
+  }
 
   /** Convenience getter for token */
   get token(): string | null {
     return localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY);
   }
 
+  private get remember(): boolean {
+    return !!localStorage.getItem(TOKEN_KEY); // токен во local = remember
+  }
+
+  private syncAuthStateFromStorage(): void {
+    const token = this.token;
+    const user  = this.readUser();
+
+    // ако нема token → исчисти user (да нема “лажен login”)
+    if (!token && user) {
+      localStorage.removeItem(USER_KEY);
+      sessionStorage.removeItem(USER_KEY);
+      this.currentUser$.next(null);
+      this.isAuthed$.next(false);
+      return;
+    }
+
+    // ако има token → пушти ја моменталната состојба
+    this.currentUser$.next(user);
+    this.isAuthed$.next(!!token);
+  }
+
   private normalizeRole(role: string | undefined, email?: string): AuthRole {
     const r = (role || 'user').toLowerCase();
 
     // whitelist по е-мејл → секогаш superadmin
-    if ((email || '').toLowerCase() === 'angjel.spasovski@gmail.com') return 'superadmin';
+    //if ((email || '').toLowerCase() === 'angjel.spasovski@gmail.com') return 'superadmin';
 
     // map backend варијанти кон нашата шема
-    if (r === 'admin_user' || r === 'adminuser' || r === 'admin') return 'adminUser';
+    if (r === 'admin_user' || r === 'adminuser' || r === 'admin') return 'adminuser';
     if (r === 'superadmin') return 'superadmin';
     return 'user';
   }
@@ -85,11 +113,14 @@ export class AuthService {
   /** === API calls === */
   signIn(body: SignInReq, remember = false): Observable<SignInRes> {
     return this.http.post<SignInRes>(`${this.base}/auth/sign-in`, body).pipe(
-      tap(res => {
+      map(res => {
         const userNorm = { ...res.user, role: this.normalizeRole(res.user.role, res.user.email) };
+        return { ...res, user: userNorm };
+      }),
+      tap(res => {
         this.storeToken(res.accessToken, remember);
-        this.storeUser(userNorm, remember);
-        this.currentUser$.next(userNorm);
+        this.storeUser(res.user, remember);
+        this.currentUser$.next(res.user);
         this.isAuthed$.next(true);
       })
     );
@@ -137,7 +168,7 @@ export class AuthService {
     if (!u) return null;
 
     const norm = { ...u, role: this.normalizeRole(u.role, u.email) };
-    if (norm.role !== u.role) this.storeUser(norm, !!localStorage.getItem('auth_token')); // resave
+    if (norm.role !== u.role) this.storeUser(norm, this.remember);    // resave
 
     //console.log('getCurrentUser', norm);
     return norm;
@@ -194,4 +225,5 @@ export class AuthService {
     const raw = localStorage.getItem(USER_KEY) ?? sessionStorage.getItem(USER_KEY);
     try { return raw ? (JSON.parse(raw) as AuthUser) : null; } catch { return null; }
   }
+
 }

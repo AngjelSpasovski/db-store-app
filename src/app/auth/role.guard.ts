@@ -4,20 +4,23 @@ import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { ToastService } from '../shared/toast.service';
 
-type Role = 'user' | 'adminUser' | 'superadmin';
+type Role = 'user' | 'adminuser' | 'superadmin';
 
-const RANK: Record<Role, number> = { user: 1, adminUser: 2, superadmin: 3 };
+const RANK: Record<Role, number> = { user: 1, adminuser: 2, superadmin: 3 };
 
-function roleAllows(expected: string[] | undefined, actual: string | undefined): boolean {
+function normRole(r: any): Role {
+  const v = String(r || 'user').toLowerCase();
+  if (v === 'admin_user' || v === 'adminuser' || v === 'admin') return 'adminuser';
+  if (v === 'superadmin') return 'superadmin';
+  return 'user';
+}
+
+function roleAllows(expected: string[] | undefined, actual: Role): boolean {
   if (!expected || expected.length === 0) return true;
 
-  const act = (actual || '').toLowerCase() as Role;
-  if (!RANK[act]) return false;
-
-  const expectedLC = expected.map(r => r.toLowerCase()) as Role[];
-  const minRank = Math.min(...expectedLC.map(r => RANK[r] ?? Number.POSITIVE_INFINITY));
-
-  return RANK[act] >= minRank;
+  const expectedNorm = expected.map(normRole);
+  const minRank = Math.min(...expectedNorm.map(r => RANK[r]));
+  return RANK[actual] >= minRank;
 }
 
 export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state): boolean | UrlTree => {
@@ -32,22 +35,21 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state): 
   }
 
   const u = auth.getCurrentUser() || auth.currentUser$.value;
-  const userRole = (u?.role || 'user').toLowerCase();
-  const expected = (route.data?.['roles'] as string[] | undefined) ?? [];
-
   const email = (u?.email || '').toLowerCase();
-  // ако си whitelist супер админ → дозволи пристап до /admin без да гледаме roles
-  if (email === 'angjel.spasovski@gmail.com' && state.url.startsWith('/admin')) {
-    return true;
-  }
+
+  // whitelist супер-админ (ако сакаш да остане вака)
+  if (email === 'angjel.spasovski@gmail.com' && state.url.startsWith('/admin')) return true;
+
+  const userRole = normRole(u?.role);
+  const expected = (route.data?.['roles'] as string[] | undefined) ?? [];
 
   if (roleAllows(expected, userRole)) return true;
 
   toast.show('You don’t have permission to view that page.', false, 3500, 'top-end');
 
-  // fallback „дом“ според улога
-  const r = (userRole || 'user').toLowerCase();
-  return (userRole === 'superadmin')
-    ? router.createUrlTree(['/admin'])
-    : router.createUrlTree(['/user/buy-credits']);
+  // ✅ анти-loop: ако веќе си на fallback страната, пушти (инаку ќе се врти бесконечно)
+  const fallback = (userRole === 'superadmin') ? '/admin' : '/user/buy-credits';
+  if (state.url.startsWith(fallback)) return true;
+
+  return router.createUrlTree([fallback]);
 };

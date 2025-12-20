@@ -9,7 +9,7 @@ export interface AdminUserRow {
   lastName: string;
   email: string;
   companyName: string;
-  role: 'user'|'adminUser'|'superadmin';
+  role: 'user'|'adminuser'|'superadmin';
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

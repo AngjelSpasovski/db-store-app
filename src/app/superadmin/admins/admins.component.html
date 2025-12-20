@@ -1,191 +1,136 @@
-<section class="superadmin-admins container py-3">
+<div class="page">
+  <div class="panel">
+    <div class="panel-head">
+      <div class="title">ADMINS</div>
 
-  <div class="row g-3">
+      <div class="right">
+        <span class="pill">TOTAL: {{ total }}</span>
 
-    <div class="col-12">
-      <div class="card list-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Admins</span>
-
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge rounded-pill bg-secondary small">
-              TOTAL: {{ total }}
-            </span>
-
-            <button class="btn btn-sm btn-primary"
-                    type="button"
-                    (click)="openCreateModal()">
-              + New admin
-            </button>
-          </div>
-        </div>
-
-        <div class="card-body p-0">
-
-          <div *ngIf="loading" class="p-3 small text-muted">
-            Loading admins...
-          </div>
-
-          <div *ngIf="!loading && error" class="p-3 text-danger small">
-            {{ error }}
-          </div>
-
-          <div class="table-responsive" *ngIf="!loading && !error">
-            <table class="table table-dark table-sm mb-0 align-middle">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Company</th>
-                  <th>Active</th>
-                  <th class="text-end">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let a of admins">
-                  <td>{{ a.id }}</td>
-                  <td>{{ a.firstName }} {{ a.lastName }}</td>
-                  <td>{{ a.email }}</td>
-                  <td>{{ a.companyName }}</td>
-                  <td>
-                    <span class="badge"
-                          [ngClass]="a.isActive ? 'bg-success' : 'bg-secondary'">
-                      {{ a.isActive ? 'Yes' : 'No' }}
-                    </span>
-                  </td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-outline-light me-2"
-                            (click)="openEditModal(a)">
-                      Edit
-                    </button>
-
-                    <button class="btn btn-sm btn-outline-warning me-2"
-                            (click)="toggleActive(a)"
-                            [disabled]="saving">
-                      {{ a.isActive ? 'Deactivate' : 'Activate' }}
-                    </button>
-
-                    <button class="btn btn-sm btn-outline-danger"
-                            (click)="delete(a)"
-                            [disabled]="saving">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-
-                <tr *ngIf="admins.length === 0 && !loading">
-                  <td colspan="6"
-                      class="text-center small text-muted py-3">
-                    No admins yet.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-
-        <div class="card-footer small text-muted d-flex justify-content-between align-items-center">
-          <div>
-            Page {{ page }} / {{ totalPages }}
-          </div>
-          <div class="btn-group btn-group-sm">
-            <button type="button"
-                    class="btn btn-outline-light"
-                    [disabled]="page <= 1"
-                    (click)="prev()">
-              Prev
-            </button>
-            <button type="button"
-                    class="btn btn-outline-light"
-                    [disabled]="page >= totalPages"
-                    (click)="next()">
-              Next
-            </button>
-          </div>
-        </div>
+        <button class="btn btn-primary" type="button" (click)="openCreate()" [disabled]="loading">
+          + New admin
+        </button>
       </div>
     </div>
 
-  </div>
+    <div class="panel-body">
+      <div class="loading" *ngIf="loading">Loading...</div>
 
-  <!-- ========== MODAL ========== -->
-  <div class="modal-backdrop-custom"
-       *ngIf="modalOpen">
-    <div class="modal-dialog-custom">
-      <div class="card modal-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span *ngIf="!editId">Create admin</span>
-          <span *ngIf="editId">Edit admin</span>
-          <button type="button"
-                  class="btn-close btn-close-white"
-                  aria-label="Close"
-                  (click)="closeModal()"></button>
-        </div>
+      <table class="tbl" *ngIf="!loading">
+        <thead>
+          <tr>
+            <th class="col-id">#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th class="col-active">Active</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
 
-        <div class="card-body">
-          <form [formGroup]="form" (ngSubmit)="save()">
+        <tbody>
+          <tr *ngIf="admins.length === 0">
+            <td colspan="6" class="empty">No admins found.</td>
+          </tr>
 
-            <div class="row g-2 mb-2">
-              <div class="col-md-6">
-                <label class="form-label">First name</label>
-                <input class="form-control form-control-sm"
-                       formControlName="firstName">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Last name</label>
-                <input class="form-control form-control-sm"
-                       formControlName="lastName">
-              </div>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Email</label>
-              <input class="form-control form-control-sm"
-                     formControlName="email">
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Company</label>
-              <input class="form-control form-control-sm"
-                     formControlName="companyName">
-            </div>
-
-            <div class="form-check form-switch mb-3">
-              <input class="form-check-input"
-                     type="checkbox"
-                     id="isActiveAdmin"
-                     formControlName="isActive">
-              <label class="form-check-label" for="isActiveAdmin">
-                Active
-              </label>
-            </div>
-
-            <div class="d-flex justify-content-between">
-              <button type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                      (click)="closeModal()">
-                Cancel
+          <tr *ngFor="let a of admins">
+            <td class="muted">{{ a.id }}</td>
+            <td>{{ a.firstName }} {{ a.lastName }}</td>
+            <td>{{ a.email }}</td>
+            <td>{{ a.companyName || '-' }}</td>
+            <td>
+              <span class="badge" [class.ok]="a.isActive" [class.no]="!a.isActive">
+                {{ a.isActive ? 'Yes' : 'No' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn btn-danger-outline" type="button" (click)="deleteAdmin(a)" [disabled]="loading">
+                Delete
               </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-              <button type="submit"
-                      class="btn btn-primary btn-sm"
-                      [disabled]="saving || form.invalid">
-                <span *ngIf="!saving">
-                  {{ editId ? 'Save changes' : 'Create admin' }}
-                </span>
-                <span *ngIf="saving">
-                  <span class="spinner-border spinner-border-sm me-1"></span>
-                  Saving...
-                </span>
-              </button>
-            </div>
+      <div class="pager" *ngIf="!loading && total > perPage">
+        <button class="btn btn-dark-outline" type="button" (click)="page = page - 1; load()" [disabled]="page <= 1">
+          Prev
+        </button>
 
-          </form>
-        </div>
+        <div class="muted">Page {{ page }}</div>
+
+        <button
+          class="btn btn-dark-outline"
+          type="button"
+          (click)="page = page + 1; load()"
+          [disabled]="page * perPage >= total"
+        >
+          Next
+        </button>
       </div>
     </div>
   </div>
 
-</section>
+  <!-- ✅ CUSTOM MODAL (renamed classes to avoid Bootstrap conflict) -->
+  <div class="sa-backdrop" *ngIf="showCreateModal" (click)="closeCreate()">
+    <div class="sa-modal" (click)="$event.stopPropagation()">
+      <div class="sa-head">
+        <div class="sa-title">CREATE ADMIN</div>
+        <button class="icon-btn" type="button" (click)="closeCreate()">✕</button>
+      </div>
+
+      <form class="sa-body" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+        <div class="grid-2">
+          <div class="field">
+            <label>First name</label>
+            <input type="text" formControlName="firstName" />
+            <div class="err" *ngIf="isTouchedInvalid('firstName')">Required</div>
+          </div>
+
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" formControlName="lastName" />
+            <div class="err" *ngIf="isTouchedInvalid('lastName')">Required</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input type="email" formControlName="email" />
+
+          <div class="err" *ngIf="isTouchedInvalid('email') && !createForm.controls.email.hasError('emailExists')">
+            Valid email required
+          </div>
+
+          <div class="err" *ngIf="createForm.controls.email.touched && createForm.controls.email.hasError('emailExists')">
+            Email already exists. This account is already registered as a user.
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Company</label>
+          <input type="text" formControlName="companyName" />
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input type="password" formControlName="password" autocomplete="new-password" />
+          <div class="hint">Min 8 characters.</div>
+          <div class="err" *ngIf="isTouchedInvalid('password')">Password required (min 8)</div>
+        </div>
+
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" formControlName="isActive" />
+            <span class="slider"></span>
+          </label>
+          <span class="switch-label">Active</span>
+        </div>
+
+        <div class="sa-actions">
+          <button class="btn btn-dark-outline" type="button" (click)="closeCreate()">Cancel</button>
+          <button class="btn btn-primary" type="submit" [disabled]="loading">Create admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

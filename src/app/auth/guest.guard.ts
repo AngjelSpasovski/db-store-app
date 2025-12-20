@@ -3,22 +3,23 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
 
-export const guestGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+export const guestGuard: CanActivateFn = (_route, state): boolean | UrlTree => {
+  const auth   = inject(AuthService);
   const router = inject(Router);
 
-  const u = auth.currentUser$?.value || null;
-  if (!u || !auth.token) return true; // не-логираn → дозволи /login
+  // ако има токен -> guest не смее да гледа /login
+  const token = auth.token;
+  if (!token) return true;
 
-  const email = (u.email || '').toLowerCase();
-  if (email === 'angjel.spasovski@gmail.com') {
-    return router.createUrlTree(['/admin']) as UrlTree;
-  }
+  const u = auth.getCurrentUser(); // чита од storage
+  const role = (u?.role || 'user').toLowerCase();
 
-  const role = (u.role || 'user').toLowerCase();
   const target =
-    role === 'superadmin' ? '/user/superadmin' :
-    role === 'admin'      ? '/user/admin'      :
-                            '/user/buy-credits';
-  return router.createUrlTree([target]) as UrlTree;
+    role === 'superadmin' ? '/admin' :
+    /* adminuser + user */ '/user/buy-credits';
+
+  // (опционално) анти-loop ако некако веќе е на target:
+  if (state.url.startsWith(target)) return true;
+
+  return router.createUrlTree([target]);
 };

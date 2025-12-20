@@ -20,7 +20,7 @@ const routes: Routes = [
     path: '',
     component: UserComponent,
     canActivateChild: [roleGuard],
-    data: { roles: ['user', 'adminUser','superadmin'] }, // ⬅️ сите имаат пристап до основните user рути
+    data: { roles: ['user', 'adminuser','superadmin'] }, // ⬅️ сите имаат пристап до основните user рути
     children: [
       { path: '', redirectTo: 'buy-credits', pathMatch: 'full' },
 
@@ -39,7 +39,7 @@ const routes: Routes = [
       { path: 'service-delivery-policy',  component: DocumentViewerComponent, data: { title: 'SERVICE_DELIVERY_POLICY', docType: 'service-delivery-policy' } },
 
       // account page
-      { path: 'account',                 component: AccountComponent,                data: { title: 'ACCOUNT',        roles: ['user','adminUser','superadmin'] } },
+      { path: 'account',                 component: AccountComponent,                data: { title: 'ACCOUNT',        roles: ['user','adminuser','superadmin'] } },
 
       // ⬇️ Пример за admin-only подоцна:
       // { path: 'admin',                 component: AdminDashboardComponent,     canActivate: [roleGuard], data: { roles: ['admin','superadmin'] } },

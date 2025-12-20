@@ -66,7 +66,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     // debug logging
-    console.debug('[HTTP]',finalReq.method,finalReq.url,finalReq.headers.get('Authorization'));
+    console.debug('[HTTP]', finalReq.method, finalReq.url, { authed: !!finalReq.headers.get('Authorization') });
 
     return next.handle(finalReq).pipe(
       catchError((err: HttpErrorResponse) => {
@@ -75,12 +75,11 @@ export class AuthInterceptor implements HttpInterceptor {
           this.router.url.startsWith('/forgot-password') ||
           this.router.url.startsWith('/reset-password');
 
-        const heavyError =
-          [0, 500, 502, 503, 504].includes(err.status) || err.status >= 500;
+        const heavyError = [0, 500, 502, 503, 504].includes(err.status) || err.status >= 500;
 
-        // глобален toast (освен за auth ендпоинти и „лесни“ грешки на login екрани)
-        // ⬇️ важно: НЕ прикажувај глобален toast за Stripe
-        if (!isAuth && !isStripeCheckout && (!onAuthScreen || heavyError)) {
+        const willLogout = err.status === 401 && addAuth;
+
+        if (!isAuth && !isStripeCheckout && (!onAuthScreen || heavyError) && !willLogout) {
           this.toast.error(this.prettyError(err), {
             position: 'top-end',
             duration: 6000,
@@ -90,12 +89,14 @@ export class AuthInterceptor implements HttpInterceptor {
         // 401 → logout само ако сме праќале токен (addAuth == true)
         if (err.status === 401 && addAuth && !this.loggingOut) {
           this.loggingOut = true;
-          localStorage.removeItem('auth_token');
-          sessionStorage.removeItem('auth_token');
-          this.router
-            .navigate(['/login'], { queryParams: { tab: 'login' } })
-            .finally(() => (this.loggingOut = false));
+
+          // најчисто: едно место што чисти token+user и ги сетира subject-ите
+          this.auth.logout();
+
+          // logout() веќе navigate-ира; само reset на флагот
+          queueMicrotask(() => (this.loggingOut = false));
         }
+
 
         return throwError(() => err);
       })

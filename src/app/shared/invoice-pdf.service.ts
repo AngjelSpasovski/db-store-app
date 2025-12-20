@@ -195,10 +195,9 @@ export class InvoicePdfService {
         ? `${INVOICE_ISSUER.zipcode} ${INVOICE_ISSUER.city} (${INVOICE_ISSUER.country})`
         : undefined,
       INVOICE_ISSUER.vatNumber ? `P.IVA / VAT: ${INVOICE_ISSUER.vatNumber}` : undefined,
-      INVOICE_ISSUER.rea ? `REA: ${INVOICE_ISSUER.rea}` : undefined,
-      INVOICE_ISSUER.shareCapital ? `Share capital: ${INVOICE_ISSUER.shareCapital}` : undefined,
+      //INVOICE_ISSUER.rea ? `REA: ${INVOICE_ISSUER.rea}` : undefined,
       INVOICE_ISSUER.email ? `Email: ${INVOICE_ISSUER.email}` : undefined,
-      INVOICE_ISSUER.phone ? `Tel: ${INVOICE_ISSUER.phone}` : undefined,
+      //INVOICE_ISSUER.phone ? `Tel: ${INVOICE_ISSUER.phone}` : undefined,
     ]);
 
     issuerY += 16;

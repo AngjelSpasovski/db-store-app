@@ -27,10 +27,12 @@
     <li *ngFor="let item of menuItems"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }">
+
       <a [routerLink]="item.route" (click)="onMenuItemClick()">
         <fa-icon [icon]="item.icon" class="icon"></fa-icon>
         <span class="label" *ngIf="isOpen">{{ item.label | translate }}</span>
       </a>
+
     </li>
 
     <!-- Credits indicator кога sidebar е затворен -->
