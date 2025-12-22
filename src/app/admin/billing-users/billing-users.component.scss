@@ -1,2 +1,22 @@
 :host { display:block; }
-.card { background:#1f2329; border-radius:12px; }
+
+.page {
+  --bg-card: #1b212b;
+  --text: #e9eef6;
+  --text-muted: #99a3b3;
+  --border: rgba(255,255,255,.08);
+
+  color: var(--text);
+}
+
+.title { margin: 0 0 .35rem; font-weight: 700; }
+.subtitle { margin: 0 0 1rem; color: var(--text-muted); }
+
+.card-dark {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: .85rem;
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+.card-dark .card-body { color: var(--text); }

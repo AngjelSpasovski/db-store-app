@@ -9,11 +9,11 @@
 
     <div class="sidebar__profile" *ngIf="currentUser">
       <div class="avatar">
-        {{ (currentUser.email || 'U')[0] | uppercase }}
+        {{ (currentUser.firstName)[0] | uppercase }}
       </div>
       <div class="info">
-        <div class="email" title="{{ currentUser.email }}">
-          {{ currentUser.email }}
+        <div class="email" title="{{ currentUser.firstName }} {{currentUser.lastName}}">
+          {{ currentUser.firstName }}
         </div>
         <div class="role" *ngIf="currentUser.role">
           {{ (currentUser.role | uppercase) | translate  }}
@@ -32,6 +32,18 @@
         <fa-icon [icon]="item.icon" class="icon"></fa-icon>
         <span class="label" *ngIf="isOpen">{{ item.label | translate }}</span>
       </a>
+    </li>
+
+    <!-- ✅ Admin entry (само за adminuser) -->
+    <li *ngIf="showGoToAdmin"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="admin-entry">
+
+      <a [routerLink]="adminRoute"  (click)="onMenuItemClick()"  [attr.title]="!isOpen ? 'Admin Page' : null">
+        <fa-icon [icon]="faAdmin" class="icon"></fa-icon>
+        <span class="label" *ngIf="isOpen">{{ 'ADMIN_PAGE' | translate }}</span>
+      </a>
 
     </li>
 
@@ -45,6 +57,7 @@
       </a>
     </li>
   </ul>
+
 
   <!-- FOOTER со кредити кога е отворен -->
   <div class="sidebar__footer px-3 py-2 small text-muted"
@@ -60,6 +73,7 @@
       </a>
     </div>
   </div>
+
 </aside>
 
 <!-- Backdrop (се рендерира од user.component, ова останува како што беше ако го имаш) -->

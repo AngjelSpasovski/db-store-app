@@ -210,6 +210,8 @@
   "FAQS": "ЧПП",
   "YOUR_BALANCE": "Вашата состојба",
   "BUY_NOW": "Купи сега",
+  "ADMIN_PAGE": "Админ страница",
+  "BACK_TO_USER": "Назад кај корисникот",
 
   "SETTINGS":"Наставки",
   "LOGGEDIN_AS": "Најавени сте како",
@@ -266,11 +268,21 @@
   "ONLY_PDF": "Само PDF-фајлови се дозволени.",
 
   "ADMIN": {
-      "DASHBOARD": "Контролна табла",
-      "USERS": "Корисници",
-      "BILLING_USERS": "Фактурирање по корисник",
-      "PACKAGE_MANAGEMENT": "Управување со пакети",
-      "USER_DETAILS": "Детали за корисници"
+    "DASHBOARD": "Контролна табла",
+    "USERS": "Корисници",
+    "BILLING_USERS": "Фактурирање по корисник",
+    "PACKAGE_MANAGEMENT": "Управување со пакети",
+    "USER_DETAILS": "Детали за корисници",
+    "ACTIONS": "Акции",
+    "PER_PAGE": "Редови",
+    "TOTAL": "Вкупно",
+    "PAGE": "Страница",
+    "YES": "Да",
+    "NO": "Не",
+    "ACTIVATE": "Активирај",
+    "DEACTIVATE": "Деактивирај",
+    "USER_DETAILS_TITLE": "Детали за корисникот",
+    "UPDATED_AT": "Ажурирано"
   },
 
   "RECEIPT": "Добиеница",

@@ -9,7 +9,7 @@ import {
   HostBinding,
   OnInit,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -28,6 +28,7 @@ import {
   faChevronLeft,
   faBars,
   faCoins,
+  faUserShield
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -37,7 +38,7 @@ import {
     RouterModule,
     CommonModule,
     TranslateModule,
-    FontAwesomeModule,   // 👈 важно
+    FontAwesomeModule,
   ],
   templateUrl: './side-bar.component.html',
   styleUrls: ['./side-bar.component.scss'],
@@ -61,9 +62,10 @@ export class SidebarComponent implements OnInit {
   public credits$ = this.creditsSvc.credits$;
 
   // FontAwesome icons за toggle и кредити
-  public faToggleOpen = faChevronLeft;
+  public faToggleOpen   = faChevronLeft;
   public faToggleClosed = faBars;
-  public faCredits = faCoins;
+  public faCredits      = faCoins;
+  public faAdmin        = faUserShield;
 
   // Менито – веќе не се emoji, туку FontAwesome објекти
   public menuItems = [
@@ -76,18 +78,31 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private creditsSvc: CreditsService
+    private creditsSvc: CreditsService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.creditsSvc.refreshFromApi();
     this.currentUser = this.auth.getCurrentUser();
 
+    debugger;
+
     this.isMobile = window.innerWidth < 992;
     if (this.isMobile) {
       this.isOpen = false;
     }
   }
+
+  // GET FUNCTIONS
+  get showGoToAdmin(): boolean {
+    return (this.currentUser?.role || '').toLowerCase() === 'adminuser';
+  }
+
+  get adminRoute(): string {
+    return '/admin';
+  }
+  //------------
 
   toggle(): void {
     this.isOpen = !this.isOpen;
@@ -100,6 +115,11 @@ export class SidebarComponent implements OnInit {
     if (this.isMobile) {
       this.close.emit();
     }
+  }
+
+  goToAdmin(): void {
+    this.router.navigateByUrl('/admin');
+    this.onMenuItemClick();
   }
 
   @HostListener('window:resize')

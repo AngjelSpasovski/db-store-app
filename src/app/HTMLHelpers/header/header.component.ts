@@ -7,7 +7,7 @@ import { AuthService } from '../../auth/auth.service';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUser, faUserCircle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUserCircle, faSignOutAlt, faArrowLeft  } from '@fortawesome/free-solid-svg-icons';
 import { UserMenuSyncService } from '../../shared/user-menu-sync.service';
 @Component({
   selector: 'app-header',
@@ -26,6 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // icons
   public faSignOutAlt = faSignOutAlt;
   public faUserCircle = faUserCircle;
+  public faBackToUser = faArrowLeft;
 
   public viewMode: 'home' | 'login' | 'forgot-password' | 'reset-password' | 'user' | 'admin' = 'home';
   public isLoggedIn = false;
@@ -33,19 +34,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   public showSettingsMenu = false;
 
-  public isUserNavOpen = false;
-  public isHomeNavOpen = false;
+  public isUserNavOpen  = false;
+  public isHomeNavOpen  = false;
   public isAdminNavOpen = false;
 
   public isSuperadmin = false;
+  public isAdminuser  = false;
 
   private destroy$ = new Subject<void>();
 
   public ready = false;
-
-  get isAdmin(): boolean {
-    return (this.userEmail || '').toLowerCase() === 'angjel.spasovski@gmail.com';
-  }
 
   constructor(
     private router: Router,
@@ -63,18 +61,42 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.ready = true;
 
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd), takeUntil(this.destroy$))
-      .subscribe((e: any) => {
-        const url: string = e.urlAfterRedirects || e.url;
-        this.viewMode = this.mapUrlToViewMode(url);
-      });
+    .pipe(filter(e => e instanceof NavigationEnd), takeUntil(this.destroy$))
+    .subscribe((e: any) => {
+      const url: string = e.urlAfterRedirects || e.url;
 
-    this.auth.currentUser$
+      // ✅ памети last /user/* (за back-to-user да оди таму каде што бил)
+      if (url.startsWith('/user/')) {
+        localStorage.setItem('last_user_url', url);
+      }
+
+      const nextMode = this.mapUrlToViewMode(url);
+      if (nextMode !== this.viewMode) {
+        // затвори менија при промена на view
+        this.isUserNavOpen  = false;
+        this.isAdminNavOpen = false;
+        this.isHomeNavOpen  = false;
+      }
+
+      this.viewMode = nextMode;
+    });
+
+      this.auth.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.isLoggedIn  = !!user;
         this.userEmail   = user?.email ?? '';
-        this.isSuperadmin = (user?.role?.toLowerCase() === 'superadmin');
+
+        const role = (user?.role || '').toLowerCase();
+        this.isSuperadmin = role === 'superadmin';
+        this.isAdminuser  = role === 'adminuser';
+
+        // ако нема корисник, затвори ги менијата (за да не останат отворени визуелно)
+        if (!user) {
+          this.isUserNavOpen  = false;
+          this.isAdminNavOpen = false;
+          this.isHomeNavOpen  = false;
+        }
       });
 
         this.menuSync.sidebarOpen$
@@ -88,14 +110,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
       });
   }
 
+  get showBackToUser(): boolean {
+    // само adminuser (не superadmin)
+    return this.isAdminuser && !this.isSuperadmin;
+  }
+
+  goBackToUser(): void {
+    const lastUserUrl = localStorage.getItem('last_user_url') || '/user/buy-credits';
+    this.router.navigateByUrl(lastUserUrl);
+  }
 
   private mapUrlToViewMode(url: string): typeof this.viewMode {
     if (url.includes('/login')) return 'login';
     if (url.includes('/forgot-password')) return 'forgot-password';
     if (url.includes('/reset-password')) return 'reset-password';
-    if (url.includes('/admin') || url.includes('/superadmin')) {
-      return 'admin';
-    }
+    if (url.includes('/admin')) return 'admin';
     if (url.includes('/user')) return 'user';
     return 'home';
   }

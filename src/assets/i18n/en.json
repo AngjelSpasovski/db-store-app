@@ -211,6 +211,8 @@
   "FAQS": "FAQs",
   "YOUR_BALANCE": "Your Balance",
   "BUY_NOW": "Buy Now",
+  "ADMIN_PAGE": "Admin Page",
+  "BACK_TO_USER": "Back to User",
 
   "SETTINGS":"Settings",
   "LOGGEDIN_AS": "Logged in as",
@@ -267,11 +269,21 @@
   "ONLY_PDF": "Only PDF files are allowed.",
 
   "ADMIN": {
-      "DASHBOARD": "Dashboard",
-      "USERS": "Users",
-      "BILLING_USERS": "Billing by Users",
-      "PACKAGE_MANAGEMENT": "Package Management",
-      "USER_DETAILS": "User Details"
+    "DASHBOARD": "Dashboard",
+    "USERS": "Users",
+    "BILLING_USERS": "Billing by Users",
+    "PACKAGE_MANAGEMENT": "Package Management",
+    "USER_DETAILS": "User Details",
+    "ACTIONS": "Actions",
+    "PER_PAGE": "Rows",
+    "TOTAL": "Total",
+    "PAGE": "Page",
+    "YES": "Yes",
+    "NO": "No",
+    "ACTIVATE": "Activate",
+    "DEACTIVATE": "Deactivate",
+    "USER_DETAILS_TITLE": "User details",
+    "UPDATED_AT": "Updated"
   },
 
   "RECEIPT": "Receipt",

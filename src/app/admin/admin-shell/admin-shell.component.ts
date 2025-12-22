@@ -6,10 +6,8 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   selector: 'app-admin-shell',
   imports: [CommonModule, RouterOutlet],
-  template: `
-    <section class="container py-4">
-      <router-outlet></router-outlet>
-    </section>
-  `,
+  templateUrl: './admin-shell.component.html',
+  styleUrls: ['./admin-shell.component.scss']
 })
 export class AdminShellComponent {}
+

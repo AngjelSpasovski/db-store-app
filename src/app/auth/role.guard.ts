@@ -38,7 +38,7 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state): 
   const email = (u?.email || '').toLowerCase();
 
   // whitelist супер-админ (ако сакаш да остане вака)
-  if (email === 'angjel.spasovski@gmail.com' && state.url.startsWith('/admin')) return true;
+  //if (email === 'angjel.spasovski@gmail.com' && state.url.startsWith('/admin')) return true;
 
   const userRole = normRole(u?.role);
   const expected = (route.data?.['roles'] as string[] | undefined) ?? [];

@@ -86,10 +86,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     // if tolken exists, redirect to user/buy-credits or admin based on role
   if (token && (role || email)) {
     // ✅ special-case: admin by email
-    if (email === 'angjel.spasovski@gmail.com') {
-      this.router.navigateByUrl('/admin', { replaceUrl: true });
-      return;
-    }
+    // if (email === 'angjel.spasovski@gmail.com') {
+    //   this.router.navigateByUrl('/admin', { replaceUrl: true });
+    //   return;
+    // }
 
     const target =
     role === 'superadmin' ? '/admin' :

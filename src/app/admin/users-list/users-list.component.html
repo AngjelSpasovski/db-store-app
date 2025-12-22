@@ -1,101 +1,115 @@
-<div class="admin-page-wrapper">
+<section class="container admin-users-page p-3 p-md-4">
+  <div class="card-block admin-users-card">
 
-  <div class="card admin-table-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h2 class="mb-0">Users</h2>
-
-      <div class="d-flex align-items-center gap-2">
-        <span class="me-1">Per page:</span>
-        <select [(ngModel)]="perPage"
-                (change)="reload()"
-                class="form-select form-select-sm w-auto">
-          <option *ngFor="let p of pageOptions" [value]="p">{{ p }}</option>
-        </select>
+    <!-- TOOLBAR -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 admin-toolbar">
+      <div class="form-label small mb-0">
+        {{ 'ADMIN.USERS' | translate:{ default:'Users' } }}
       </div>
-    </div>
 
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-dark table-striped align-middle mb-0 table-users">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Active</th>
-              <th class="text-end">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let u of rows">
-              <td>{{ u.id }}</td>
-              <td>{{ u.name }}</td>
-              <td>{{ u.email }}</td>
-              <td>{{ u.role }}</td>
-              <td>
-                <span class="badge"
-                      [class.bg-success]="u.isActive"
-                      [class.bg-secondary]="!u.isActive">
-                  {{ u.isActive ? 'Yes' : 'No' }}
-                </span>
-              </td>
+      <div class="d-flex flex-wrap align-items-stretch gap-3 justify-content-end admin-toolbar-right">
 
-              <!-- ⬇️ ОВА Е НОВО -->
-              <td class="text-end actions-cell">
-                <div class="actions-buttons">
-                  <button class="btn btn-sm btn-outline-info"
-                          (click)="openDetails(u)">
-                    View
-                  </button>
+        <!-- SEARCH -->
+        <div class="toolbar-section toolbar-search">
+          <span class="toolbar-label">
+            {{ 'SEARCH' | translate:{ default:'Search' } }}
+          </span>
 
-                  <button class="btn btn-sm btn-outline-warning"
-                          [disabled]="togglingId === u.id"
-                          (click)="toggleStatus(u)">
-                    {{ u.isActive ? 'Deactivate' : 'Activate' }}
-                  </button>
-                </div>
-              </td>
-            </tr>
+          <input
+            type="text"
+            class="form-control form-control-sm search-input"
+            [(ngModel)]="searchText"
+            (input)="applyQuickFilter()"
+            [placeholder]="'ADMIN.SEARCH_USERS' | translate:{ default:'Search users…' }" />
 
-            <tr *ngIf="!rows.length">
-              <td colspan="6" class="text-center py-3">
-                No users found.
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          <button
+            type="button"
+            class="btn btn-sm btn-clear"
+            *ngIf="searchText"
+            (click)="clearSearch()"
+            aria-label="Clear search">
+            ✕
+          </button>
+        </div>
+
+        <!-- PER PAGE -->
+        <div class="toolbar-section">
+          <span class="toolbar-label">
+            {{ 'ADMIN.PER_PAGE' | translate:{ default:'Per page' } }}
+          </span>
+
+          <select
+            [(ngModel)]="perPage"
+            (change)="reload()"
+            class="form-select form-select-sm w-auto">
+            <option *ngFor="let p of pageOptions" [value]="p">{{ p }}</option>
+          </select>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="toolbar-section">
+          <span class="toolbar-label">
+            {{ 'ADMIN.ACTIONS' | translate:{ default:'Actions' } }}
+          </span>
+
+          <button type="button" class="btn btn-export btn-sm" (click)="load()">
+            {{ 'REFRESH' | translate:{ default:'Refresh' } }}
+          </button>
+        </div>
 
       </div>
     </div>
 
-    <div class="card-footer d-flex justify-content-between align-items-center">
+    <!-- GRID -->
+    <div class="admin-grid-wrapper">
+      <ag-grid-angular
+        class="ag-theme-alpine"
+        [theme]="theme"
+        [gridOptions]="gridOptions"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [rowData]="rows"
+        [pagination]="false"
+        style="width: 100%; height: 57vh"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
+
+    <!-- SERVER PAGER -->
+    <div class="admin-pager d-flex justify-content-between align-items-center mt-3">
       <button class="btn btn-outline-light btn-sm"
               [disabled]="page <= 1"
               (click)="prevPage()">
-        Prev
+        {{ 'PREVIOUS' | translate:{ default:'Previous' } }}
       </button>
 
-      <div>Page {{ page }} / {{ totalPages }}</div>
+      <div class="small text-muted">
+        {{ 'ADMIN.PAGE' | translate:{ default:'Page' } }} {{ page }} / {{ totalPages }}
+        · {{ 'ADMIN.TOTAL' | translate:{ default:'Total' } }}: {{ total }}
+      </div>
 
       <button class="btn btn-outline-light btn-sm"
               [disabled]="page >= totalPages"
               (click)="nextPage()">
-        Next
+        {{ 'NEXT' | translate:{ default:'Next' } }}
       </button>
     </div>
+
   </div>
 
-  <!-- MODAL: User details -->
-  <div class="modal-backdrop fade show" *ngIf="detailsVisible"></div>
+  <!-- BLUR BACKDROP (for View + Confirm) -->
+  <div class="modal-backdrop blur show" *ngIf="detailsVisible || confirmVisible"></div>
 
+  <!-- VIEW MODAL -->
   <div class="custom-modal" *ngIf="detailsVisible">
     <div class="custom-modal-dialog">
-      <div class="custom-modal-content">
+      <div class="custom-modal-content glass">
         <div class="custom-modal-header">
           <h5 class="modal-title">
-            User details – {{ selectedUser?.name || selectedRow?.name }}
+            {{ 'ADMIN.USER_DETAILS_TITLE' | translate:{ default:'User details' } }}
+            – {{ selectedUser?.firstName }} {{ selectedUser?.lastName }}
           </h5>
+
           <button type="button"
                   class="btn-close btn-close-white"
                   (click)="closeDetails()"></button>
@@ -106,40 +120,87 @@
             <div class="col-4 fw-semibold">ID</div>
             <div class="col-8">{{ selectedUser.id }}</div>
 
-            <div class="col-4 fw-semibold mt-2">Name</div>
-            <div class="col-8 mt-2">{{ selectedUser.name }}</div>
-
-            <div class="col-4 fw-semibold mt-2">Email</div>
+            <div class="col-4 fw-semibold mt-2">{{ 'EMAIL' | translate:{default:'Email'} }}</div>
             <div class="col-8 mt-2">{{ selectedUser.email }}</div>
 
-            <div class="col-4 fw-semibold mt-2">Company</div>
+            <div class="col-4 fw-semibold mt-2">{{ 'COMPANY' | translate:{default:'Company'} }}</div>
             <div class="col-8 mt-2">{{ selectedUser.companyName || '-' }}</div>
 
-            <div class="col-4 fw-semibold mt-2">Role</div>
+            <div class="col-4 fw-semibold mt-2">{{ 'FIRST_NAME' | translate:{default:'First name'} }}</div>
+            <div class="col-8 mt-2">{{ selectedUser.firstName || '-' }}</div>
+
+            <div class="col-4 fw-semibold mt-2">{{ 'LAST_NAME' | translate:{default:'Last name'} }}</div>
+            <div class="col-8 mt-2">{{ selectedUser.lastName || '-' }}</div>
+
+            <div class="col-4 fw-semibold mt-2">{{ 'ROLE' | translate:{default:'Role'} }}</div>
             <div class="col-8 mt-2">{{ selectedUser.role }}</div>
 
-            <div class="col-4 fw-semibold mt-2">Active</div>
+            <div class="col-4 fw-semibold mt-2">{{ 'ACTIVE' | translate:{default:'Active'} }}</div>
             <div class="col-8 mt-2">
               <span class="badge"
                     [class.bg-success]="selectedUser.isActive"
                     [class.bg-secondary]="!selectedUser.isActive">
-                {{ selectedUser.isActive ? 'Yes' : 'No' }}
+                {{ selectedUser.isActive ? ('ADMIN.YES' | translate:{default:'Yes'}) : ('ADMIN.NO' | translate:{default:'No'}) }}
               </span>
             </div>
 
-            <div class="col-4 fw-semibold mt-2">Created</div>
+            <div class="col-4 fw-semibold mt-2">{{ 'CREATED_AT' | translate:{default:'Created'} }}</div>
             <div class="col-8 mt-2">{{ selectedUser.createdAt || '-' }}</div>
 
-            <div class="col-4 fw-semibold mt-2">Updated</div>
+            <div class="col-4 fw-semibold mt-2">{{ 'ADMIN.UPDATED_AT' | translate:{default:'Updated'} }}</div>
             <div class="col-8 mt-2">{{ selectedUser.updatedAt || '-' }}</div>
           </div>
         </div>
 
         <div class="custom-modal-footer">
-          <button class="btn btn-secondary" (click)="closeDetails()">Close</button>
+          <button class="btn btn-secondary" (click)="closeDetails()">
+            {{ 'CLOSE' | translate:{default:'Close'} }}
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-</div>
+  <!-- CONFIRM MODAL -->
+  <div class="custom-modal" *ngIf="confirmVisible">
+    <div class="custom-modal-dialog confirm-dialog">
+      <div class="custom-modal-content glass">
+        <div class="custom-modal-header">
+          <h5 class="modal-title">
+            {{ confirmNextActive ? ('ACTIVATE' | translate:{default:'Activate'}) : ('DEACTIVATE' | translate:{default:'Deactivate'}) }}
+          </h5>
+
+          <button type="button"
+                  class="btn-close btn-close-white"
+                  (click)="closeConfirm()"></button>
+        </div>
+
+        <div class="custom-modal-body" *ngIf="confirmUser">
+          <div class="confirm-text">
+            {{ 'ADMIN.CONFIRM_TOGGLE' | translate:{ default:'Are you sure you want to change status for' } }}
+            <span class="fw-semibold">{{ confirmUser.email }}</span>?
+          </div>
+
+          <div class="small text-muted mt-2" *ngIf="confirmUser.role === 'superadmin'">
+            {{ 'ADMIN.CANNOT_TOGGLE_SUPERADMIN' | translate:{ default:'Superadmin status cannot be changed.' } }}
+          </div>
+        </div>
+
+        <div class="custom-modal-footer d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-light" (click)="closeConfirm()">
+            {{ 'CANCEL' | translate:{default:'Cancel'} }}
+          </button>
+
+          <button class="btn"
+                  [class.btn-success]="confirmNextActive"
+                  [class.btn-danger]="!confirmNextActive"
+                  [disabled]="confirmBusy"
+                  (click)="confirmToggle()">
+            {{ confirmBusy ? ('LOADING' | translate:{default:'Loading'}) : ('CONFIRM' | translate:{default:'Confirm'}) }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>

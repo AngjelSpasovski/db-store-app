@@ -1,123 +1,289 @@
-:host {
-  display: block;
-}
-
-/* истите променливи како кај new-research */
-.admin-page-wrapper {
-  --bg: #141922;
+/* src/app/admin/users-list/users-list.component.scss */
+.admin-users-page {
   --bg-card: #1b212b;
   --text: #e9eef6;
   --text-muted: #99a3b3;
   --border: rgba(255, 255, 255, 0.08);
   --brand: #0d6efd;
 
-  padding: 1.5rem;
   color: var(--text);
-}
+  font-size: 13px; /* ✅ намален базен фонт */
 
-/* card стил – усогласен со user card-овите */
-.admin-table-card {
-  background: var(--bg-card);
-  border-radius: 0.75rem;
-  border: 1px solid var(--border);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-}
+  .card-block.admin-users-card {
+    background: var(--bg-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    padding: 1.25rem; /* ✅ малку покомпактно */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
 
-.admin-table-card .card-header,
-.admin-table-card .card-footer {
-  background-color: #15151a;
-  border-color: var(--border);
-}
+  .admin-toolbar-right { flex: 1; justify-content: flex-end; }
 
-.admin-table-card .card-header h2 {
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
+  .toolbar-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.8rem; /* ✅ помало */
+    border-radius: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #171c25;
+  }
 
-/* табела */
+  .toolbar-label {
+    position: absolute;
+    top: -0.55rem;
+    left: 1rem;
+    padding: 0 0.45rem;
+    font-size: 0.62rem; /* ✅ помало */
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    background: var(--bg-card);
+  }
 
-.table-users thead {
-  background-color: #111;
-}
+  /* search */
+  .toolbar-search { min-width: 260px; }
 
-.table-users th,
-.table-users td {
-  vertical-align: middle;
-  border-color: rgba(255, 255, 255, 0.05);
-}
+  .search-input {
+    background: #121722;
+    border-color: rgba(255,255,255,.12);
+    color: var(--text);
+    width: 100%;
+    min-width: 210px;
+    font-size: 0.82rem; /* ✅ */
+    padding: 0.35rem 0.55rem;
+  }
+  .search-input::placeholder { color: rgba(233,238,246,.55); }
 
-/* Actions колона – уредни, линеарни копчиња */
+  .btn-clear {
+    border-radius: 999px;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid rgba(255,255,255,.14);
+    background: transparent;
+    color: rgba(233,238,246,.7);
+    line-height: 1;
+  }
+  .btn-clear:hover { background: rgba(255,255,255,.08); color: #fff; }
 
-.actions-cell {
-  white-space: nowrap;
-}
+  .btn-export {
+    border-radius: 999px;
+    padding: 0.32rem 1.0rem; /* ✅ */
+    border: 1px solid var(--border);
+    background: #202632;
+    color: var(--text-muted);
+    font-size: 0.74rem; /* ✅ */
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .btn-export:hover { background: #0b5ed7; border-color: var(--brand); color: #fff; }
 
-.actions-buttons {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
+  .admin-grid-wrapper {
+    margin-top: 0.45rem;
+    overflow: auto;
+    border-radius: 0.7rem;
+  }
 
-/* малку поцврсти граници како во user делот */
-.actions-buttons .btn {
-  min-width: 90px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
+  /* AG GRID */
+  :host ::ng-deep .ag-theme-alpine {
+    .ag-actions-cell { display: flex; align-items: center; justify-content: center; }
 
-/* Modal styles – како кај packages/admins */
-.custom-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .ag-actions.icon-only {
+      display: flex;
+      gap: .30rem; /* ✅ помало */
+      justify-content: center;
+      width: 100%;
+    }
 
-.custom-modal-dialog {
-  max-width: 600px;
-  width: 100%;
-  padding: 1rem;
-}
+    /* icon buttons */
+    .ag-actions .ag-icon-btn {
+      width: 28px;   /* ✅ помало */
+      height: 28px;  /* ✅ помало */
+      padding: 0;
+      border-radius: 9px;
+      line-height: 1;
+      font-size: 0.85rem;
 
-.custom-modal-content {
-  background-color: #18181f;
-  color: #fff;
-  border-radius: 0.75rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-  overflow: hidden;
-}
+      background: transparent !important;
+      border: 1px solid rgba(255,255,255,.16) !important;
+      color: rgba(233,238,246,.85) !important;
 
-.custom-modal-header,
-.custom-modal-footer {
-  padding: 0.75rem 1.25rem;
-  background-color: #11111a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
+      box-shadow: none !important;
+      transition: all .15s ease;
+    }
 
-.custom-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+    .ag-actions .ag-icon-btn:hover {
+      background: rgba(255,255,255,.08) !important;
+      color: #fff !important;
+    }
 
-.custom-modal-body {
-  padding: 1.25rem 1.5rem;
-}
+    .ag-actions .ag-icon-btn.btn-success {
+      border-color: rgba(25,135,84,.45) !important;
+      color: rgba(25,135,84,.95) !important;
+    }
+    .ag-actions .ag-icon-btn.btn-success:hover {
+      background: rgba(25,135,84,.14) !important;
+      color: #fff !important;
+    }
 
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.65);
-}
+    .ag-actions .ag-icon-btn.btn-danger {
+      border-color: rgba(220,53,69,.45) !important;
+      color: rgba(220,53,69,.95) !important;
+    }
+    .ag-actions .ag-icon-btn.btn-danger:hover {
+      background: rgba(220,53,69,.14) !important;
+      color: #fff !important;
+    }
 
-/* мал responsive tweak – на помали екрани копчињата да се кршат во 2 реда */
-@media (max-width: 768px) {
-  .actions-buttons {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    .ag-actions .ag-icon-btn:disabled {
+      opacity: .38;
+      cursor: not-allowed !important;
+      filter: grayscale(1);
+    }
+  }
+
+  /* stacked cells (mobile) */
+  :host ::ng-deep .cell-stack { display: flex; flex-direction: column; gap: 1px; }
+  :host ::ng-deep .cell-stack .cell-main { font-weight: 650; }
+  :host ::ng-deep .cell-stack .cell-sub {
+    font-size: 0.70rem;
+    opacity: 0.75;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Active dot (mobile) */
+  :host ::ng-deep .active-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255,255,255,.08);
+  }
+  :host ::ng-deep .active-dot.on  { background: rgba(25,135,84,.95); }
+  :host ::ng-deep .active-dot.off { background: rgba(108,117,125,.90); }
+
+  /* badges (desktop) */
+  .badge.bg-success { background-color: rgba(25,135,84,.85) !important; }
+  .badge.bg-secondary { background-color: rgba(108,117,125,.70) !important; }
+
+  /* select */
+  .form-select {
+    background-color: #121722;
+    border-color: rgba(255,255,255,.12);
+    color: var(--text);
+    font-size: 0.82rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  /* MODALS + BLUR BACKDROP */
+  .custom-modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; }
+  .custom-modal-dialog { max-width: 600px; width: 100%; padding: 1rem; }
+  .confirm-dialog { max-width: 520px; }
+
+  .modal-backdrop.blur {
+    position: fixed;
+    inset: 0;
+    z-index: 1990;
+    background-color: rgba(0,0,0,.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .custom-modal-content.glass {
+    background: rgba(24, 24, 31, 0.78);
+    color: #fff;
+    border-radius: 0.85rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  .custom-modal-header,
+  .custom-modal-footer {
+    padding: 0.70rem 1.1rem; /* ✅ помало */
+    background: rgba(17, 17, 26, 0.65);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .custom-modal-header { display: flex; align-items: center; justify-content: space-between; }
+  .custom-modal-body { padding: 1.0rem 1.15rem; }
+  .confirm-text { font-size: 0.92rem; }
+
+  /* ✅ SCROLLBARS: wrapper + AG viewport (за да не стануваат бели) */
+  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar { width: 8px; height: 8px; }
+  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-track { background-color: #151823; }
+  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-thumb { background-color: #34384d; border-radius: 4px; }
+  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-thumb:hover { background-color: #4a4f6a; }
+  :host ::ng-deep .admin-grid-wrapper { scrollbar-width: thin; scrollbar-color: #34384d #151823; }
+
+  /* AG internal scrollbars (both directions) */
+  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar,
+  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar,
+  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
+  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-track,
+  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-track,
+  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
+  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-track {
+    background: #151823;
+  }
+  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-thumb,
+  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb,
+  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
+  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-thumb {
+    background: #34384d;
+    border-radius: 4px;
+  }
+  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-thumb:hover,
+  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb:hover,
+  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb:hover,
+  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-thumb:hover {
+    background: #4a4f6a;
+  }
+
+  /* MOBILE */
+  @media (max-width: 576px) {
+    font-size: 12px; /* ✅ уште помало на мобилен */
+    padding: 0.60rem !important;
+
+    .card-block.admin-users-card {
+      padding: 0.90rem;
+      border-radius: 1rem;
+    }
+
+    .admin-toolbar { flex-direction: column; align-items: stretch !important; }
+    .admin-toolbar-right { justify-content: stretch; }
+
+    .toolbar-section {
+      width: 100%;
+      justify-content: space-between;
+      padding: 0.42rem 0.75rem; /* ✅ */
+    }
+
+    .toolbar-search { min-width: unset; }
+    .search-input { min-width: unset; width: 100%; }
+
+    .admin-pager { flex-direction: column; gap: 0.5rem; text-align: center; }
+
+    .custom-modal-dialog { width: 92vw; }
+
+    /* icon buttons even smaller */
+    :host ::ng-deep .ag-theme-alpine .ag-actions .ag-icon-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      font-size: 0.40rem;
+    }
+
+    :host ::ng-deep .cell-stack .cell-sub { font-size: 0.46rem; }
   }
 }

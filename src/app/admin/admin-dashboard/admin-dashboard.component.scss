@@ -1,0 +1,63 @@
+:host { display: block; }
+
+.admin-page {
+  --bg-card: #1b212b;
+  --text: #e9eef6;
+  --text-muted: #99a3b3;
+  --border: rgba(255,255,255,.08);
+
+  color: var(--text);
+}
+
+.admin-page__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.25rem 0 1rem;
+}
+
+.admin-title {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.admin-subtitle {
+  margin: .35rem 0 0;
+  color: var(--text-muted);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 991.98px) {
+  .admin-grid { grid-template-columns: 1fr; }
+}
+
+.admin-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: .85rem;
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+
+.admin-card__title {
+  padding: .85rem 1rem;
+  background: #15151a;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: .85rem;
+}
+
+.admin-card__body {
+  padding: 1rem;
+}
+
+.muted { color: var(--text-muted); margin: 0; }

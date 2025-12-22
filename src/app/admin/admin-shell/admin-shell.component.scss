@@ -1,0 +1,88 @@
+:host { display: block; }
+
+/* Shell wrapper што дава dark theme */
+.admin-shell {
+  --bg: #141922;
+  --bg-card: #1b212b;
+  --bg-card-2: #151b24;
+  --text: #e9eef6;
+  --text-muted: #99a3b3;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --brand: #0d6efd;
+
+  height: 94.3vh;
+  padding: 2%;
+
+  min-height: calc(100vh - 67px); /* ако header ти е ~67px */
+  background: radial-gradient(1200px 600px at 15% 10%, rgba(13,110,253,.12), transparent 60%),
+              radial-gradient(900px 500px at 80% 0%, rgba(130,80,255,.10), transparent 55%),
+              var(--bg);
+  color: var(--text);
+}
+
+.admin-shell__content {
+  /* контејнерот си е bootstrap .container, тука само фино spacing */
+  padding-top: 1.25rem;
+  padding-bottom: 2rem;
+}
+
+/* Унифицирај bootstrap text-muted во админ делот */
+:host ::ng-deep .admin-shell .text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Карти во админ дел */
+:host ::ng-deep .admin-shell .card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+
+/* Card header/footer */
+:host ::ng-deep .admin-shell .card-header,
+:host ::ng-deep .admin-shell .card-footer {
+  background: var(--bg-card-2);
+  border-color: var(--border);
+}
+
+/* Табели (ако користиш bootstrap table-dark) */
+:host ::ng-deep .admin-shell .table {
+  margin-bottom: 0;
+}
+:host ::ng-deep .admin-shell .table th,
+:host ::ng-deep .admin-shell .table td {
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* Form controls */
+:host ::ng-deep .admin-shell .form-select,
+:host ::ng-deep .admin-shell .form-control {
+  background-color: #121722;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+:host ::ng-deep .admin-shell .form-select:focus,
+:host ::ng-deep .admin-shell .form-control:focus {
+  border-color: rgba(13,110,253,.55);
+  box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+}
+
+/* Buttons unify */
+:host ::ng-deep .admin-shell .btn-outline-light {
+  border-color: rgba(255,255,255,.25);
+  color: var(--text);
+}
+:host ::ng-deep .admin-shell .btn-outline-light:hover {
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.35);
+}
+
+/* Headings */
+:host ::ng-deep .admin-shell h1,
+:host ::ng-deep .admin-shell h2,
+:host ::ng-deep .admin-shell h3 {
+  color: var(--text);
+}

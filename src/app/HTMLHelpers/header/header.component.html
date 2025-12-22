@@ -118,49 +118,43 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <!-- активни состојби со routerLinkActive -->
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin']" routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link" [routerLink]="['/admin']" routerLinkActive="active"  [routerLinkActiveOptions]="{ exact: true }" (click)="closeAdminNav()">
               {{ 'ADMIN.DASHBOARD' | translate }}
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/users']" routerLinkActive="active">
+            <a class="nav-link" [routerLink]="['/admin/users']" routerLinkActive="active" (click)="closeAdminNav()">
               {{ 'ADMIN.USERS' | translate }}
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/billing-users']" routerLinkActive="active">
+            <a class="nav-link" [routerLink]="['/admin/billing-users']" routerLinkActive="active" (click)="closeAdminNav()">
               {{ 'ADMIN.BILLING_USERS' | translate }}
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/package-management']" routerLinkActive="active">
-              {{ 'ADMIN.PACKAGE_MANAGEMENT' | translate }}
             </a>
           </li>
 
           <!-- 🔹 Superadmin секција (видлива само ако е superadmin) -->
           <li class="nav-item dropdown" *ngIf="isSuperadmin">
-            <a class="nav-link dropdown-toggle" href="#" id="superadminDropdown" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="superadminDropdown" role="button"  data-bs-toggle="dropdown" aria-expanded="false" (click)="$event.preventDefault()">
               Superadmin
             </a>
+
             <ul class="dropdown-menu" aria-labelledby="superadminDropdown">
               <li>
-                <a class="dropdown-item" [routerLink]="['/superadmin/packages']">
+                <a class="dropdown-item" [routerLink]="['/admin/packages']" (click)="closeAdminNav()">
                   Packages
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" [routerLink]="['/superadmin/admins']">
+                <a class="dropdown-item" [routerLink]="['/admin/admins']" (click)="closeAdminNav()">
                   Admins
                 </a>
               </li>
             </ul>
           </li>
+
 
         </ul>
 
@@ -169,6 +163,14 @@
             <p class="navbar-text text-white me-lg-3 email-truncate">
               <span class="email-style">{{ userEmail }}</span>
             </p>
+          </li>
+
+          <!-- ✅ Back to User (само за adminuser, не за superadmin) -->
+          <li class="nav-item" *ngIf="showBackToUser">
+            <button class="btn chip-btn" type="button" (click)="goBackToUser(); closeAdminNav()">
+              <fa-icon [icon]="faBackToUser"></fa-icon>
+              <span class="d-none d-lg-inline">{{ 'BACK_TO_USER' | translate }}</span>
+            </button>
           </li>
 
           <li class="nav-item">

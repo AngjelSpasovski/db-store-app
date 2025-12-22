@@ -211,6 +211,8 @@
   "FAQS": "FAQ",
   "YOUR_BALANCE": "La tua disponibilità",
   "BUY_NOW": "Acquista ora",
+  "ADMIN_PAGE": "Pagina admin",
+  "BACK_TO_USER": "Torna all'utente",
 
   "SETTINGS": "Impostazioni",
   "LOGGEDIN_AS": "Accedi come",
@@ -267,11 +269,21 @@
   "ONLY_PDF": "Sono ammessi solo file PDF.",
 
   "ADMIN": {
-      "DASHBOARD": "Pannello di controllo",
-      "USERS": "Utenti",
-      "BILLING_USERS": "Fatturazione per utente",
-      "PACKAGE_MANAGEMENT": "Gestione pacchetti",
-      "USER_DETAILS": "Dettagli utente"
+    "DASHBOARD": "Pannello di controllo",
+    "USERS": "Utenti",
+    "BILLING_USERS": "Fatturazione per utente",
+    "PACKAGE_MANAGEMENT": "Gestione pacchetti",
+    "USER_DETAILS": "Dettagli utente",
+    "ACTIONS": "Azioni",
+    "PER_PAGE": "Righe",
+    "TOTAL": "Totale",
+    "PAGE": "Pagina",
+    "YES": "Sì",
+    "NO": "No",
+    "ACTIVATE": "Attiva",
+    "DEACTIVATE": "Disattiva",
+    "USER_DETAILS_TITLE": "Dettagli utente",
+    "UPDATED_AT": "Aggiornato"
   },
 
   "RECEIPT": "Ricevuta",

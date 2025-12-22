@@ -35,7 +35,7 @@ $secondary:  #555;
 
 .user-wrap {
   display: flex;
-  min-height: 94vh;   // целата user страна барем колку viewport
+  min-height: 94.3vh;   // целата user страна барем колку viewport
   background: $black;
   color: $secondary;
   overflow-y: auto;    // скрол по потреба (desktop + mobile)
