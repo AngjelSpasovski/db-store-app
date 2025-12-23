@@ -68,8 +68,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const saved = localStorage.getItem('selectedLanguage') || 'en';
-    this.languageService.set(saved);
 
     // online/offline listeners
     window.addEventListener('offline', this.onOffline);

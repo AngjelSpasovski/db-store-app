@@ -1,8 +1,10 @@
+<!-- src/app/admin/users-list/users-list.component.html -->
 <section class="container admin-users-page p-3 p-md-4">
   <div class="card-block admin-users-card">
 
     <!-- TOOLBAR -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 admin-toolbar">
+
       <div class="form-label small mb-0">
         {{ 'ADMIN.USERS' | translate:{ default:'Users' } }}
       </div>
@@ -60,8 +62,8 @@
       </div>
     </div>
 
-    <!-- GRID -->
-    <div class="admin-grid-wrapper">
+    <!-- DESKTOP GRID (hidden on mobile, but stays mounted) -->
+    <div class="admin-grid-wrapper" [class.grid-hidden]="isMobile">
       <ag-grid-angular
         class="ag-theme-alpine"
         [theme]="theme"
@@ -73,6 +75,97 @@
         style="width: 100%; height: 57vh"
         (gridReady)="onGridReady($event)">
       </ag-grid-angular>
+    </div>
+
+    <!-- MOBILE: accordion cards (like Billing) -->
+    <div *ngIf="isMobile" class="admin-mobile-list mt-3">
+      <div class="accordion" id="usersAccordion">
+
+        <div class="accordion-item" *ngFor="let u of rows; let i = index">
+          <h2 class="accordion-header" [id]="'uHead' + i">
+            <button
+              class="accordion-button collapsed mobile-acc-btn"
+              type="button"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#uCol' + i"
+              aria-expanded="false"
+              [attr.aria-controls]="'uCol' + i">
+
+              <div class="acc-main-line">
+                <span class="acc-id">#{{ u.id }}</span>
+
+                <span class="acc-right">
+                  <span class="badge"
+                        [class.bg-success]="u.isActive"
+                        [class.bg-secondary]="!u.isActive">
+                    {{ u.isActive ? ('ADMIN.YES' | translate:{default:'Yes'}) : ('ADMIN.NO' | translate:{default:'No'}) }}
+                  </span>
+                </span>
+              </div>
+
+              <div class="acc-sub-line">
+                <span class="acc-name">
+                  {{ (u.firstName || '') + ' ' + (u.lastName || '') || '-' }}
+                </span>
+                <span class="acc-email">{{ u.email }}</span>
+              </div>
+            </button>
+          </h2>
+
+          <div
+            [id]="'uCol' + i"
+            class="accordion-collapse collapse"
+            [attr.aria-labelledby]="'uHead' + i"
+            data-bs-parent="#usersAccordion">
+
+            <div class="accordion-body">
+
+              <div class="acc-row" *ngIf="u.companyName">
+                <span class="acc-label">{{ 'COMPANY' | translate:{default:'Company'} }}</span>
+                <span class="acc-value">{{ u.companyName }}</span>
+              </div>
+
+              <div class="acc-row">
+                <span class="acc-label">{{ 'ROLE' | translate:{default:'Role'} }}</span>
+                <span class="acc-value">{{ u.role }}</span>
+              </div>
+
+              <div class="acc-row" *ngIf="u.createdAt">
+                <span class="acc-label">{{ 'CREATED_AT' | translate:{default:'Created'} }}</span>
+                <span class="acc-value">{{ u.createdAt | date:'dd/MM/yyyy' }}</span>
+              </div>
+
+              <div class="acc-row" *ngIf="u.updatedAt">
+                <span class="acc-label">{{ 'ADMIN.UPDATED_AT' | translate:{default:'Updated'} }}</span>
+                <span class="acc-value">{{ u.updatedAt | date:'dd/MM/yyyy' }}</span>
+              </div>
+
+              <div class="acc-row acc-row-button d-flex gap-2">
+                <button type="button"
+                        class="btn btn-outline-light btn-sm w-100"
+                        (click)="openDetails(u)">
+                  {{ 'VIEW' | translate:{default:'View'} }}
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm w-100"
+                        [class.btn-success]="!u.isActive"
+                        [class.btn-danger]="u.isActive"
+                        [disabled]="u.role === 'superadmin' || togglingId === u.id"
+                        (click)="openConfirmToggle(u)">
+                  {{ togglingId === u.id ? ('LOADING' | translate:{default:'Loading'}) : (u.isActive ? ('DEACTIVATE' | translate:{default:'Deactivate'}) : ('ACTIVATE' | translate:{default:'Activate'})) }}
+                </button>
+              </div>
+
+              <div class="small text-muted mt-2" *ngIf="u.role === 'superadmin'">
+                {{ 'ADMIN.CANNOT_TOGGLE_SUPERADMIN' | translate:{ default:'Superadmin status cannot be changed.' } }}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <!-- SERVER PAGER -->

@@ -8,17 +8,18 @@ $light:  #ffffff;
   --chip-width: 132px;
 
   width: 100%;
-  position: sticky;
-  top: 0;
+  position: relative;
+  top: auto;
   z-index: 1000;
-  box-shadow: 0 0 18px rgba(0, 0, 0, .55);
+  box-shadow: none !important;
 
   /* =========================
      BASE NAVBAR (common)
      ========================= */
   .navbar {
     padding: 0.75rem 1.5rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: none !important;         /* ако не сакаш линија од navbar shadow */
+    border-bottom: none !important;
 
     /* IMPORTANT: Bootstrap p.navbar-text има margin-bottom: 1rem → ти го растегнува header-от */
     .navbar-text {
@@ -240,7 +241,8 @@ $light:  #ffffff;
 .header-user {
   .navbar {
     background-color: $darker !important;
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-bottom: none !important;
+    box-shadow: none !important;
   }
 
   #userNavbarContent.collapse.show {
@@ -251,30 +253,164 @@ $light:  #ffffff;
 }
 
 /* =========================
-   ADMIN VIEW HEADER
-   ========================= */
+/   ADMIN VIEW HEADER
+========================= */
 .header-admin {
   .navbar {
     background-color: $darker !important;
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-bottom: none !important;
+    box-shadow: none !important;
+    position: relative;
   }
 
-  /* admin active state */
-  #adminNavbarContent .nav-link {
-    color: rgba(255,255,255,.7);
+  /* ✅ DESKTOP/LG+: врати го layout-от (лево линкови, десно actions) */
+  @media (min-width: 992px) {
+    #adminNavbarContent {
+      width: 100%;
+    }
 
-    &:hover { color: #fff; }
+    .admin-collapse-inner {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
 
-    &.active {
-      font-weight: 600;
-      color: #fff;
-      border-bottom: 2px solid rgba(255,255,255,.6);
+    .admin-nav-links {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-right: auto;
+      /* ✅ левиот блок */
+      gap: .25rem;
+    }
+
+    .admin-nav-actions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-left: auto;
+      /* ✅ десниот блок */
+      gap: .6rem;
+    }
+
+    .admin-divider {
+      display: none !important;
+    }
+
+    /* desktop стил (поједноставен, како претходно) */
+    #adminNavbarContent .nav-link {
+      color: rgba(255, 255, 255, .70);
+      padding: .25rem .5rem;
+      border-radius: .5rem;
+
+      &:hover {
+        color: #fff;
+      }
+
+      &.active {
+        font-weight: 600;
+        color: #fff;
+        border-bottom: 2px solid rgba(255, 255, 255, .6);
+        border-radius: 0;
+      }
     }
   }
 
-  #adminNavbarContent.collapse.show {
-    background-color: $darker;
-    border-top: 1px solid rgba(255,255,255,.12);
-    padding: .5rem 0;
+  /* ✅ MOBILE: твојот panel стил (останува како што беше) */
+  @media (max-width: 991.98px) {
+    #adminNavbarContent.collapse.show {
+      top: calc(100% + 0.5rem);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+      overflow: visible;
+      padding: 0;
+    }
+
+    .admin-collapse-inner {
+      background: $darker;
+      padding: .75rem;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+
+    .admin-nav-links,
+    .admin-nav-actions {
+      width: 100%;
+      gap: .35rem;
+    }
+
+    .admin-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, .10);
+      margin: .25rem 0;
+    }
+
+    .admin-email {
+      padding: .25rem .25rem .1rem .25rem;
+      opacity: .95;
+    }
+
+    /* mobile nav-link да е “pill” */
+    #adminNavbarContent .nav-link {
+      color: rgba(255, 255, 255, .78);
+      border-radius: .65rem;
+      padding: .55rem .75rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+
+      &:hover {
+        background: rgba(255, 255, 255, .08);
+        color: #fff;
+      }
+
+      &.active {
+        background: rgba(255, 255, 255, .10);
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+
+    .dropdown-menu {
+      position: static !important;
+      float: none !important;
+      width: 100%;
+      margin-top: .35rem;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .10);
+      border-radius: .75rem;
+      padding: .35rem;
+    }
+
+    .dropdown-item {
+      border-radius: .55rem;
+      padding: .55rem .65rem;
+      color: rgba(255, 255, 255, .85);
+
+      &:hover {
+        background: rgba(255, 255, 255, .08);
+        color: #fff;
+      }
+    }
+
+    .admin-dropdown-toggle {
+      justify-content: space-between;
+    }
+
+    .app-language-selector {
+      width: 100%;
+      position: relative;
+    }
+
+    /* ✅ во admin mobile panel dropdown да биде “inline/panel” (без popper позиционирања) */
+    .app-language-selector ::ng-deep .dropdown-menu {
+      position: static !important;
+      transform: none !important;
+      width: 100%;
+      min-width: 100%;
+      margin-top: .35rem;
+      z-index: 3000;
+    }
   }
 }

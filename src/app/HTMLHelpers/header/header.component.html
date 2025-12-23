@@ -115,76 +115,84 @@
 
       <div id="adminNavbarContent" class="navbar-collapse collapse" [class.show]="isAdminNavOpen">
 
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <!-- активни состојби со routerLinkActive -->
-          <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin']" routerLinkActive="active"  [routerLinkActiveOptions]="{ exact: true }" (click)="closeAdminNav()">
-              {{ 'ADMIN.DASHBOARD' | translate }}
-            </a>
-          </li>
+        <div class="admin-collapse-inner">
 
-          <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/users']" routerLinkActive="active" (click)="closeAdminNav()">
-              {{ 'ADMIN.USERS' | translate }}
-            </a>
-          </li>
+          <!-- LEFT: admin links -->
+          <ul class="navbar-nav admin-nav-links">
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/admin']" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }" (click)="closeAdminNav()">
+                {{ 'ADMIN.DASHBOARD' | translate }}
+              </a>
+            </li>
 
-          <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/billing-users']" routerLinkActive="active" (click)="closeAdminNav()">
-              {{ 'ADMIN.BILLING_USERS' | translate }}
-            </a>
-          </li>
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/admin/users']" routerLinkActive="active" (click)="closeAdminNav()">
+                {{ 'ADMIN.USERS' | translate }}
+              </a>
+            </li>
 
-          <!-- 🔹 Superadmin секција (видлива само ако е superadmin) -->
-          <li class="nav-item dropdown" *ngIf="isSuperadmin">
-            <a class="nav-link dropdown-toggle" href="#" id="superadminDropdown" role="button"  data-bs-toggle="dropdown" aria-expanded="false" (click)="$event.preventDefault()">
-              Superadmin
-            </a>
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/admin/billing-users']" routerLinkActive="active" (click)="closeAdminNav()">
+                {{ 'ADMIN.BILLING_USERS' | translate }}
+              </a>
+            </li>
 
-            <ul class="dropdown-menu" aria-labelledby="superadminDropdown">
-              <li>
-                <a class="dropdown-item" [routerLink]="['/admin/packages']" (click)="closeAdminNav()">
-                  Packages
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" [routerLink]="['/admin/admins']" (click)="closeAdminNav()">
-                  Admins
-                </a>
-              </li>
-            </ul>
-          </li>
+            <!-- Superadmin dropdown -->
+            <li class="nav-item dropdown" *ngIf="isSuperadmin">
+              <a class="nav-link dropdown-toggle admin-dropdown-toggle" href="#" id="superadminDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false" (click)="$event.preventDefault()">
+                <span>Superadmin</span>
+              </a>
 
+              <ul class="dropdown-menu" aria-labelledby="superadminDropdown">
+                <li>
+                  <a class="dropdown-item" [routerLink]="['/admin/packages']" (click)="closeAdminNav()">
+                    Packages
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" [routerLink]="['/admin/admins']" (click)="closeAdminNav()">
+                    Admins
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
 
-        </ul>
+          <div class="admin-divider d-lg-none"></div>
 
-        <ul class="navbar-nav ms-auto align-items-lg-center">
-          <li class="nav-item">
-            <p class="navbar-text text-white me-lg-3 email-truncate">
-              <span class="email-style">{{ userEmail }}</span>
-            </p>
-          </li>
+          <!-- RIGHT: actions -->
+          <ul class="navbar-nav admin-nav-actions ms-lg-auto">
 
-          <!-- ✅ Back to User (само за adminuser, не за superadmin) -->
-          <li class="nav-item" *ngIf="showBackToUser">
-            <button class="btn chip-btn" type="button" (click)="goBackToUser(); closeAdminNav()">
-              <fa-icon [icon]="faBackToUser"></fa-icon>
-              <span class="d-none d-lg-inline">{{ 'BACK_TO_USER' | translate }}</span>
-            </button>
-          </li>
+            <li class="nav-item admin-email">
+              <p class="navbar-text text-white email-truncate">
+                <span class="email-style">{{ userEmail }}</span>
+              </p>
+            </li>
 
-          <li class="nav-item">
-            <app-language-selector class="language-selector"></app-language-selector>
-          </li>
+            <li class="nav-item" *ngIf="showBackToUser">
+              <button class="btn chip-btn w-100" type="button" (click)="goBackToUser(); closeAdminNav()">
+                <fa-icon [icon]="faBackToUser"></fa-icon>
+                <span>{{ 'BACK_TO_USER' | translate }}</span>
+              </button>
+            </li>
 
-          <li class="nav-item">
-            <button class="btn logout-btn" (click)="logout(); closeAdminNav()">
-              <fa-icon [icon]="faSignOutAlt"></fa-icon> {{ 'LOGOUT' | translate }}
-            </button>
-          </li>
-        </ul>
+            <li class="nav-item">
+              <app-language-selector class="language-selector w-100"></app-language-selector>
+            </li>
 
+            <li class="nav-item">
+              <button class="btn logout-btn w-100" (click)="logout(); closeAdminNav()">
+                <fa-icon [icon]="faSignOutAlt"></fa-icon> {{ 'LOGOUT' | translate }}
+              </button>
+            </li>
+
+          </ul>
+
+        </div>
       </div>
+
     </div>
   </nav>
 

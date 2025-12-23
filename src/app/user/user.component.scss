@@ -35,7 +35,7 @@ $secondary:  #555;
 
 .user-wrap {
   display: flex;
-  min-height: 94.3vh;   // целата user страна барем колку viewport
+  min-height: 93.3vh;   // целата user страна барем колку viewport
   background: $black;
   color: $secondary;
   overflow-y: auto;    // скрол по потреба (desktop + mobile)
@@ -48,7 +48,7 @@ $secondary:  #555;
   transition: margin-left .3s ease;
 
   .main-header-wrap {
-    background-color: $darker;
+    background-color: #262a32;
     padding: 1.1rem 0.75rem;
     flex: 0 0 auto;      // header со природна висина
     box-shadow: 0 0 18px rgba(0, 0, 0, .55);

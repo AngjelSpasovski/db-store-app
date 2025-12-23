@@ -5,12 +5,13 @@ $darker: #1e1e1e;
 $light:  #ffffff;
 $primary-blue: #00509e;
 
-$header-total-height: 67px;
-$header-total-height-margin: 68px;
+$header-total-height: 69px;
+$header-total-height-margin: 60px;
+$sidebar-top-height: 64px;
 
 .sidebar {
   position: fixed;
-  top: $header-total-height;
+  top: $sidebar-top-height;
   bottom: 0;
   left: 0;
   width: 240px;
@@ -26,7 +27,7 @@ $header-total-height-margin: 68px;
   &__header {
     margin-top: 0;
     padding: 0.5rem 0.75rem;
-    background: $darker;
+    background: #262a32;;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -92,7 +93,6 @@ $header-total-height-margin: 68px;
 
   /* ── главно мени ──────────────────────────────────────── */
   &__menu {
-    margin: 4px 0;
     list-style: none;
     padding: 20px 5px;
     background: $darker;
@@ -101,6 +101,7 @@ $header-total-height-margin: 68px;
 
     li {
       box-shadow: 5px 2px 14px rgba(0, 0, 0, 0.55);
+      background-color: #282a31;
     }
 
     li a {

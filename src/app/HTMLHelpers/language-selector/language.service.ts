@@ -4,12 +4,14 @@ import { BehaviorSubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { DOCUMENT } from '@angular/common';
 
-const STORAGE_KEY = 'selectedLanguage';
-const FALLBACK = 'en';
+export type LangCode = 'en' | 'it' | 'mk';
 
+const STORAGE_KEY = 'selectedLanguage';
+const FALLBACK: LangCode = 'it';
+const ALLOWED: LangCode[] = ['en', 'it', 'mk'];
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
-  private _lang$ = new BehaviorSubject<string>(localStorage.getItem(STORAGE_KEY) || FALLBACK);
+  private _lang$ = new BehaviorSubject<LangCode>(this.readInitial());
   readonly language$ = this._lang$.asObservable();
 
   constructor(private i18n: TranslateService, @Inject(DOCUMENT) private doc: Document) {
@@ -17,19 +19,24 @@ export class LanguageService {
     this.apply(this._lang$.value);
   }
 
-  /** Јавно менување јазик (перзистира + аплицира) */
-  set(lang: string) {
+  set(lang: LangCode) {
     if (!lang || lang === this._lang$.value) return;
     localStorage.setItem(STORAGE_KEY, lang);
     this._lang$.next(lang);
     this.apply(lang);
   }
 
-  /** Тековен јазик (синхрон) */
-  current() { return this._lang$.value; }
+  current(): LangCode {
+    return this._lang$.value;
+  }
 
-  /** Внатрешно: активирање на преводите + <html lang=".."> */
-  private apply(lang: string) {
+  private readInitial(): LangCode {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw && (ALLOWED as string[]).includes(raw)) return raw as LangCode;
+    return FALLBACK;
+  }
+
+  private apply(lang: LangCode) {
     this.i18n.use(lang);
     this.doc.documentElement.lang = lang;
   }

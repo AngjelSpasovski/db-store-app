@@ -1,30 +1,37 @@
 /* src/app/admin/users-list/users-list.component.scss */
-.admin-users-page {
+
+:host {
   --bg-card: #1b212b;
   --text: #e9eef6;
   --text-muted: #99a3b3;
   --border: rgba(255, 255, 255, 0.08);
   --brand: #0d6efd;
+}
 
+.admin-users-page {
   color: var(--text);
-  font-size: 13px; /* ✅ намален базен фонт */
+  font-size: 13px;
 
   .card-block.admin-users-card {
     background: var(--bg-card);
     border-radius: 0.75rem;
     border: 1px solid var(--border);
-    padding: 1.25rem; /* ✅ малку покомпактно */
+    padding: 1.25rem;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   }
 
-  .admin-toolbar-right { flex: 1; justify-content: flex-end; }
+  .admin-toolbar-right {
+    flex: 1;
+    justify-content: flex-end;
+  }
 
+  /* TOOLBAR CAPSULE (same as Billing) */
   .toolbar-section {
     position: relative;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.45rem 0.8rem; /* ✅ помало */
+    padding: 0.5rem 0.9rem;
     border-radius: 0.9rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: #171c25;
@@ -35,150 +42,181 @@
     top: -0.55rem;
     left: 1rem;
     padding: 0 0.45rem;
-    font-size: 0.62rem; /* ✅ помало */
+    font-size: 0.65rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--text-muted);
     background: var(--bg-card);
   }
 
-  /* search */
-  .toolbar-search { min-width: 260px; }
+  /* SEARCH capsule */
+  .toolbar-search {
+    min-width: 260px;
+  }
 
   .search-input {
     background: #121722;
-    border-color: rgba(255,255,255,.12);
+    border-color: rgba(255, 255, 255, 0.12);
     color: var(--text);
     width: 100%;
     min-width: 210px;
-    font-size: 0.82rem; /* ✅ */
+    font-size: 0.82rem;
     padding: 0.35rem 0.55rem;
   }
-  .search-input::placeholder { color: rgba(233,238,246,.55); }
+  .search-input::placeholder {
+    color: rgba(233, 238, 246, 0.55);
+  }
 
   .btn-clear {
     border-radius: 999px;
     padding: 0.15rem 0.5rem;
-    border: 1px solid rgba(255,255,255,.14);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     background: transparent;
-    color: rgba(233,238,246,.7);
+    color: rgba(233, 238, 246, 0.7);
     line-height: 1;
   }
-  .btn-clear:hover { background: rgba(255,255,255,.08); color: #fff; }
+  .btn-clear:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
 
+  /* pill buttons */
   .btn-export {
     border-radius: 999px;
-    padding: 0.32rem 1.0rem; /* ✅ */
+    padding: 0.35rem 1.1rem;
     border: 1px solid var(--border);
     background: #202632;
     color: var(--text-muted);
-    font-size: 0.74rem; /* ✅ */
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 500;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
-  .btn-export:hover { background: #0b5ed7; border-color: var(--brand); color: #fff; }
-
-  .admin-grid-wrapper {
-    margin-top: 0.45rem;
-    overflow: auto;
-    border-radius: 0.7rem;
+  .btn-export:hover {
+    background: #0b5ed7;
+    border-color: var(--brand);
+    color: #fff;
   }
 
-  /* AG GRID */
-  :host ::ng-deep .ag-theme-alpine {
-    .ag-actions-cell { display: flex; align-items: center; justify-content: center; }
-
-    .ag-actions.icon-only {
-      display: flex;
-      gap: .30rem; /* ✅ помало */
-      justify-content: center;
-      width: 100%;
-    }
-
-    /* icon buttons */
-    .ag-actions .ag-icon-btn {
-      width: 28px;   /* ✅ помало */
-      height: 28px;  /* ✅ помало */
-      padding: 0;
-      border-radius: 9px;
-      line-height: 1;
-      font-size: 0.85rem;
-
-      background: transparent !important;
-      border: 1px solid rgba(255,255,255,.16) !important;
-      color: rgba(233,238,246,.85) !important;
-
-      box-shadow: none !important;
-      transition: all .15s ease;
-    }
-
-    .ag-actions .ag-icon-btn:hover {
-      background: rgba(255,255,255,.08) !important;
-      color: #fff !important;
-    }
-
-    .ag-actions .ag-icon-btn.btn-success {
-      border-color: rgba(25,135,84,.45) !important;
-      color: rgba(25,135,84,.95) !important;
-    }
-    .ag-actions .ag-icon-btn.btn-success:hover {
-      background: rgba(25,135,84,.14) !important;
-      color: #fff !important;
-    }
-
-    .ag-actions .ag-icon-btn.btn-danger {
-      border-color: rgba(220,53,69,.45) !important;
-      color: rgba(220,53,69,.95) !important;
-    }
-    .ag-actions .ag-icon-btn.btn-danger:hover {
-      background: rgba(220,53,69,.14) !important;
-      color: #fff !important;
-    }
-
-    .ag-actions .ag-icon-btn:disabled {
-      opacity: .38;
-      cursor: not-allowed !important;
-      filter: grayscale(1);
-    }
-  }
-
-  /* stacked cells (mobile) */
-  :host ::ng-deep .cell-stack { display: flex; flex-direction: column; gap: 1px; }
-  :host ::ng-deep .cell-stack .cell-main { font-weight: 650; }
-  :host ::ng-deep .cell-stack .cell-sub {
-    font-size: 0.70rem;
-    opacity: 0.75;
-    line-height: 1.1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  /* Active dot (mobile) */
-  :host ::ng-deep .active-dot {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 2px rgba(255,255,255,.08);
-  }
-  :host ::ng-deep .active-dot.on  { background: rgba(25,135,84,.95); }
-  :host ::ng-deep .active-dot.off { background: rgba(108,117,125,.90); }
-
-  /* badges (desktop) */
-  .badge.bg-success { background-color: rgba(25,135,84,.85) !important; }
-  .badge.bg-secondary { background-color: rgba(108,117,125,.70) !important; }
-
-  /* select */
   .form-select {
     background-color: #121722;
-    border-color: rgba(255,255,255,.12);
+    border-color: rgba(255, 255, 255, 0.12);
     color: var(--text);
     font-size: 0.82rem;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+  }
+
+  /* GRID WRAPPER */
+  .admin-grid-wrapper {
+    margin-top: 0.5rem;
+  }
+
+  /* hidden grid on mobile (like Billing) */
+  .admin-grid-wrapper.grid-hidden {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* badges */
+  .badge.bg-success { background-color: rgba(25,135,84,.85) !important; }
+  .badge.bg-secondary { background-color: rgba(108,117,125,.70) !important; }
+
+  /* ===== MOBILE accordion list (like Billing) ===== */
+  .admin-mobile-list {
+    margin-top: 1rem;
+
+    .accordion-item {
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #151921;
+
+      & + .accordion-item {
+        margin-top: 0.75rem;
+      }
+    }
+
+    .mobile-acc-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      background: #1d2330;
+      color: var(--text);
+      font-size: 0.85rem;
+      padding-top: 0.6rem;
+      padding-bottom: 0.6rem;
+    }
+
+    .acc-main-line {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .acc-sub-line {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .acc-name { color: var(--text); font-weight: 600; }
+    .acc-email { opacity: 0.9; }
+
+    .accordion-body {
+      background: #151921;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .acc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.15rem 0;
+    }
+
+    .acc-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .acc-value {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+      max-width: 62%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .acc-row-button {
+      justify-content: center;
+      margin-top: 0.35rem;
+
+      .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.9rem;
+        border-radius: 999px;
+      }
+    }
   }
 
   /* MODALS + BLUR BACKDROP */
@@ -206,84 +244,253 @@
 
   .custom-modal-header,
   .custom-modal-footer {
-    padding: 0.70rem 1.1rem; /* ✅ помало */
+    padding: 0.75rem 1.25rem;
     background: rgba(17, 17, 26, 0.65);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: end;
   }
 
   .custom-modal-header { display: flex; align-items: center; justify-content: space-between; }
-  .custom-modal-body { padding: 1.0rem 1.15rem; }
-  .confirm-text { font-size: 0.92rem; }
+  .custom-modal-body {
+    padding: 1.15rem 1.35rem;
+    background-color: black;
+  }
+  .confirm-text { font-size: 0.95rem; }
 
-  /* ✅ SCROLLBARS: wrapper + AG viewport (за да не стануваат бели) */
-  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar { width: 8px; height: 8px; }
-  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-track { background-color: #151823; }
-  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-thumb { background-color: #34384d; border-radius: 4px; }
-  :host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-thumb:hover { background-color: #4a4f6a; }
-  :host ::ng-deep .admin-grid-wrapper { scrollbar-width: thin; scrollbar-color: #34384d #151823; }
-
-  /* AG internal scrollbars (both directions) */
-  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar,
-  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar,
-  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
-  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-track,
-  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-track,
-  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
-  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-track {
-    background: #151823;
-  }
-  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-thumb,
-  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb,
-  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
-  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-thumb {
-    background: #34384d;
-    border-radius: 4px;
-  }
-  :host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-thumb:hover,
-  :host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb:hover,
-  :host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb:hover,
-  :host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-thumb:hover {
-    background: #4a4f6a;
-  }
-
-  /* MOBILE */
-  @media (max-width: 576px) {
-    font-size: 12px; /* ✅ уште помало на мобилен */
-    padding: 0.60rem !important;
+  /* 📱 Mobile layout for toolbar like Billing */
+  @media (max-width: 768px) {
+    font-size: 12px;
 
     .card-block.admin-users-card {
-      padding: 0.90rem;
-      border-radius: 1rem;
+      padding: 1rem;
     }
 
-    .admin-toolbar { flex-direction: column; align-items: stretch !important; }
-    .admin-toolbar-right { justify-content: stretch; }
+    .admin-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
+    .admin-toolbar-right {
+      justify-content: stretch;
+      width: 100%;
+    }
 
     .toolbar-section {
       width: 100%;
-      justify-content: space-between;
-      padding: 0.42rem 0.75rem; /* ✅ */
+      justify-content: center;
+      text-align: center;
     }
 
-    .toolbar-search { min-width: unset; }
+    .toolbar-label {
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      font-size: 0.6rem;
+    }
+
+    .toolbar-search { min-width: unset; width: 100%; }
     .search-input { min-width: unset; width: 100%; }
-
-    .admin-pager { flex-direction: column; gap: 0.5rem; text-align: center; }
-
-    .custom-modal-dialog { width: 92vw; }
-
-    /* icon buttons even smaller */
-    :host ::ng-deep .ag-theme-alpine .ag-actions .ag-icon-btn {
-      width: 22px;
-      height: 22px;
-      border-radius: 4px;
-      font-size: 0.40rem;
-    }
-
-    :host ::ng-deep .cell-stack .cell-sub { font-size: 0.46rem; }
   }
+}
+
+/* ===== ag-Grid look (copy style from Billing) ===== */
+:host ::ng-deep .ag-theme-alpine {
+  background-color: transparent;
+
+  .ag-root-wrapper {
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background-color: #141922;
+  }
+
+  .ag-header {
+    background-color: #2a303a;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ag-header-cell-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+
+  .ag-row {
+    border-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .ag-row.ag-row-hover {
+    background-color: #232936 !important;
+  }
+
+  .ag-row-selected {
+    background-color: rgba(13, 110, 253, 0.18) !important;
+  }
+
+  .ag-cell {
+    color: var(--text);
+    font-size: 0.85rem;
+  }
+
+  .ag-cell-focus {
+    outline: 2px solid var(--brand);
+    outline-offset: -1px;
+  }
+
+  .ag-paging-panel {
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .ag-paging-button {
+    border-radius: 999px;
+  }
+
+  /* actions buttons (your existing style, compact) */
+  .ag-actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ag-actions.icon-only {
+    display: flex;
+    gap: 0.35rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .ag-actions .ag-icon-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 10px;
+    line-height: 1;
+    font-size: 0.85rem;
+
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    color: rgba(233, 238, 246, 0.85) !important;
+
+    box-shadow: none !important;
+    transition: all 0.15s ease;
+  }
+
+  .ag-actions .ag-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+  }
+
+  .ag-actions .ag-icon-btn.btn-success {
+    border-color: rgba(25, 135, 84, 0.45) !important;
+    color: rgba(25, 135, 84, 0.95) !important;
+  }
+  .ag-actions .ag-icon-btn.btn-success:hover {
+    background: rgba(25, 135, 84, 0.14) !important;
+    color: #fff !important;
+  }
+
+  .ag-actions .ag-icon-btn.btn-danger {
+    border-color: rgba(220, 53, 69, 0.45) !important;
+    color: rgba(220, 53, 69, 0.95) !important;
+  }
+  .ag-actions .ag-icon-btn.btn-danger:hover {
+    background: rgba(220, 53, 69, 0.14) !important;
+    color: #fff !important;
+  }
+
+  .ag-actions .ag-icon-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed !important;
+    filter: grayscale(1);
+  }
+}
+
+/* --- Scrollbar styling (same as Billing) --- */
+:host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+:host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-track {
+  background-color: #151823;
+}
+
+:host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-thumb {
+  background-color: #34384d;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .admin-grid-wrapper ::-webkit-scrollbar-thumb:hover {
+  background-color: #4a4f6a;
+}
+
+/* Firefox */
+:host ::ng-deep .admin-grid-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: #34384d #151823;
+}
+
+/* ag-grid internal scrollbars (to avoid white bars) */
+:host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar,
+:host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar,
+:host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
+:host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+:host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-track,
+:host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-track,
+:host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
+:host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-track {
+  background: #151823;
+}
+
+:host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-thumb,
+:host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb,
+:host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
+:host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-thumb {
+  background: #34384d;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .ag-theme-alpine .ag-body-viewport::-webkit-scrollbar-thumb:hover,
+:host ::ng-deep .ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb:hover,
+:host ::ng-deep .ag-theme-alpine .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb:hover,
+:host ::ng-deep .ag-theme-alpine .ag-body-vertical-scroll-viewport::-webkit-scrollbar-thumb:hover {
+  background: #4a4f6a;
+}
+
+/* ===== ag-grid action buttons: MUST be OUTSIDE .admin-users-page {} ===== */
+:host ::ng-deep .ag-theme-alpine .ag-actions.icon-only {
+  gap: 0.25rem;
+  justify-content: center;
+  width: 100%;
+}
+
+:host ::ng-deep .ag-theme-alpine .ag-cell.ag-actions-cell {
+  padding: 0 !important;
+}
+
+:host ::ng-deep .ag-theme-alpine .ag-actions.icon-only .ag-icon-btn {
+  /* override bootstrap btn vars (BS5+) */
+  --bs-btn-padding-x: 0;
+  --bs-btn-padding-y: 0;
+  --bs-btn-font-size: 12px;
+  --bs-btn-line-height: 1;
+
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+
+  padding: 0 !important;        /* клучно */
+  line-height: 1 !important;
+  font-size: 12px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }

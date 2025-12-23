@@ -162,8 +162,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   // Затвори dropdown и нав кога кликнуваш надвор
-  @HostListener('document:click')
-  onDocClick() {
+  @HostListener('document:click', ['$event'])
+  onDocClick(evt: MouseEvent) {
+    const target = evt.target as HTMLElement;
+
+    // ако не е кликнато во header → затвори ги менијата
+    if (!target.closest('.app-header')) {
+      this.isAdminNavOpen = false;
+      this.isUserNavOpen = false;
+      this.isHomeNavOpen = false;
+    }
+
     this.showSettingsMenu = false;
   }
 

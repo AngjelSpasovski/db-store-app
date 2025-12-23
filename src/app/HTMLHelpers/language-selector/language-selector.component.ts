@@ -1,44 +1,51 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { LanguageService } from './language.service';
+import { LanguageService, LangCode } from './language.service';
+import { ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-language-selector',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './language-selector.component.html',
   styleUrls: ['./language-selector.component.scss']
 })
 export class LanguageSelectorComponent {
   dropdownOpen = false;
 
-  languages = [
+  languages: ReadonlyArray<{ code: LangCode; name: string }> = [
     { code: 'en', name: 'EN' },
     { code: 'it', name: 'IT' },
     { code: 'mk', name: 'MK' }
   ];
 
-  constructor(private langSvc: LanguageService) {}
+  constructor(private langSvc: LanguageService, private el: ElementRef<HTMLElement>) {}
 
   /** секогаш ја читаме моменталната вредност од сервисот */
-  get selectedLanguage() { return this.langSvc.current(); }
+  get selectedLanguage(): LangCode {
+    return this.langSvc.current();
+  }
 
-  toggleDropdown() { this.dropdownOpen = !this.dropdownOpen; }
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
 
-  changeLanguage(lang: string) {
-    this.langSvc.set(lang);      // ← перзистира + i18n.use + <html lang>
+  changeLanguage(lang: LangCode) {
+    this.langSvc.set(lang);
     this.dropdownOpen = false;
   }
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.custom-dropdown')) this.dropdownOpen = false;
+    if (!this.el.nativeElement.contains(event.target as Node)) {
+      this.dropdownOpen = false;
+    }
   }
 
   @HostListener('document:keydown.escape')
-  onEsc() { this.dropdownOpen = false; } 
-  
+  onEsc() {
+    this.dropdownOpen = false;
+  }
+
 }

@@ -5,40 +5,46 @@ html,body,ion-app {
     background-color: black;
 }
 
+:root { --header-h: 65px; }
+
 #app-component-wrap {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 #header-wrap {
-    flex: 0 0 64px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    z-index: 10;
-    background-color: black;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  z-index: 10;
+  background: #000;
 }
 
+/* наместо absolute+top 67px */
 #content-wrap {
-  flex: 1 1 auto;
-  position: absolute;
-  top: 60px;
+  position: fixed;
+  top: var(--header-h);
+  left: 0; right: 0; bottom: 0;
+  overflow: hidden; /* или auto ако сакаш да скрола */
+  background: #0b0f14; /* по желба, за да нема “flash” */
+}
+
+.app-logout-warning {
+  position: fixed;
+  top: var(--header-h);
   left: 0;
   right: 0;
-  bottom: 0;
-  overflow-y: auto;     // ✅ ОВДЕ СЕ СКРОЛА ЦЕЛА APP
+  z-index: 11;
+  pointer-events: none;
 }
 
-app-logout-warning {
-    position: absolute;
-    top: 64px;
-    right: 16px;
+.app-loading-bar:empty {
+  display: none;
 }
 
 #toast-container.top-0 {
-  top: 72px !important;
+  top: calc(var(--header-h) + 8px) !important;
 }
 #toast-container {
   right: 12px;

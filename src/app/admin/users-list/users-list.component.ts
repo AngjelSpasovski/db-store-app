@@ -120,7 +120,7 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // responsive
-    this.mq = window.matchMedia('(max-width: 576px)');
+    this.mq = window.matchMedia('(max-width: 768px)');
     this.isMobile = this.mq.matches;
 
     this.setTheme();
@@ -167,10 +167,10 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
       textColor: '#e9eef6',
       cellTextColor: '#e9eef6',
       borderColor: 'rgba(255,255,255,.10)',
-      rowHeight: this.isMobile ? 30 : 40,
-      headerHeight: this.isMobile ? 30 : 46,
+      rowHeight: this.isMobile ? 38 : 40,
+      headerHeight: this.isMobile ? 40 : 46,
       fontFamily: 'Inter, system-ui, Roboto, sans-serif',
-      fontSize: this.isMobile ? '12px' : '14px',
+      fontSize: this.isMobile ? '13px' : '14px',
       accentColor: '#0d6efd',
     });
   }
@@ -364,19 +364,19 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
         return `
           <div class="ag-actions icon-only">
             <button type="button"
-              class="btn ag-icon-btn btn-secondary"
+              class="btn btn-secondary icon"
               data-action="view"
               aria-label="${viewTip}"
               data-bs-toggle="tooltip"
-              data-bs-title="${viewTip}">👁</button>
+              data-bs-title="${viewTip}"><span class="icon-btn">👁</span></button>
 
             <button type="button"
-              class="btn ag-icon-btn ${toggleClass}"
+              class="btn ${toggleClass} icon"
               data-action="toggle"
               aria-label="${toggleTip}"
               data-bs-toggle="tooltip"
               data-bs-title="${toggleTip}"
-              ${disabled}>${isBusy ? '…' : toggleIcon}</button>
+              ${disabled}><span class="icon-btn">${isBusy ? '…' : toggleIcon}</span></button>
           </div>
         `;
       },
