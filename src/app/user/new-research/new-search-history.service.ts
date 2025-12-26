@@ -23,11 +23,11 @@ export class SearchHistoryService {
           return bTime - aTime;
         });
 
-        console.log('[DataRequests] list response ➜', sorted);
+        //console.log('[DataRequests] list response ➜', sorted);
         this.historySubject.next(sorted);
       },
       error: (err) => {
-        console.error('[DataRequests] list failed', err);
+        //console.error('[DataRequests] list failed', err);
         this.historySubject.next([]);
       }
     });

@@ -86,8 +86,6 @@ export class SidebarComponent implements OnInit {
     this.creditsSvc.refreshFromApi();
     this.currentUser = this.auth.getCurrentUser();
 
-    debugger;
-
     this.isMobile = window.innerWidth < 992;
     if (this.isMobile) {
       this.isOpen = false;
