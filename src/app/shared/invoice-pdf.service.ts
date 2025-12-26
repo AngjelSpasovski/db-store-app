@@ -99,11 +99,11 @@ export class InvoicePdfService {
 
     // ===== Header layout =================================================
     const headerY = marginTop;
-    const headerH = 180;
+    const headerH = 186; // малку повеќе воздух
 
-    // IMPORTANT: inner padding in header (го решава “залепено” чувство)
+    // inner padding
     const headerPadX = 28;
-    const headerPadY = 26;
+    const headerPadY = 18; // ✅ помало => логото оди погоре
 
     const headerLeftX = marginX + headerPadX;
     const headerRightX = marginX + contentW - headerPadX;
@@ -113,17 +113,18 @@ export class InvoicePdfService {
     doc.rect(marginX, headerY, contentW, headerH, 'F');
 
     // Bottom separator
-    setDraw([220, 224, 232]);
+    setDraw([235, 238, 244]);
     doc.setLineWidth(1);
+    doc.rect(24, 24, pageW - 48, pageH - 48);
     doc.line(marginX, headerY + headerH, marginX + contentW, headerY + headerH);
 
     // ===== Logo (top-right) =============================================
-    const logoW = 120;
-    const logoH = 46;
+    // ✅ поголемо + погоре
+    const logoW = 148;
+    const logoH = 54;
     const logoX = headerRightX - logoW;
-    const logoY = headerY + headerPadY;
+    const logoY = headerY + headerPadY - 2; // мал “lift” нагоре
 
-    // Ако ти е сега PNG transparent, може слободно да го исклучиш badge-от:
     const DRAW_LOGO_BADGE = false;
 
     if (DRAW_LOGO_BADGE) {
@@ -158,20 +159,25 @@ export class InvoicePdfService {
       }
     }
 
-    // ===== Watermark “PAID” (header) ====================================
+    // ===== Watermark (header) ============================================
+    // ✅ “Paid / Pagato” + помали букви + помал фонт
     if (isPaid) {
       try {
         const GState = (doc as any).GState;
-        doc.setGState(new GState({ opacity: 0.08 }));
+        doc.setGState(new GState({ opacity: 0.05 })); // пофино
 
-        doc.setFontSize(64);
+        const wmText = 'Paid / Pagato';
+
+        doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'bold');
+        doc.setFontSize(40);
         doc.setTextColor(16, 24, 40);
 
         const wmX = marginX + contentW / 2;
-        const wmY = headerY + headerH / 2 + 14;
+        const wmY = headerY + headerH / 2 + 10;
 
-        doc.text('PAID', wmX, wmY, { align: 'center', angle: -18 });
+        doc.text(wmText, wmX, wmY, { align: 'center', angle: -18 });
 
+        doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'normal');
         doc.setGState(new GState({ opacity: 1 }));
       } catch {
         // ignore if GState not available
@@ -195,9 +201,7 @@ export class InvoicePdfService {
         ? `${INVOICE_ISSUER.zipcode} ${INVOICE_ISSUER.city} (${INVOICE_ISSUER.country})`
         : undefined,
       INVOICE_ISSUER.vatNumber ? `P.IVA / VAT: ${INVOICE_ISSUER.vatNumber}` : undefined,
-      //INVOICE_ISSUER.rea ? `REA: ${INVOICE_ISSUER.rea}` : undefined,
       INVOICE_ISSUER.email ? `Email: ${INVOICE_ISSUER.email}` : undefined,
-      //INVOICE_ISSUER.phone ? `Tel: ${INVOICE_ISSUER.phone}` : undefined,
     ]);
 
     issuerY += 16;
@@ -207,13 +211,16 @@ export class InvoicePdfService {
       issuerY += wrapped.length * 11;
     });
 
-    // ===== Invoice meta (right under logo) ==============================
-    const metaTitleY = logoY + logoH + 22;
+    // ===== Invoice meta (right under logo) ===============================
+    // ✅ мета блокот малку поблиску/поубаво после поголемо лого
+    const metaTitleY = logoY + logoH + 18;
     const metaLineH = 12;
 
+    // ✅ ако сакаш двојазичен title како во PDF:
+    // (можеш и со Translate keys ако сакаш)
     doc.setFontSize(16);
     setTextColor(clrText);
-    doc.text(this.t('INVOICE_TITLE', 'INVOICE'), headerRightX, metaTitleY, { align: 'right' });
+    doc.text('INVOICE / FATTURA', headerRightX, metaTitleY, { align: 'right' });
 
     doc.setFontSize(9);
     setTextColor(clrMuted);
@@ -314,7 +321,7 @@ export class InvoicePdfService {
     doc.text(`${statusLabel}:`, sumLeft, sumY);
 
     // status pill
-    const pillText = isPaid ? 'PAID' : isPending ? 'PENDING' : 'FAILED';
+    const pillText = isPaid ? 'PAID / PAGATO' : isPending ? 'PENDING' : 'FAILED';
     const pillW = 72;
     const pillH = 18;
     const pillX = sumRight - pillW;

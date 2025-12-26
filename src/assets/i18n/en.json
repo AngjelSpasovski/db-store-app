@@ -397,9 +397,9 @@
   "INVOICE_NO_BILLING_DETAILS": "No billing details available / Dati di fatturazione non disponibili",
   "INVOICE_VAT_ID_LABEL": "VAT / Partita IVA",
   "INVOICE_EMAIL_LABEL": "Email",
-  "INVOICE_STATUS": "state / stato",
+  "INVOICE_STATUS": "Status / Stato",
   "INVOICE_CURRENCY": "Currency / Valuta",
-  "INVOICE_VAT": "VAT",
+  "INVOICE_VAT": "VAT / P.IVA",
   "INVOICE_PAYMENT_INFO": "Payment Information / Informazioni di pagamento",
   "INVOICE_NO_BILLING": "No billing details available / Dati di fatturazione non disponibili"
 
