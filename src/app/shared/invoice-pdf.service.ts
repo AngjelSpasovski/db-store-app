@@ -16,6 +16,8 @@ import { ROBOTO_BOLD } from './fonts/roboto-bold';
 
 import { INVOICE_LOGO_BASE64, INVOICE_LOGO_MIME } from './invoice-logo';
 
+type BuyerFallback = { fullName?: string; email?: string; role?: string };
+
 @Injectable({ providedIn: 'root' })
 export class InvoicePdfService {
   private fontRegistered = false;
@@ -67,7 +69,7 @@ export class InvoicePdfService {
   }
 
 
-  generateInvoicePdf(inv: InvoiceDto, billingDetails?: InvoiceBillingDetails | null): void {
+  generateInvoicePdf(inv: InvoiceDto, billingDetails?: InvoiceBillingDetails | null, buyerFallback?: BuyerFallback | null): void {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     const hasUnicodeFont = this.registerFont(doc);
 
@@ -277,7 +279,14 @@ export class InvoicePdfService {
 
     doc.setFontSize(11);
     setTextColor(clrText);
-    doc.text(this.t('INVOICE_BILL_TO', 'Bill to:'), billX + billPadX, cursorY + billPadY);
+    const hasBilling = !!billing;
+    const isAdminNoBilling = !hasBilling && (buyerFallback?.role ?? '').toLowerCase() === 'admin';
+
+    const billToTitle = isAdminNoBilling
+      ? this.t('INVOICE_ACCOUNT_HOLDER', 'Account holder / Titolare account:')
+      : this.t('INVOICE_BILL_TO', 'Bill to / Dati di fatturazione:');
+
+    doc.text(billToTitle, billX + billPadX, cursorY + billPadY);
 
     const buyerLines: string[] = [];
     if (billing) {
@@ -299,9 +308,22 @@ export class InvoicePdfService {
       if (billing.email) buyerLines.push(`${this.t('INVOICE_EMAIL_LABEL', 'Email')}: ${billing.email}`);
 
     }
+    else if (buyerFallback) {
+      if (buyerFallback.fullName) {
+        buyerLines.push(`${this.t('INVOICE_FALLBACK_NAME', 'Name / Nome')}: ${buyerFallback.fullName}`);
+      }
+      if (buyerFallback.role) {
+        buyerLines.push(`${this.t('INVOICE_FALLBACK_ROLE', 'Role / Ruolo')}: ${buyerFallback.role}`);
+      }
+      if (buyerFallback.email) {
+        buyerLines.push(`${this.t('INVOICE_FALLBACK_EMAIL', 'Email / Email')}: ${buyerFallback.email}`);
+      }
+    }
+
     else {
       buyerLines.push(this.t('INVOICE_NO_BILLING', 'No billing details available'));
     }
+
 
     // name bold
     const lineH = 12;
@@ -511,7 +533,14 @@ export class InvoicePdfService {
     const metaY = footerTopY + 16;
     const discY = footerTopY + 30;
 
-    const disc = this.t('INVOICE_DISCLAIMER', INVOICE_DISCLAIMER).trim();
+    const baseDisc = this.t('INVOICE_DISCLAIMER', INVOICE_DISCLAIMER).trim();
+
+    const internalNote = this.t(
+      'INVOICE_INTERNAL_ACCOUNT_NOTE',
+      'Internal account (no billing address provided) / Account interno (indirizzo di fatturazione non fornito).'
+    );
+
+    const disc = isAdminNoBilling ? `${baseDisc} ${internalNote}` : baseDisc;
 
     for (let p = 1; p <= totalPages; p++) {
       doc.setPage(p);

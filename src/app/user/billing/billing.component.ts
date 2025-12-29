@@ -93,6 +93,8 @@ export class BillingComponent implements OnInit, OnDestroy {
     accentColor: '#0d6efd',
   });
 
+  private buyerFallback: { fullName?: string; email?: string; role?: string } | null = null;
+
   constructor(
     private translate: TranslateService,
     private toast: ToastService,
@@ -141,20 +143,36 @@ export class BillingComponent implements OnInit, OnDestroy {
 
     forkJoin({
       payments: this.billingApi.listMyPayments(),
-      invoices: this.invoiceApi.listMyInvoices(),
-      details:  this.userApi.getMeDetails(),
+      invoicesRes: this.invoiceApi.listMyInvoicesWithBillingDetails(),
+      details: this.userApi.getMeDetails(), // може да остане како fallback
     }).subscribe({
-      next: ({ payments, invoices, details }) => {
-        this.invoices = invoices ?? [];
-        this.billingDetails = (details as any)?.user?.billingDetails ?? null;
+      next: ({ payments, invoicesRes, details }) => {
+        this.invoices = invoicesRes?.invoices ?? [];
+
+        const user = (details as any)?.user ?? (details as any) ?? null;
+
+        this.buyerFallback = user ? {
+          fullName: [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.email,
+          email: user.email,
+          role: user.role,
+        } : null;
+
+        // ✅ прво земи од invoices endpoint (кај тебе таму реално ги има)
+        const bdFromInvoices = invoicesRes?.billingDetails ?? null;
+
+        // fallback ако invoices endpoint не врати
+        const bdFromDetails =
+          (details as any)?.billingDetails ??
+          (details as any)?.user?.billingDetails ??
+          null;
+
+        this.billingDetails = bdFromInvoices ?? bdFromDetails;
 
         this.buildInvoiceMap();
 
         this.allRows = this.mergeInvoicesIntoPayments(payments ?? []).filter(r => r.status === 'SUCCESS' || r.status === 'FAILED');
 
         this.applyFilter();
-
-        // ✅ крај: сокриј loader / или покажи "no rows"
         this.setLoading(false);
       },
       error: (err) => {
@@ -162,8 +180,6 @@ export class BillingComponent implements OnInit, OnDestroy {
         this.toast.error(this.translate.instant('BILLING_HISTORY_LOAD_FAILED'));
         this.allRows = [];
         this.applyFilter();
-
-        // ✅ крај: сокриј loader / покажи "no rows"
         this.setLoading(false);
       },
     });
@@ -514,7 +530,7 @@ export class BillingComponent implements OnInit, OnDestroy {
 
     try {
       // 🔹 сега PDF сервисот добива и billingDetails
-      this.invoicePdfService.generateInvoicePdf(inv, this.billingDetails);
+      this.invoicePdfService.generateInvoicePdf(inv, this.billingDetails, this.buyerFallback);
     }
     catch (e) {
       console.error('Failed to generate invoice PDF', e);
