@@ -57,7 +57,7 @@ export class BillingComponent implements OnInit, OnDestroy {
   rowData: BillingRow[] = [];
   statusFilter: 'ALL' | 'SUCCESS' | 'FAILED' = 'ALL';
 
-  private gridApi!: GridApi<BillingRow>;
+  private gridApi?: GridApi<BillingRow>;
 
   columnChooser: ColumnChooserItem[] = [];
   showColumnPanel = false;
@@ -72,6 +72,11 @@ export class BillingComponent implements OnInit, OnDestroy {
   selectedRow: BillingRow | null = null;
 
   private langSub?: Subscription;
+
+  // loader in ag-grid
+  isLoading = true;
+  overlayLoadingTemplate = '';
+  overlayNoRowsTemplate = '';
 
   public theme = themeAlpine.withParams({
     backgroundColor: '#151821',
@@ -112,19 +117,32 @@ export class BillingComponent implements OnInit, OnDestroy {
     }
 
     this.buildColumns();
+    this.setOverlaysText();
 
     // 🔄 обнови headers кога се менува јазикот
     this.langSub = this.translate.onLangChange.subscribe(() => {
+
       this.buildColumns();
+      this.setOverlaysText();
+
       if (this.gridApi) {
         this.gridApi.setGridOption('columnDefs', this.columnDefs as any);
+
+        // ✅ ре-аплај за да го фати новиот текст во overlay
+        this.gridApi.setGridOption('overlayLoadingTemplate', this.overlayLoadingTemplate);
+        this.gridApi.setGridOption('overlayNoRowsTemplate', this.overlayNoRowsTemplate);
+
+        // ✅ ако моментално е loading, само “refresh” му правиме преку loading flag
+        this.gridApi.setGridOption('loading', this.isLoading);
       }
     });
+
+    this.setLoading(true);
 
     forkJoin({
       payments: this.billingApi.listMyPayments(),
       invoices: this.invoiceApi.listMyInvoices(),
-      details: this.userApi.getMeDetails(),
+      details:  this.userApi.getMeDetails(),
     }).subscribe({
       next: ({ payments, invoices, details }) => {
         this.invoices = invoices ?? [];
@@ -132,17 +150,21 @@ export class BillingComponent implements OnInit, OnDestroy {
 
         this.buildInvoiceMap();
 
-        this.allRows = this
-          .mergeInvoicesIntoPayments(payments ?? [])
-          .filter(r => r.status === 'SUCCESS' || r.status === 'FAILED');
+        this.allRows = this.mergeInvoicesIntoPayments(payments ?? []).filter(r => r.status === 'SUCCESS' || r.status === 'FAILED');
 
         this.applyFilter();
+
+        // ✅ крај: сокриј loader / или покажи "no rows"
+        this.setLoading(false);
       },
       error: (err) => {
         console.error('Failed to load billing data', err);
         this.toast.error(this.translate.instant('BILLING_HISTORY_LOAD_FAILED'));
         this.allRows = [];
         this.applyFilter();
+
+        // ✅ крај: сокриј loader / покажи "no rows"
+        this.setLoading(false);
       },
     });
 
@@ -156,8 +178,16 @@ export class BillingComponent implements OnInit, OnDestroy {
     this.gridApi = event.api;
 
     this.columnChooser.forEach((c) => {
-      this.gridApi.setColumnsVisible([c.id], c.visible);
+      this.gridApi?.setColumnsVisible([c.id], c.visible);
     });
+
+    // ✅ нов начин (без deprecated warning)
+    this.gridApi.setGridOption('loading', this.isLoading);
+
+    // ако не е loading, а нема редови — покажи no rows overlay
+    if (!this.isLoading && (!this.rowData || this.rowData.length === 0)) {
+      this.gridApi.showNoRowsOverlay();
+    }
   }
 
   setStatusFilter(filter: 'ALL' | 'SUCCESS' | 'FAILED') {
@@ -167,14 +197,14 @@ export class BillingComponent implements OnInit, OnDestroy {
 
   exportCsv() {
     if (!this.gridApi) return;
-    this.gridApi.exportDataAsCsv({
+    this.gridApi?.exportDataAsCsv({
       fileName: 'billing-history.csv',
     });
   }
 
   exportExcel() {
     if (!this.gridApi) return;
-    this.gridApi.exportDataAsCsv({
+    this.gridApi?.exportDataAsCsv({
       fileName: 'billing-history.xlsx',
     });
   }
@@ -191,7 +221,7 @@ export class BillingComponent implements OnInit, OnDestroy {
     this.columnChooser = [...this.columnChooser];
 
     if (this.gridApi) {
-      this.gridApi.setColumnsVisible([col.id], visible);
+      this.gridApi?.setColumnsVisible([col.id], visible);
     }
   }
 
@@ -485,11 +515,50 @@ export class BillingComponent implements OnInit, OnDestroy {
     try {
       // 🔹 сега PDF сервисот добива и billingDetails
       this.invoicePdfService.generateInvoicePdf(inv, this.billingDetails);
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Failed to generate invoice PDF', e);
       this.toast.error(
         this.translate.instant('INVOICE_GENERATION_FAILED')
       );
     }
   }
+
+  private setOverlaysText() {
+    const loadingText = this.translate.instant('LOADING', { default: 'Loading' });
+    const noRowsText = this.translate.instant('NO_ROWS', { default: 'No rows to show' });
+
+    this.overlayLoadingTemplate = `
+      <div class="ag-overlay-loading-center billing-overlay" role="status" aria-live="polite">
+        <span class="billing-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="billing-overlay-text">${loadingText}</span>
+      </div>
+    `;
+
+    this.overlayNoRowsTemplate = `
+      <div class="ag-overlay-loading-center billing-overlay billing-overlay--muted" role="status" aria-live="polite">
+        <span class="billing-overlay-text">${noRowsText}</span>
+      </div>
+    `;
+  }
+
+  private setLoading(v: boolean) {
+    this.isLoading = v;
+
+    if (!this.gridApi) return;
+
+    // ✅ AG Grid v32+ начин
+    this.gridApi.setGridOption('loading', v);
+
+    if (!v) {
+      if (!this.rowData || this.rowData.length === 0) {
+        this.gridApi.showNoRowsOverlay();
+      } else {
+        this.gridApi.hideOverlay();
+      }
+    }
+  }
+
 }

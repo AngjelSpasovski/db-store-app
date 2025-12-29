@@ -13,32 +13,27 @@
 
         <!-- SORTING GROUP -->
         <div class="toolbar-section">
-          <span class="toolbar-label">
-            {{ 'SORTING' | translate:{ default:'Sorting' } }}
-          </span>
+          <span class="toolbar-label">{{ 'SORTING' | translate:{ default:'Sorting' } }}</span>
 
           <div class="btn-group btn-group-sm billing-filters" role="group" aria-label="Filter by status">
-            <button
-              type="button"
-              class="btn btn-filter"
-              [class.active]="statusFilter === 'ALL'"
-              (click)="setStatusFilter('ALL')">
+            <button type="button"
+                    class="btn btn-filter"
+                    [class.active]="statusFilter === 'ALL'"
+                    (click)="setStatusFilter('ALL')">
               {{ 'FILTER_ALL' | translate:{ default:'All' } }}
             </button>
 
-            <button
-              type="button"
-              class="btn btn-filter"
-              [class.active]="statusFilter === 'SUCCESS'"
-              (click)="setStatusFilter('SUCCESS')">
+            <button type="button"
+                    class="btn btn-filter"
+                    [class.active]="statusFilter === 'SUCCESS'"
+                    (click)="setStatusFilter('SUCCESS')">
               {{ 'FILTER_SUCCESS' | translate:{ default:'Success' } }}
             </button>
 
-            <button
-              type="button"
-              class="btn btn-filter"
-              [class.active]="statusFilter === 'FAILED'"
-              (click)="setStatusFilter('FAILED')">
+            <button type="button"
+                    class="btn btn-filter"
+                    [class.active]="statusFilter === 'FAILED'"
+                    (click)="setStatusFilter('FAILED')">
               {{ 'FILTER_FAILED' | translate:{ default:'Failed' } }}
             </button>
           </div>
@@ -46,61 +41,36 @@
 
         <!-- DOWNLOAD GROUP -->
         <div class="toolbar-section">
-          <span class="toolbar-label">
-            {{ 'DOWNLOAD' | translate:{ default:'Download' } }}
-          </span>
+          <span class="toolbar-label">{{ 'DOWNLOAD' | translate:{ default:'Download' } }}</span>
 
           <div class="btn-group btn-group-sm billing-export" role="group" aria-label="Export">
-            <button
-              type="button"
-              class="btn btn-export"
-              (click)="exportCsv()">
-              {{ 'EXPORT_CSV' | translate:{ default:'CSV' } }}
-            </button>
-            <button
-              type="button"
-              class="btn btn-export"
-              (click)="exportExcel()">
-              {{ 'EXPORT_EXCEL' | translate:{ default:'Excel' } }}
-            </button>
+            <button type="button" class="btn btn-export" (click)="exportCsv()">{{ 'EXPORT_CSV' | translate:{ default:'CSV' } }}</button>
+            <button type="button" class="btn btn-export" (click)="exportExcel()">{{ 'EXPORT_EXCEL' | translate:{ default:'Excel' } }}</button>
           </div>
         </div>
 
         <!-- TABLE VIEW / COLUMNS GROUP – momentalno disabled -->
         <div class="toolbar-section d-none d-md-flex">
-          <span class="toolbar-label">
-            {{ 'TABLE_VIEW' | translate:{ default:'Table view' } }}
-          </span>
+          <span class="toolbar-label">{{ 'TABLE_VIEW' | translate:{ default:'Table view' } }}</span>
 
           <div class="billing-column-chooser">
-            <button
-              type="button"
-              class="btn btn-export btn-sm"
-              (click)="toggleColumnPanel()">
-              {{ 'COLUMNS' | translate:{ default:'Columns' } }}
-            </button>
+            <button type="button" class="btn btn-export btn-sm" (click)="toggleColumnPanel()">{{ 'COLUMNS' | translate:{ default:'Columns' } }}</button>
 
             <div class="billing-column-panel mt-2" *ngIf="showColumnPanel">
-              <div class="small fw-semibold mb-1">
-                {{ 'VISIBLE_COLUMNS' | translate:{ default:'Visible columns' } }}
-              </div>
+              <div class="small fw-semibold mb-1">{{ 'VISIBLE_COLUMNS' | translate:{ default:'Visible columns' } }}</div>
 
-              <div
-                *ngFor="let col of columnChooser"
-                class="form-check form-check-sm mb-1">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  [checked]="col.visible"
-                  [disabled]="col.lock"
-                  (change)="onToggleColumn(col, $event)">
-                <label class="form-check-label">
-                  {{ col.label }}
-                  <span *ngIf="col.lock" class="text-muted">
-                    ({{ 'FIXED' | translate:{ default:'fixed' } }})
-                  </span>
+              <div *ngFor="let col of columnChooser" class="form-check form-check-sm mb-1">
+                <input  class="form-check-input"
+                        type="checkbox"
+                        [checked]="col.visible"
+                        [disabled]="col.lock"
+                        (change)="onToggleColumn(col, $event)">
+
+                <label class="form-check-label">{{ col.label }}
+                  <span *ngIf="col.lock" class="text-muted">({{ 'FIXED' | translate:{ default:'fixed' } }})</span>
                 </label>
               </div>
+
             </div>
           </div>
         </div>
@@ -115,6 +85,8 @@
         [columnDefs]="columnDefs"
         [defaultColDef]="defaultColDef"
         [rowData]="rowData"
+        [overlayLoadingTemplate]="overlayLoadingTemplate"
+        [overlayNoRowsTemplate]="overlayNoRowsTemplate"
         [pagination]="true"
         [paginationPageSize]="10"
         [paginationPageSizeSelector]="[10, 20, 50, 100]"
@@ -126,109 +98,108 @@
 
     <!-- MOBILE: accordion cards -->
     <div *ngIf="isMobile" class="billing-mobile-list mt-3">
-      <div class="accordion" id="billingAccordion">
-        <div
-          class="accordion-item"
-          *ngFor="let row of rowData; let i = index">
-          <h2 class="accordion-header" [id]="'heading' + i">
-            <button
-              class="accordion-button collapsed mobile-acc-btn"
-              type="button"
-              data-bs-toggle="collapse"
-              [attr.data-bs-target]="'#collapse' + i"
-              aria-expanded="false"
-              [attr.aria-controls]="'collapse' + i">
 
-              <div class="acc-main-line">
-                <span class="acc-id">#{{ row.id }}</span>
-                <span class="acc-amount">
-                  {{ row.amount | number:'1.0-0' }} €
-                </span>
-              </div>
+      <!-- ✅ MOBILE LOADER -->
+      <div *ngIf="isLoading" class="billing-mobile-state">
+        <div class="billing-mobile-card" role="status" aria-live="polite">
+          <span class="billing-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="billing-overlay-text">{{ 'LOADING' | translate:{ default:'Loading' } }}</span>
+        </div>
+      </div>
 
-              <div class="acc-sub-line">
-                {{ row.timestamp | date:'dd/MM/yyyy, HH:mm' }}
-              </div>
-            </button>
-          </h2>
+      <!-- ✅ MOBILE EMPTY -->
+      <div *ngIf="!isLoading && (!rowData || rowData.length === 0)" class="billing-mobile-state">
+        <div class="billing-mobile-card billing-mobile-card--muted">{{ 'NO_ROWS' | translate:{ default:'No rows to show' } }}</div>
+      </div>
 
-          <div
-            [id]="'collapse' + i"
-            class="accordion-collapse collapse"
-            [attr.aria-labelledby]="'heading' + i"
-            data-bs-parent="#billingAccordion">
+      <!-- ✅ MOBILE LIST -->
+      <div *ngIf="!isLoading && rowData?.length" class="accordion" id="billingAccordion">
+        <div class="accordion-item" *ngFor="let row of rowData; let i = index">
+            <h2 class="accordion-header" [id]="'heading' + i">
+              <button class="accordion-button collapsed mobile-acc-btn"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      [attr.data-bs-target]="'#collapse' + i"
+                      aria-expanded="false"
+                      [attr.aria-controls]="'collapse' + i">
+                <!-- line 1: id + status -->
+                <div class="acc-top-line">
+                  <span class="acc-id">#{{ row.id }}</span>
+
+                  <span
+                    class="status-pill"
+                    [class.status-pill--success]="row.status === 'SUCCESS'"
+                    [class.status-pill--failed]="row.status === 'FAILED'">
+                    {{ row.status === 'SUCCESS'
+                        ? ('FILTER_SUCCESS' | translate:{ default:'Success' })
+                        : ('FILTER_FAILED'  | translate:{ default:'Failed' }) }}
+                  </span>
+                </div>
+
+                <!-- line 2: package + amount -->
+                <div class="acc-mid-line">
+                  <span class="acc-package">{{ row.packageName }}</span>
+                  <span class="acc-amount">{{ row.amount | number:'1.0-0' }} €</span>
+                </div>
+
+                <!-- line 3: timestamp -->
+                <div class="acc-sub-line">{{ row.timestamp | date:'dd/MM/yyyy, HH:mm' }}</div>
+
+              </button>
+            </h2>
+
+          <div [id]="'collapse' + i" class="accordion-collapse collapse" [attr.aria-labelledby]="'heading' + i" data-bs-parent="#billingAccordion">
+
             <div class="accordion-body">
 
               <div class="acc-row">
-                <span class="acc-label">
-                  {{ 'PACKAGE_NAME' | translate }}
-                </span>
-                <span class="acc-value">
-                  {{ row.packageName }}
-                </span>
+                <span class="acc-label">{{ 'PACKAGE_NAME' | translate }}</span>
+                <span class="acc-value">{{ row.packageName }}</span>
               </div>
 
               <div class="acc-row">
-                <span class="acc-label">
-                  {{ 'PACKAGE_CREDITS' | translate }}
-                </span>
-                <span class="acc-value">
-                  {{ row.packageCredits }}
-                </span>
+                <span class="acc-label">{{ 'PACKAGE_CREDITS' | translate }}</span>
+                <span class="acc-value">{{ row.packageCredits }}</span>
               </div>
 
               <div class="acc-row">
-                <span class="acc-label">
-                  {{ 'PACKAGE_PRICE' | translate }}
-                </span>
-                <span class="acc-value">
-                  {{ row.packagePrice | number:'1.0-0' }} €
-                </span>
+                <span class="acc-label">{{ 'PACKAGE_PRICE' | translate }}</span>
+                <span class="acc-value">{{ row.packagePrice | number:'1.0-0' }} €</span>
               </div>
 
               <div class="acc-row">
-                <span class="acc-label">
-                  {{ 'DISCOUNT_PERCENT' | translate }}
-                </span>
-                <span class="acc-value">
-                  {{ row.packageDiscountPercentage }} %
-                </span>
+                <span class="acc-label">{{ 'DISCOUNT_PERCENT' | translate }}</span>
+                <span class="acc-value">{{ row.packageDiscountPercentage }} %</span>
               </div>
 
               <div class="acc-row">
-                <span class="acc-label">
-                  {{ 'CREDITS' | translate }}
-                </span>
-                <span class="acc-value">
-                  {{ row.credits }}
-                </span>
+                <span class="acc-label">{{ 'CREDITS' | translate }}</span>
+                <span class="acc-value">{{ row.credits }}</span>
               </div>
 
               <div class="acc-row">
-                <span class="acc-label">
-                  {{ 'STATUS' | translate }}
-                </span>
+                <span class="acc-label">{{ 'STATUS' | translate:{ default:'Status' } }}</span>
+
                 <span class="acc-value">
-                  <span class="badge bg-success" *ngIf="row.status === 'SUCCESS'">
-                    {{ 'FILTER_SUCCESS' | translate }}
-                  </span>
-                  <span class="badge bg-danger" *ngIf="row.status === 'FAILED'">
-                    {{ 'FILTER_FAILED' | translate }}
-                  </span>
+                  <span *ngIf="row.status === 'SUCCESS'"  class="status-pill status-pill--success">{{ 'FILTER_SUCCESS' | translate:{ default:'Success' } }}</span>
+                  <span *ngIf="row.status === 'FAILED'" class="status-pill status-pill--failed">{{ 'FILTER_FAILED' | translate:{ default:'Failed' } }}</span>
                 </span>
               </div>
 
               <div class="acc-row acc-row-button d-flex gap-2">
-                <button type="button" class="btn btn-outline-primary btn-sm w-100"
-                  (click)="downloadInvoicePdf(row)">
+                <button type="button" class="btn btn-outline-primary btn-sm w-100" (click)="downloadInvoicePdf(row)">
                   {{ 'INVOICE' | translate:{ default:'Invoice' } }}
                 </button>
               </div>
 
             </div>
           </div>
+
         </div>
       </div>
+
     </div>
 
   </div>

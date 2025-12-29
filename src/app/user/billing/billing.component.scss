@@ -1,7 +1,14 @@
 // src/app/user/billing/billing.component.scss
 @use 'sass:color';
 
+/* =============================================================================
+  BILLING PAGE (layout + toolbar + grid + mobile list + overlays)
+============================================================================= */
+
 .billing-page {
+  /* ---------------------------------------------------------------------------
+    THEME TOKENS
+  --------------------------------------------------------------------------- */
   --bg-card: #1b212b;
   --text: #e9eef6;
   --text-muted: #99a3b3;
@@ -15,6 +22,9 @@
     letter-spacing: 0.01em;
   }
 
+  /* ---------------------------------------------------------------------------
+    CARD WRAPPER
+  --------------------------------------------------------------------------- */
   .card-block.billing-card {
     background: var(--bg-card);
     border-radius: 0.75rem;
@@ -23,6 +33,9 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   }
 
+  /* ---------------------------------------------------------------------------
+    TOOLBAR (Sorting / Download / Columns)
+  --------------------------------------------------------------------------- */
   .billing-toolbar {
     position: relative;
   }
@@ -33,6 +46,7 @@
   .billing-column-chooser .btn {
     margin-right: 0.4rem;
   }
+
   .billing-filters .btn:last-child,
   .billing-export .btn:last-child,
   .billing-column-chooser .btn:last-child {
@@ -93,6 +107,7 @@
     box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.35);
   }
 
+  /* Columns dropdown panel */
   .billing-column-chooser {
     position: relative;
   }
@@ -114,6 +129,7 @@
     .form-check-input {
       cursor: pointer;
     }
+
     .form-check-label {
       cursor: pointer;
       font-size: 0.8rem;
@@ -121,6 +137,9 @@
     }
   }
 
+  /* ---------------------------------------------------------------------------
+    DESKTOP GRID WRAPPER
+  --------------------------------------------------------------------------- */
   .billing-grid-wrapper {
     margin-top: 0.5rem;
   }
@@ -137,7 +156,9 @@
     overflow: hidden;
   }
 
-  /* ===== ag-Grid (desktop) – веќе добро средено, не го менуваме многу ===== */
+  /* ---------------------------------------------------------------------------
+    AG-GRID THEME OVERRIDES (DESKTOP)
+  --------------------------------------------------------------------------- */
   :host ::ng-deep .ag-theme-alpine {
     background-color: transparent;
 
@@ -192,7 +213,9 @@
     }
   }
 
-  /* ===== MOBILE – accordion look ===== */
+  /* ---------------------------------------------------------------------------
+    MOBILE LIST (ACCORDION)
+  --------------------------------------------------------------------------- */
   .billing-mobile-list {
     margin-top: 1rem;
 
@@ -207,32 +230,75 @@
       }
     }
 
+    /* --- mini-header divider (gradient line between header & body) --- */
+    .accordion-collapse {
+      position: relative;
+    }
+
+    .accordion-collapse::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 1px;
+
+      background: linear-gradient(
+        90deg,
+        rgba(13, 110, 253, 0) 0%,
+        rgba(13, 110, 253, 0.55) 20%,
+        rgba(255, 255, 255, 0.10) 50%,
+        rgba(13, 110, 253, 0.55) 80%,
+        rgba(13, 110, 253, 0) 100%
+      );
+
+      opacity: 0.95;
+      pointer-events: none;
+    }
+
     .mobile-acc-btn {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 0.2rem;
+      align-items: stretch;
+      gap: 0.25rem;
       background: #1d2330;
       color: var(--text);
       font-size: 0.85rem;
-      padding-top: 0.6rem;
-      padding-bottom: 0.6rem;
+      padding-top: 0.7rem;
+      padding-bottom: 0.7rem;
     }
 
-    .acc-main-line {
+    .acc-top-line,
+    .acc-mid-line {
       display: flex;
-      width: 100%;
+      align-items: center;
       justify-content: space-between;
-      font-weight: 600;
-      font-size: 0.9rem;
+      width: 100%;
+      gap: 0.6rem;
     }
 
     .acc-id {
       opacity: 0.9;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .acc-package {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #e9eef6;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 70%;
     }
 
     .acc-amount {
       color: #e5f0ff;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .acc-sub-line {
@@ -240,35 +306,149 @@
       color: var(--text-muted);
     }
 
-    .accordion-body {
-      background: #151921;
-      font-size: 0.8rem;
-      color: var(--text);
-    }
-
-    .acc-row {
-      display: flex;
-      justify-content: space-between;
+    /* Status pill + dot */
+    .status-pill {
+      display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.15rem 0;
+      gap: 0.45rem;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(233, 238, 246, 0.88);
+      white-space: nowrap;
+
+      &::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(233, 238, 246, 0.55);
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15) inset;
+      }
     }
 
+    .status-pill--success {
+      background: rgba(25, 135, 84, 0.18);
+      border-color: rgba(25, 135, 84, 0.35);
+      color: rgba(170, 255, 210, 0.95);
+      &::before {
+        background: rgba(80, 255, 170, 0.95);
+      }
+    }
+
+    .status-pill--failed {
+      background: rgba(220, 53, 69, 0.16);
+      border-color: rgba(220, 53, 69, 0.35);
+      color: rgba(255, 185, 190, 0.95);
+      &::before {
+        background: rgba(255, 120, 130, 0.95);
+      }
+    }
+
+    /* --- Stronger accordion caret (arrow) --- */
+    .accordion-button {
+      padding-right: 3.15rem; /* остави место за поголемата стрелка */
+    }
+
+    .accordion-button::after {
+      /* custom SVG chevron (појака бела) */
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='M2.5 6l5.5 5 5.5-5' fill='none' stroke='%23e9eef6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+
+      width: 1.85rem;
+      height: 1.85rem;
+
+      background-size: 0.95rem 0.95rem;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      border-radius: 999px;
+      background-color: rgba(13, 110, 253, 0.14);
+      border: 1px solid rgba(13, 110, 253, 0.30);
+
+      opacity: 1;
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+    }
+
+    .accordion-button:not(.collapsed)::after {
+      background-color: rgba(13, 110, 253, 0.24);
+      border-color: rgba(13, 110, 253, 0.42);
+    }
+
+    /* --- MOBILE body -> mini table look --- */
+    .accordion-body {
+      border-top: 0;
+      background: #151921;
+      padding: 0.85rem 0.9rem 1rem;
+    }
+
+    /* mini-table rows */
+    .acc-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 0.75rem;
+
+      padding: 0.55rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* last data row без divider (пред копчето) */
+    .acc-row:not(.acc-row-button):last-of-type {
+      border-bottom: 0;
+    }
+
+    /* subtle zebra + hover (но без button row) */
+    .acc-row:not(.acc-row-button) {
+      border-radius: 10px;
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
+    }
+
+    .acc-row:not(.acc-row-button):nth-of-type(even) {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .acc-row:not(.acc-row-button):hover {
+      background: rgba(13, 110, 253, 0.10);
+    }
+
+    /* label/value polish */
     .acc-label {
-      font-size: 0.78rem;
-      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      color: rgba(153, 163, 179, 0.95);
     }
 
     .acc-value {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
       font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text);
+      font-weight: 700;
+      color: rgba(233, 238, 246, 0.95);
       text-align: right;
+      white-space: nowrap;
     }
 
+    .acc-value .status-pill {
+      font-size: 0.68rem;
+      padding: 0.18rem 0.55rem;
+    }
+
+    /* button row separation */
     .acc-row-button {
-      justify-content: center;
-      margin-top: 0.3rem;
+      margin-top: 0.65rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 0;
+      background: transparent !important;
+      padding-left: 0;
+      padding-right: 0;
     }
 
     .btn-outline-light.btn-sm {
@@ -276,9 +456,37 @@
       padding: 0.35rem 0.9rem;
       border-radius: 999px;
     }
+
   }
 
-  /* 📱 Global mobile adjustments за toolbar/card */
+  /* ---------------------------------------------------------------------------
+    MOBILE STATE CARDS (loading / empty)
+  --------------------------------------------------------------------------- */
+  .billing-mobile-state {
+    display: flex;
+    justify-content: center;
+    padding: 1.2rem 0;
+  }
+
+  .billing-mobile-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.9rem 1rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(20, 25, 34, 0.7);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    color: #e9eef6;
+  }
+
+  .billing-mobile-card--muted {
+    color: rgba(233, 238, 246, 0.78);
+  }
+
+  /* ---------------------------------------------------------------------------
+    RESPONSIVE: toolbar/card tweaks
+  --------------------------------------------------------------------------- */
   @media (max-width: 768px) {
     .card-block.billing-card {
       padding: 1rem;
@@ -292,18 +500,17 @@
 
     .toolbar-section {
       width: 100%;
-      justify-content: center;   /* 👈 центрирај ги копчињата во „капсулата“ */
+      justify-content: center;
       text-align: center;
     }
 
     .toolbar-label {
-      left: 50%;                 /* 👈 label во средина */
+      left: 50%;
       transform: translateX(-50%);
       text-align: center;
       font-size: 0.6rem;
     }
 
-    /* да се центрираат групите од копчиња во рамките на секција */
     .billing-filters,
     .billing-export {
       display: flex;
@@ -317,30 +524,116 @@
       font-size: 0.7rem;
     }
   }
-
 }
 
-/* --- Scrollbar styling за grid (и хоризонтален и вертикален) --- */
+/* =============================================================================
+  SCROLLBARS (AG-GRID WRAPPER)
+============================================================================= */
 :host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar {
-  width: 8px;   /* вертикален */
-  height: 8px;  /* хоризонтален */
+  width: 8px; /* vertical */
+  height: 8px; /* horizontal */
 }
 
 :host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar-track {
-  background-color: #151823; /* позадина, блиску до card/bg */
+  background-color: #151823;
 }
 
 :host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar-thumb {
-  background-color: #34384d; /* thumb боја */
+  background-color: #34384d;
   border-radius: 4px;
 }
 
 :host ::ng-deep .billing-grid-wrapper ::-webkit-scrollbar-thumb:hover {
-  background-color: #4a4f6a; /* hover малку посветло */
+  background-color: #4a4f6a;
 }
 
-/* Firefox варијанта – важи за сите scrollbars во wrapper-от */
+/* Firefox */
 :host ::ng-deep .billing-grid-wrapper {
   scrollbar-width: thin;
   scrollbar-color: #34384d #151823;
+}
+
+/* =============================================================================
+  AG-GRID OVERLAYS (loading / no-rows) + shared dots loader
+============================================================================= */
+
+/* glass layer behind overlay */
+:host ::ng-deep .ag-overlay-loading-wrapper,
+:host ::ng-deep .ag-overlay-no-rows-wrapper {
+  background: rgba(10, 12, 18, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+/* ag-grid center container (we keep it clean) */
+:host ::ng-deep .ag-overlay-loading-center {
+  border: 0;
+  box-shadow: none;
+}
+
+/* overlay "card" */
+:host ::ng-deep .billing-overlay {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(20, 25, 34, 0.82);
+  color: #e9eef6;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+:host ::ng-deep .billing-overlay--muted {
+  color: rgba(233, 238, 246, 0.78);
+}
+
+/* dots loader (used in overlay + mobile card) */
+:host ::ng-deep .billing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:host ::ng-deep .billing-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(233, 238, 246, 0.9);
+  animation: billingDots 1s infinite ease-in-out;
+}
+
+:host ::ng-deep .billing-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+:host ::ng-deep .billing-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes billingDots {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  40% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host ::ng-deep .billing-dots span {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+:host ::ng-deep .billing-overlay-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
 }
