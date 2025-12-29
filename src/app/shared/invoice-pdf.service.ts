@@ -12,6 +12,7 @@ import {
 
 import { TranslateService } from '@ngx-translate/core';
 import { ROBOTO_NORMAL } from './fonts/roboto-normal';
+import { ROBOTO_BOLD } from './fonts/roboto-bold';
 
 import { INVOICE_LOGO_BASE64, INVOICE_LOGO_MIME } from './invoice-logo';
 
@@ -21,54 +22,71 @@ export class InvoicePdfService {
 
   constructor(private translate: TranslateService) {}
 
-  private t(key: string, fallback: string): string {
-    const v = this.translate.instant(key);
-    return v && v !== key ? v : fallback;
+  private t(key: string, fallback: string, params?: Record<string, any>): string {
+    const raw = this.translate.instant(key, params);
+    // ако нема key -> raw === key
+    const txt = raw && raw !== key ? raw : fallback;
+
+    return this.applyParams(txt, params);
   }
 
-  private registerFont(doc: jsPDF): void {
-    if (this.fontRegistered) {
-      doc.setFont('Roboto', 'normal');
-      return;
-    }
+  private applyParams(text: string, params?: Record<string, any>): string {
+    if (!params) return text;
 
-    if (!ROBOTO_NORMAL || ROBOTO_NORMAL.includes('PASTE_BASE64_TTF_HERE')) {
-      console.warn('[InvoicePdfService] Roboto font not configured, using helvetica.');
+    // поддршка и за {{param}} и за {param} (ако користиш messageformat compiler)
+    return text
+      .replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k) => (params[k] ?? '').toString())
+      .replace(/\{\s*(\w+)\s*\}/g, (_, k) => (params[k] ?? '').toString());
+  }
+
+  private registerFont(doc: jsPDF): boolean {
+    // ако нема реални фонтови -> нема кирилица
+    if (
+      !ROBOTO_NORMAL || ROBOTO_NORMAL.includes('PASTE_BASE64') ||
+      !ROBOTO_BOLD || ROBOTO_BOLD.includes('PASTE_BASE64')
+    ) {
       doc.setFont('helvetica', 'normal');
-      return;
+      return false;
     }
 
     try {
+      // IMPORTANT: секој doc мора пак да ги добие фонтовите
       (doc as any).addFileToVFS('Roboto-Regular.ttf', ROBOTO_NORMAL.trim());
-      (doc as any).addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+      (doc as any).addFont('Roboto-Regular.ttf', 'Roboto', 'normal', 'Identity-H');
+
+      (doc as any).addFileToVFS('Roboto-Bold.ttf', ROBOTO_BOLD.trim());
+      (doc as any).addFont('Roboto-Bold.ttf', 'Roboto', 'bold', 'Identity-H');
+
       doc.setFont('Roboto', 'normal');
-      this.fontRegistered = true;
-    } catch (err) {
-      console.error('[InvoicePdfService] Failed to register Roboto font', err);
+      return true;
+    } catch (e) {
+      console.error('[InvoicePdfService] Font register failed', e);
       doc.setFont('helvetica', 'normal');
+      return false;
     }
   }
 
+
   generateInvoicePdf(inv: InvoiceDto, billingDetails?: InvoiceBillingDetails | null): void {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-    this.registerFont(doc);
+    const hasUnicodeFont = this.registerFont(doc);
 
     // ===== Page ==========================================================
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
 
-    const marginX = 40;
+    const marginX   = 40;
     const marginTop = 22;
-    const contentW = pageW - marginX * 2;
-    const rightX = pageW - marginX;
+    const contentW  = pageW - marginX * 2;
+    const rightX    = pageW - marginX;
 
     // ===== Theme =========================================================
-    const clrHeaderBg: [number, number, number] = [245, 246, 248];
-    const clrCardBg: [number, number, number] = [255, 255, 255];
-    const clrBorder: [number, number, number] = [225, 228, 235];
-    const clrMuted: [number, number, number] = [102, 112, 133];
-    const clrText: [number, number, number] = [16, 24, 40];
-    const clrPrimary: [number, number, number] = [13, 110, 253];
+    const clrHeaderBg:  [number, number, number] = [245, 246, 248];
+    const clrCardBg:    [number, number, number] = [255, 255, 255];
+    const clrBorder:    [number, number, number] = [225, 228, 235];
+    const clrMuted:     [number, number, number] = [102, 112, 133];
+    const clrText:      [number, number, number] = [16, 24, 40];
+    const clrPrimary:   [number, number, number] = [13, 110, 253];
 
     const cardRadius = 10;
 
@@ -165,9 +183,9 @@ export class InvoicePdfService {
         const GState = (doc as any).GState;
         doc.setGState(new GState({ opacity: 0.05 })); // пофино
 
-        const wmText = 'Paid / Pagato';
+        const wmText = this.t('INVOICE_WATERMARK_PAID', 'Paid / Pagato');
 
-        doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'bold');
+        doc.setFont(hasUnicodeFont? 'Roboto' : 'helvetica', 'bold');
         doc.setFontSize(40);
         doc.setTextColor(16, 24, 40);
 
@@ -176,7 +194,7 @@ export class InvoicePdfService {
 
         doc.text(wmText, wmX, wmY, { align: 'center', angle: -18 });
 
-        doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'normal');
+        doc.setFont(hasUnicodeFont ? 'Roboto' : 'helvetica', 'normal');
         doc.setGState(new GState({ opacity: 1 }));
       } catch {
         // ignore if GState not available
@@ -219,7 +237,7 @@ export class InvoicePdfService {
     // (можеш и со Translate keys ако сакаш)
     doc.setFontSize(16);
     setTextColor(clrText);
-    doc.text('INVOICE / FATTURA', headerRightX, metaTitleY, { align: 'right' });
+    doc.text(this.t('INVOICE_TITLE', 'INVOICE / FATTURA'), headerRightX, metaTitleY, { align: 'right' });
 
     doc.setFontSize(9);
     setTextColor(clrMuted);
@@ -277,9 +295,11 @@ export class InvoicePdfService {
         .trim();
       if (lineCity) buyerLines.push(lineCity);
 
-      if (billing.vatNumber) buyerLines.push(`VAT / Tax ID: ${billing.vatNumber}`);
-      if (billing.email) buyerLines.push(`Email: ${billing.email}`);
-    } else {
+      if (billing.vatNumber) buyerLines.push(`${this.t('INVOICE_VAT_ID_LABEL', 'VAT / Tax ID')}: ${billing.vatNumber}`);
+      if (billing.email) buyerLines.push(`${this.t('INVOICE_EMAIL_LABEL', 'Email')}: ${billing.email}`);
+
+    }
+    else {
       buyerLines.push(this.t('INVOICE_NO_BILLING', 'No billing details available'));
     }
 
@@ -290,10 +310,10 @@ export class InvoicePdfService {
     if (buyerLines.length) {
       doc.setFontSize(10);
       setTextColor(clrText);
-      doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'bold');
+      doc.setFont(hasUnicodeFont ? 'Roboto' : 'helvetica', 'bold');
       doc.text(String(buyerLines[0]), billX + billPadX, billTextY);
 
-      doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'normal');
+      doc.setFont(hasUnicodeFont ? 'Roboto' : 'helvetica', 'normal');
       setTextColor(clrMuted);
       billTextY += 14;
 
@@ -320,7 +340,12 @@ export class InvoicePdfService {
     doc.text(`${statusLabel}:`, sumLeft, sumY);
 
     // status pill
-    const pillText = isPaid ? 'PAID / PAGATO' : isPending ? 'PENDING' : 'FAILED';
+    const pillText = isPaid
+    ? this.t('INVOICE_STATUS_PAID', 'PAID / PAGATO')
+    : isPending
+    ? this.t('INVOICE_STATUS_PENDING', 'PENDING')
+    : this.t('INVOICE_STATUS_FAILED', 'FAILED');
+
     const pillW = 72;
     const pillH = 18;
     const pillX = sumRight - pillW;
@@ -342,23 +367,37 @@ export class InvoicePdfService {
     setTextColor(clrMuted);
     doc.text(`${currencyLabel}:`, sumLeft, sumY);
     setTextColor(clrText);
-    doc.text('EUR', sumRight, sumY, { align: 'right' });
+    doc.text(this.t('INVOICE_CURRENCY_EUR', 'EUR'), sumRight, sumY, { align: 'right' });
 
     // vat row
     sumY += 18;
     setTextColor(clrMuted);
     doc.text(`${vatLabel}:`, sumLeft, sumY);
     setTextColor(clrText);
-    doc.text(billing?.vatNumber ? 'VAT ID provided' : 'No VAT ID', sumRight, sumY, { align: 'right' });
+    doc.text(
+      billing?.vatNumber
+        ? this.t('INVOICE_VAT_ID_PROVIDED', 'VAT ID provided')
+        : this.t('INVOICE_VAT_ID_NOT_PROVIDED', 'No VAT ID'),
+      sumRight,
+      sumY,
+      { align: 'right' }
+    );
 
     // move cursor below cards
     cursorY += cardH + 18;
 
     // ===== Items table ===================================================
-    const description =
-      pkg?.name
-        ? `Credits package "${pkg.name}" (${pkg.credits} credits)`
-        : `Credits purchase (${inv.credits} credits)`;
+    const description = pkg?.name
+    ? this.t(
+        'INVOICE_ITEM_PACKAGE',
+        'Credits package "{{name}}" ({{credits}} credits)',
+        { name: pkg.name, credits: pkg.credits }
+      )
+    : this.t(
+        'INVOICE_ITEM_CREDITS_PURCHASE',
+        'Credits purchase ({{credits}} credits)',
+        { credits: inv.credits }
+      );
 
     autoTable(doc, {
       startY: cursorY,
@@ -375,7 +414,7 @@ export class InvoicePdfService {
         money(amountEur)
       ]],
       styles: {
-        font: this.fontRegistered ? 'Roboto' : 'helvetica',
+        font: hasUnicodeFont ? 'Roboto' : 'helvetica',
         fontStyle: 'normal',
         fontSize: 10,
         textColor: clrText as any,
@@ -384,8 +423,8 @@ export class InvoicePdfService {
       headStyles: {
         fillColor: clrPrimary as any,
         textColor: 255,
-        font: this.fontRegistered ? 'Roboto' : 'helvetica',
-        fontStyle: 'normal'
+        font: hasUnicodeFont ? 'Roboto' : 'helvetica',
+        fontStyle: 'bold'
       },
       alternateRowStyles: { fillColor: [248, 249, 251] },
       margin: { left: marginX, right: marginX },
@@ -411,9 +450,9 @@ export class InvoicePdfService {
 
     doc.setFontSize(14);
     setTextColor(clrText);
-    doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'bold');
+    doc.setFont(hasUnicodeFont ? 'Roboto' : 'helvetica', 'bold');
     doc.text(`€ ${money(amountEur)}`, totalX + totalCardW - 12, totalY + 32, { align: 'right' });
-    doc.setFont(this.fontRegistered ? 'Roboto' : 'helvetica', 'normal');
+    doc.setFont(hasUnicodeFont ? 'Roboto' : 'helvetica', 'normal');
 
     // ===== Payment details ==============================================
     let payY = totalY + totalCardH + 22;
@@ -427,7 +466,7 @@ export class InvoicePdfService {
     setTextColor(clrMuted);
 
     const payLines = this.compactStrings([
-      (inv as any).paymentMethod ? `Method: ${(inv as any).paymentMethod}` : undefined,
+      (inv as any).paymentMethod ? this.t('INVOICE_PAYMENT_METHOD', 'Method: {{method}}', { method: (inv as any).paymentMethod }) : undefined,
       // inv.stripePaymentIntentId ? `Stripe Payment Intent: ${inv.stripePaymentIntentId}` : undefined,
       // inv.stripeSessionId ? `Stripe Session: ${inv.stripeSessionId}` : undefined,
     ]);
@@ -491,9 +530,9 @@ export class InvoicePdfService {
       doc.setFontSize(8);
       setTextColor([120, 128, 140]);
 
-      const leftMeta = `Generated by DBStore`;
+      const leftMeta = this.t('INVOICE_FOOTER_GENERATED_BY', 'Generated by DBStore');
+      const rightMeta = this.t('INVOICE_FOOTER_PAGE', 'Page {{page}}/{{total}}', { page: p, total: totalPages });
       const centerMeta = invoiceNumber;
-      const rightMeta = `Page ${p}/${totalPages}`;
 
       doc.text(leftMeta, frameX + footerPadX, metaY);
       doc.text(centerMeta, pageW / 2, metaY, { align: 'center' });
