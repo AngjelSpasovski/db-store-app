@@ -1,4 +1,4 @@
-// src/app/home/shared/superadmin-packages.api.ts
+// src/app/shared/superadmin-packages.api.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -12,8 +12,8 @@ export interface SuperadminPackageDto {
   price: number;
   discountPercentage: number;
   isActive: boolean;
-  createdAt: string;  // ISO
-  updatedAt: string;  // ISO
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PackagesListResponse {
@@ -32,9 +32,6 @@ export interface PackagePayload {
 
 @Injectable({ providedIn: 'root' })
 export class SuperadminPackagesApi {
-  // baseApiUrl:
-  //  - dev: '/api/v1'
-  //  - prod: 'https://web-society.kps-dev.com/api/v1'
   private readonly apiBase = (environment.baseApiUrl ?? '').replace(/\/+$/, '');
   private readonly baseUrl = `${this.apiBase}/superadmin/packages`;
 
@@ -48,21 +45,15 @@ export class SuperadminPackagesApi {
     return this.http.get<PackagesListResponse>(this.baseUrl, { params });
   }
 
-  /** CREATE */
   createPackage(payload: PackagePayload): Observable<SuperadminPackageDto> {
     return this.http.post<SuperadminPackageDto>(this.baseUrl, payload);
   }
 
-  /** UPDATE */
   updatePackage(id: number, payload: PackagePayload): Observable<SuperadminPackageDto> {
-    return this.http.patch<SuperadminPackageDto>(
-      `${this.baseUrl}/${id}`,
-      payload
-    );
+    return this.http.patch<SuperadminPackageDto>(`${this.baseUrl}/${id}`, payload);
   }
 
-  /** DELETE */
-  deletePackage(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  deactivatePackage(id: number): Observable<{ status: boolean }> {
+    return this.http.patch<{ status: boolean }>(`${this.baseUrl}/${id}/deactivate`, {});
   }
 }
