@@ -260,8 +260,10 @@
 
             <div class="form-floating mb-1">
               <input type="text" id="suPhone" class="form-control"
+                     maxlength="15"
                      formControlName="phoneNumber" placeholder=" "
                      inputmode="numeric"
+                     autocomplete="tel"
                      [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('phoneNumber')?.invalid}"
                      [attr.aria-invalid]="signupSubmitted && signupForm.get('phoneNumber')?.invalid ? 'true' : null"
                      [attr.aria-describedby]="signupSubmitted && signupForm.get('phoneNumber')?.invalid ? 'suPhoneErr' : null" />
@@ -274,6 +276,7 @@
 
             <div class="form-floating mb-1">
               <input type="text" id="suVat" class="form-control"
+                     maxlength="11"
                      formControlName="vat" placeholder=" "
                      inputmode="numeric"
                      [ngClass]="{'is-invalid': signupSubmitted && signupForm.get('vat')?.invalid}"
@@ -511,7 +514,7 @@
         </div>
 
         <!-- Submit -->
-        <button type="submit" class="btn btn-primary w-100 mt-2" [disabled]="signupForm.invalid || signupInProgress">
+        <button type="submit" class="btn btn-primary w-100 mt-2" [disabled]="signupInProgress">
           <ng-container *ngIf="!signupInProgress; else suLoading">
             {{ 'SIGNUP' | translate }}
           </ng-container>
@@ -520,6 +523,7 @@
             {{ 'SIGNING_UP' | translate:{ default:'Signing up...' } }}
           </ng-template>
         </button>
+
       </form>
 
     </div>

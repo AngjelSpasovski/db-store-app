@@ -150,6 +150,9 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       )
     });
 
+    this.digitsOnly('vat', 11);
+    this.digitsOnly('phoneNumber', 15);
+
     // Секогаш кога LoginComponent се активира, постави login таб и ресетирај ги формите
     this.activeForm = 'login';
     this.resetAllForms();
@@ -258,7 +261,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
   resendVerifyEmail(auto = false) {
     if (!this.lastLoginEmail) return;
     this.resendLoading = true;
@@ -359,55 +361,77 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       const v = this.signupForm.value;
 
-      // Ако нема фајл
-      if (!this.selectedFile) return;
+      const meta = {
+        email:        v.email,
+        companyName:  v.companyName,
+        name:         v.name,
+        surname:      v.surname,
+        phoneNumber:  v.phoneNumber,
+        city:         v.city,
+        state:        v.state,
+        zip:          v.zip,
+        role:         v.role,
+        vat:          v.vat,
+        to_email:     'angjel.spasovski@gmail.com',
+      };
 
-      let fileToSend = await this.prepareFileForEmail(this.selectedFile);
-
-      // EmailJS free лимит е ~50KB; ако е над – скипни attach (не блокирај UX)
-      if (fileToSend && fileToSend.size <= 48 * 1024) {
-        await lastValueFrom(this.emailJs.sendSignupAttachment(fileToSend, {
-          email:       v.email,
-          companyName: v.companyName,
-          name:        v.name,
-          surname:     v.surname,
-          phoneNumber: v.phoneNumber,
-          city:        v.city,
-          state:       v.state,
-          zip:         v.zip,
-          role:        v.role,
-          vat:         v.vat,
-        }));
-      } else {
-        console.warn('PDF over EmailJS free limit (~50KB) – skipping attachment');
-        // опција: тука можеш да повикаш template без attachment или да пратиш само meta
+      // ако нема PDF -> прати само meta
+      if (!this.selectedFile) {
+        await lastValueFrom(this.emailJs.sendSignupMetaOnly(meta));
+        return;
       }
-    } catch (e) {
+
+      // пробај да компресираш
+      const fileToSend = await this.prepareFileForEmail(this.selectedFile);
+
+      // ако падне под лимит -> прати со attachment
+      if (fileToSend && fileToSend.size <= 48 * 1024) {
+        await lastValueFrom(this.emailJs.sendSignupAttachment(fileToSend, meta));
+        return;
+      }
+
+      // иначе -> meta-only (и логирај колку е голем)
+      console.warn('PDF too large for EmailJS free limit:', fileToSend?.size);
+      await lastValueFrom(this.emailJs.sendSignupMetaOnly(meta));
+    } 
+    catch (e) {
       console.warn('Email step failed (ignored):', e);
-    } finally {
-      // КЛУЧНО: секогаш префрли се на Login
+    } 
+    finally {
       this.switchToLogin();
     }
   }
 
   // Компресија + fallback ако „компресираниот“ е поголем од оригинал
-  private async prepareFileForEmail(file?: File): Promise<File | undefined> {
-    if (!file) return undefined;
-    try {
-      console.log('original:', file.size, 'bytes');
-      const cmp = await this.pdfCompressor.compress(file, {
-        maxBytes: 380 * 1024,
-        quality : 0.58,
-        scale   : 0.9
-      });
-      const chosen = (cmp.size < file.size) ? cmp : file;
-      console.log('chosen to send:', chosen.size, 'bytes');
-      return chosen;
-    } catch (err) {
-      console.warn('PDF compress failed, using original', err);
-      return file;
+private async prepareFileForEmail(file: File): Promise<File | undefined> {
+  try {
+    console.log('original:', file.size);
+
+    // Ако е веќе мал -> не го чепкај
+    if (file.size <= 48 * 1024) return file;
+
+    // Агресивни обиди (ова ќе деградира квалитет!)
+    const attempts = [
+      { maxBytes: 48 * 1024, quality: 0.35, scale: 0.60 },
+      { maxBytes: 48 * 1024, quality: 0.28, scale: 0.55 },
+      { maxBytes: 48 * 1024, quality: 0.22, scale: 0.50 },
+    ];
+
+    for (const a of attempts) {
+      const cmp = await this.pdfCompressor.compress(file, a);
+      console.log('attempt:', a, '=>', cmp.size);
+      if (cmp.size <= 48 * 1024) return cmp;
     }
+
+    // ако не успее -> врати најмало (или undefined)
+    const last = await this.pdfCompressor.compress(file, { maxBytes: 120 * 1024, quality: 0.30, scale: 0.60 });
+    return last.size < file.size ? last : file;
+  } 
+  catch (err) {
+    console.warn('PDF compress failed:', err);
+    return file;
   }
+}
 
   // Handle file selection for signup
   onFileSelected(evt: Event) {
@@ -480,7 +504,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     // дозволи повторно да го изберат истиот фајл
     if (input) input.value = '';
   }
-
 
   goBackToHomePage() {
     this.resetAllForms();
@@ -583,6 +606,16 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       // @ts-ignore
       if (c.controls) this.markAllAsTouched(c as FormGroup);
       c.markAsTouched();
+    });
+  }
+
+  // input sanitizers for numeric-only fields
+  private digitsOnly(controlName: string, maxLen: number) {
+    const c = this.signupForm.get(controlName);
+    c?.valueChanges.subscribe(v => {
+      if (v == null) return;
+      const cleaned = String(v).replace(/\D+/g, '').slice(0, maxLen);
+      if (cleaned !== v) c?.setValue(cleaned, { emitEvent: false });
     });
   }
 

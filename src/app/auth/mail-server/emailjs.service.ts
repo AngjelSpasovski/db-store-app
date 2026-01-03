@@ -6,8 +6,9 @@ import { finalize } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class EmailJsService {
-  private readonly serviceId  = 'service_9j8ez3k';
-  private readonly templateId = 'template_3v4i0vq';
+  private readonly serviceId          = 'service_9j8ez3k';
+  private readonly contactTemplateId  = 'template_3v4i0vq';
+  private readonly signupTemplateId   = 'template_1pnq6v8';
 
   private initialized = false;
 
@@ -23,46 +24,74 @@ export class EmailJsService {
   }
 
   sendContactForm(form: HTMLFormElement): Observable<EmailJSResponseStatus> {
-    return from(emailjs.sendForm(this.serviceId, this.templateId, form));
+    return from(emailjs.sendForm(this.serviceId, this.contactTemplateId, form));
   }
 
   // registration with attachment - old implementation with Promise
-  sendWithAttachment(form: HTMLFormElement): Promise<EmailJSResponseStatus> {
-    return emailjs.sendForm(this.serviceId, this.templateId, form);
+  sendWithAttachment(form: HTMLFormElement): Observable<EmailJSResponseStatus> {
+    return from(emailjs.sendForm(this.serviceId, this.signupTemplateId, form));
   }
 
-  // >>> НОВА имплементација: 2 аргументи + Observable
-  sendSignupAttachment(file: File, meta: unknown): Observable<EmailJSResponseStatus> {
+
+  sendSignupAttachment(file: File, meta: any): Observable<EmailJSResponseStatus> {
     const form = document.createElement('form');
 
-    const to = document.createElement('input');
-    to.name = 'to_email';
-    to.value = 'signup@dbstore.online'; // ✅ смени на реална
-    form.appendChild(to);
+    const add = (name: string, value: any) => {
+      const input = document.createElement('input');
+      input.name = name;
+      input.value = value == null ? '' : String(value);
+      form.appendChild(input);
+    };
 
-    const msg = document.createElement('textarea');
-    msg.name = 'message';
-    msg.value = JSON.stringify(meta, null, 2);
-    form.appendChild(msg);
+    // 👉 variables што ги користи твојот template
+    add('companyName',  meta.companyName);
+    add('name',         meta.name);
+    add('surname',      meta.surname);
+    add('email',        meta.email);
+    add('phoneNumber',  meta.phoneNumber);
+    add('city',         meta.city);
+    add('state',        meta.state);
+    add('zip',          meta.zip);
+    add('vat',          meta.vat);
+    add('role',         meta.role);
 
+    // ако сакаш да оди на специфичен recipient преку template:
+    add('to_email', 'angjel.spasovski@gmail.com');
+
+    // file field (мора да се совпадне со EmailJS Attachments конфигурацијата)
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.name = 'attachment';
-
+    fileInput.name = 'attachment'; // или 'my_file' — како ќе го наместиш во EmailJS
     const dt = new DataTransfer();
     dt.items.add(file);
     fileInput.files = dt.files;
-
     form.appendChild(fileInput);
 
     form.style.display = 'none';
     document.body.appendChild(form);
 
-    return from(emailjs.sendForm(this.serviceId, this.templateId, form)).pipe(
-      finalize(() => {
-        if (form.parentNode) form.parentNode.removeChild(form);
-      })
+    return from(emailjs.sendForm(this.serviceId, this.signupTemplateId, form)).pipe(
+      finalize(() => form.remove())
     );
+  }
+
+  sendSignupMetaOnly(meta: any): Observable<EmailJSResponseStatus> {
+    const params: Record<string, string> = {
+      companyName:  meta.companyName ?? '',
+      name:         meta.name ?? '',
+      surname:      meta.surname ?? '',
+      email:        meta.email ?? '',
+      phoneNumber:  meta.phoneNumber ?? '',
+      city:         meta.city ?? '',
+      state:        meta.state ?? '',
+      zip:          meta.zip ?? '',
+      vat:          meta.vat ?? '',
+      role:         meta.role ?? '',
+      to_email:     meta.to_email ?? 'angjel.spasovski@gmail.com',
+    };
+
+    // Ова не е sendForm, туку send со params (без attachment)
+    return from(emailjs.send(this.serviceId, this.signupTemplateId, params));
   }
 
 }
