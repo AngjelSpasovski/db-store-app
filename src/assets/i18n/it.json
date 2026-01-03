@@ -426,6 +426,9 @@
   "INVOICE_GENERATION_FAILED": "Generazione del PDF della fattura non riuscita.",
   "SUCCESS": "Successo",
   "PENDING": "In sospeso",
-  "FAILED": "Non riuscito"
+  "FAILED": "Non riuscito",
+
+  "MESSAGE_SENT_OK": "Il tuo messaggio è stato inviato con successo.",
+  "MESSAGE_SENT_ERR": "Si è verificato un errore durante l'invio del tuo messaggio. Riprova più tardi."
 
 }

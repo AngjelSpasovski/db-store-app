@@ -426,6 +426,9 @@
   "INVOICE_GENERATION_FAILED": "Failed to generate invoice PDF.",
   "SUCCESS": "Success",
   "PENDING": "Pending",
-  "FAILED": "Failed"
+  "FAILED": "Failed",
+
+  "MESSAGE_SENT_OK": "Your message has been sent successfully.",
+  "MESSAGE_SENT_ERR": "There was an error sending your message. Please try again later."
 
 }

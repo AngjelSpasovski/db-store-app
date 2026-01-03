@@ -401,24 +401,48 @@
               <h2 class="display-4 text-center mb-4">{{ 'CONTACT' | translate }}</h2>
               <div class="card shadow">
                   <div class="card-body p-4">
-                      <form id="contactForm" class="contact-form">
-                          <div class="mb-3">
-                              <label for="name" class="form-label">{{ 'YOUR_NAME' | translate }}</label>
-                              <input type="text" id="name" class="form-control" placeholder="{{ 'ENTER_YOUR_NAME' | translate }}" required>
-                          </div>
-                          <div class="mb-3">
-                              <label for="email" class="form-label">{{ 'EMAIL_ADDRESS' | translate }}</label>
-                              <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
-                          </div>
-                          <div class="mb-3">
-                              <label for="messageTextarea" class="form-label">{{ 'YOUR_MESSAGE' | translate }}</label>
-                              <textarea id="messageTextarea" class="form-control message-textarea" placeholder="{{ 'WRITE_YOUR_MESSAGE' | translate }}" required></textarea>
-                          </div>
-                          <div class="d-grid">
-                              <button type="submit" class="btn btn-primary"><i
-                                      class="fas fa-paper-plane me-2"></i>{{ 'SEND_MESSAGE' | translate }}</button>
-                          </div>
-                      </form>
+
+                    <form #contactForm="ngForm"
+                          #formEl
+                          id="contactForm"
+                          class="contact-form"
+                          (ngSubmit)="onContactSubmit(formEl)" >
+                      <div class="mb-3">
+                        <label for="name" class="form-label">{{ 'YOUR_NAME' | translate }}</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="{{ 'ENTER_YOUR_NAME' | translate }}" required [disabled]="sending">
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="email" class="form-label">{{ 'EMAIL_ADDRESS' | translate }}</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required [disabled]="sending">
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="messageTextarea" class="form-label">{{ 'YOUR_MESSAGE' | translate }}</label>
+                        <textarea id="messageTextarea" name="message" class="form-control message-textarea" placeholder="{{ 'WRITE_YOUR_MESSAGE' | translate }}" required [disabled]="sending"></textarea>
+                      </div>
+
+                      <!-- optional: title/subject token за template -->
+                      <input type="hidden" name="title" value="DBStore Contact Form" />
+
+                      <!-- honeypot field -->
+                      <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp-field" />
+
+                      <!-- optional: To email ако ти е во template -->
+                      <input type="hidden" name="to_email" value="contact@dbstore.online" />
+
+                      <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" [disabled]="sending">
+                          <i class="fas fa-paper-plane me-2"></i>
+                          {{ sending ? ('SENDING' | translate) : ('SEND_MESSAGE' | translate) }}
+                        </button>
+                      </div>
+
+                      <!-- status message -->
+                      <div *ngIf="sendOk" class="alert alert-success mt-3">{{ 'MESSAGE_SENT_OK' | translate }}</div>
+                      <div *ngIf="sendErr" class="alert alert-danger mt-3">{{ 'MESSAGE_SENT_ERR' | translate }}</div>
+                    </form>
+
                   </div>
               </div>
           </div>

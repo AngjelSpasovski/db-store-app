@@ -3,8 +3,11 @@ import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { Subscription, timer } from 'rxjs';
+import { filter, finalize } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
+import { EmailJsService } from '../auth/mail-server/emailjs.service';
+
 
 @Component({
   selector: 'app-home',
@@ -12,7 +15,8 @@ import { filter } from 'rxjs/operators';
   imports: [
     IonicModule,
     CommonModule,
-    TranslateModule
+    TranslateModule,
+    FormsModule
   ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss']
@@ -24,7 +28,7 @@ export class HomePage implements OnInit, OnDestroy {
   public currentYear = new Date().getFullYear();
   public sections = ['home', 'about', 'people', 'packages', 'contact', 'info'];
 
-    public infoData = {
+  public infoData = {
     company:  'OUR_COMPANY_NAME',
     street:   'ADDRESS_NAME',
     city:     'CITY_NAME',
@@ -36,7 +40,17 @@ export class HomePage implements OnInit, OnDestroy {
     vat:      '4082017520050',
   }
 
-  constructor(private translate: TranslateService, private router: Router) {
+  public sending  = false;
+  public sendOk   = false;
+  public sendErr  = false;
+
+  private flashSub?: Subscription;
+
+  constructor(
+    private translate: TranslateService,
+    private router: Router,
+    private emailJs: EmailJsService
+  ) {
     // Setup on navigation back to /home
     this.routerSub = this.router.events.pipe(
       filter(e => e instanceof NavigationEnd && (e as NavigationEnd).urlAfterRedirects === '/home')
@@ -75,6 +89,68 @@ export class HomePage implements OnInit, OnDestroy {
     // Cleanup observers and subscription
     this.obsSubs.forEach(o => o.disconnect());
     this.routerSub.unsubscribe();
+    this.flashSub?.unsubscribe();
+
+  }
+
+  // Contact form submission
+  public onContactSubmit(form: HTMLFormElement): void {
+    if (this.sending) return;
+
+    // reset messages
+    this.sendOk = false;
+    this.sendErr = false;
+
+    // allowlist host check
+    if (!this.isAllowedOrigin()) {
+      this.sendErr = true;
+      this.flashError(5000);
+      return;
+    }
+
+    // basic HTML validity check
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // honeypot check - should be empty for real users
+    const hp = (form.querySelector('[name="website"]') as HTMLInputElement | null)?.value?.trim();
+    if (hp) return; // silent block
+
+    // cooldown
+    if (!this.canSendNow()) {
+      this.sendErr = true;
+      this.flashError(5000);
+      return;
+    }
+
+    this.sending = true;
+
+    this.emailJs
+      .sendContactForm(form)
+      .pipe(finalize(() => (this.sending = false)))
+      .subscribe({
+        next: () => {
+          this.sendOk = true;
+          form.reset();
+          this.flashSuccess(5000);
+        },
+        error: (err) => {
+          console.error('EmailJS send error:', err);
+          this.sendErr = true;
+          this.flashError(5000);
+        }
+      });
+  }
+
+  private canSendNow(): boolean {
+    const key = 'contact_last_sent_at';
+    const last = Number(localStorage.getItem(key) || '0');
+    const now = Date.now();
+    if (now - last < 30_000) return false; // 30s cooldown
+    localStorage.setItem(key, String(now));
+    return true;
   }
 
   private setupObservers(): void {
@@ -90,6 +166,8 @@ export class HomePage implements OnInit, OnDestroy {
         entry.target.classList.toggle('in-view', entry.isIntersecting);
       });
     }, { root, threshold: 0.2 });
+
+    // animate-on-scroll elements
     document.querySelectorAll<HTMLElement>('.animate-on-scroll').forEach(el => animateObserver.observe(el));
     this.obsSubs.push(animateObserver);
 
@@ -104,10 +182,8 @@ export class HomePage implements OnInit, OnDestroy {
       });
     }, { root, threshold: 0.5 });
 
+    // section-scroll elements
     document.querySelectorAll<HTMLElement>('.section-scroll').forEach(sec => sectionObserver.observe(sec));
-    this.obsSubs.push(sectionObserver);
-
-    this.obsSubs.push(animateObserver);
     this.obsSubs.push(sectionObserver);
 
     // === Statistics count-up observer ===
@@ -180,6 +256,28 @@ export class HomePage implements OnInit, OnDestroy {
     };
 
     requestAnimationFrame(step);
+  }
+
+  private readonly allowedHosts = new Set([
+    'dbstore.online',
+    'www.dbstore.online',
+    'db-store-it.web.app',
+    'localhost'
+  ]);
+
+  private isAllowedOrigin(): boolean {
+    const host = window.location.hostname;
+    return this.allowedHosts.has(host);
+  }
+
+  private flashSuccess(ms = 5000) {
+    this.flashSub?.unsubscribe();
+    this.flashSub = timer(ms).subscribe(() => (this.sendOk = false));
+  }
+
+  private flashError(ms = 5000) {
+    this.flashSub?.unsubscribe();
+    this.flashSub = timer(ms).subscribe(() => (this.sendErr = false));
   }
 
 }
