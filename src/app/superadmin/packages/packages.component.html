@@ -1,177 +1,296 @@
 <!-- src/app/superadmin/packages/packages.component.html -->
-<section class="superadmin-packages container py-3">
+<section class="container superadmin-packages-page p-3 p-md-4">
+  <div class="card-block superadmin-packages-card">
 
-  <div class="card list-card mb-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center gap-3">
-        <span class="card-title">Packages</span>
-        <span class="badge bg-secondary small">Total: {{ total }}</span>
+    <!-- TOOLBAR (same UX pattern as users-list) -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 admin-toolbar">
+
+      <div class="form-label small mb-0">
+        {{ 'ADMIN.PACKAGES' | translate }}
       </div>
 
-      <button class="btn btn-sm btn-primary" (click)="openCreateModal()">
-        + New package
-      </button>
+      <div class="d-flex flex-wrap align-items-stretch gap-3 justify-content-end admin-toolbar-right">
+
+        <!-- SEARCH -->
+        <div class="toolbar-section toolbar-search">
+          <span class="toolbar-label">{{ 'ADMIN.SEARCH' | translate }}</span>
+
+          <input
+            type="text"
+            class="form-control form-control-sm search-input"
+            [(ngModel)]="searchText"
+            (input)="applyQuickFilter()"
+            placeholder="{{ 'ADMIN.SEARCH_PACKAGES_PLACEHOLDER' | translate }}" />
+
+          <button
+            type="button"
+            class="btn btn-sm btn-clear"
+            *ngIf="searchText"
+            (click)="clearSearch()"
+            [attr.aria-label]="'ADMIN.CLEAR_SEARCH' | translate">
+            ✕
+          </button>
+        </div>
+
+        <!-- ROWS -->
+        <div class="toolbar-section">
+          <span class="toolbar-label">{{ 'ADMIN.ROWS' | translate }}</span>
+
+          <select
+            [(ngModel)]="perPage"
+            (change)="reload()"
+            class="form-select form-select-sm w-auto">
+            <option *ngFor="let p of pageOptions" [value]="p">{{ p }}</option>
+          </select>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="toolbar-section">
+          <span class="toolbar-label">{{ 'ADMIN.ACTIONS' | translate }}</span>
+
+          <button type="button"
+                  class="btn btn-export btn-sm"
+                  (click)="loadPackages()"
+                  [disabled]="loading || saving">
+            {{ 'REFRESH' | translate }}
+          </button>
+
+          <button type="button"
+                  class="btn btn-sm btn-primary"
+                  (click)="openCreateModal()"
+                  [disabled]="saving">
+            + {{ 'ADMIN.NEW_PACKAGE' | translate }}
+          </button>
+        </div>
+
+      </div>
     </div>
 
-    <div class="card-body p-0">
+    <!-- GRID (desktop stays mounted) -->
+    <div class="admin-grid-wrapper" [class.grid-hidden]="isMobile">
+
       <div *ngIf="loading" class="p-3 small text-muted">
-        Loading packages...
+        {{ 'ADMIN.LOADING_PACKAGES' | translate }}
       </div>
 
       <div *ngIf="!loading && error" class="p-3 text-danger small">
         {{ error }}
       </div>
 
-      <table *ngIf="!loading && !error"
-             class="table table-dark table-sm mb-0 align-middle">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th class="text-end">Credits</th>
-            <th class="text-end">Price</th>
-            <th class="text-end">Discount %</th>
-            <th class="text-center">Status</th>
-            <th class="text-end">Actions</th>
-          </tr>
-        </thead>
+      <ag-grid-angular
+        *ngIf="!loading && !error"
+        class="ag-theme-alpine"
+        [theme]="theme"
+        [gridOptions]="gridOptions"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [rowData]="packages"
+        [pagination]="false"
+        style="width: 100%; height: 57vh"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
 
-        <tbody>
-          <tr *ngFor="let pkg of packages">
-            <td>{{ pkg.name }}</td>
-            <td class="text-end">{{ pkg.credits }}</td>
-            <td class="text-end">{{ pkg.price | number:'1.2-2' }}</td>
-            <td class="text-end">{{ pkg.discountPercentage }}</td>
+    </div>
 
-            <!-- display-only -->
-            <td class="text-center">
-              <span class="badge" [ngClass]="pkg.isActive ? 'bg-success' : 'bg-secondary'">
-                {{ pkg.isActive ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
+    <!-- MOBILE (accordion list; same pattern as users-list) -->
+    <div *ngIf="isMobile" class="admin-mobile-list mt-3">
+      <div class="accordion" id="packagesAccordion">
 
-            <td class="text-end">
-              <!-- MUST be enabled even for inactive packages (to re-activate via modal) -->
-              <button class="btn btn-sm btn-outline-light"
-                      (click)="openEditModal(pkg)"
+        <div class="accordion-item" *ngFor="let p of packages; let i = index">
+          <h2 class="accordion-header" [id]="'pHead' + i">
+            <button
+              class="accordion-button collapsed mobile-acc-btn"
+              type="button"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#pCol' + i"
+              aria-expanded="false"
+              [attr.aria-controls]="'pCol' + i">
+
+              <div class="acc-main-line">
+                <span class="acc-id">{{ p.name }}</span>
+                <span class="acc-right">
+                  <span class="badge"
+                        [class.bg-success]="p.isActive"
+                        [class.bg-secondary]="!p.isActive">
+                    {{ p.isActive ? ('ADMIN.YES' | translate) : ('ADMIN.NO' | translate) }}
+                  </span>
+                </span>
+              </div>
+
+              <div class="acc-sub-line">
+                <span class="acc-email">
+                  {{ 'PACKAGE_CREDITS' | translate }}: {{ p.credits }}
+                · {{ 'PACKAGE_PRICE' | translate }}: {{ p.price | number:'1.2-2' }}
+                · {{ 'DISCOUNT_PERCENT' | translate }}: {{ p.discountPercentage }}%
+                </span>
+              </div>
+            </button>
+          </h2>
+
+          <div
+            [id]="'pCol' + i"
+            class="accordion-collapse collapse"
+            [attr.aria-labelledby]="'pHead' + i"
+            data-bs-parent="#packagesAccordion">
+
+            <div class="accordion-body">
+
+              <div class="acc-row" *ngIf="p.description">
+                <span class="acc-label">{{ 'DESCRIPTION' | translate }}</span>
+                <span class="acc-value">{{ p.description }}</span>
+              </div>
+
+              <div class="acc-row">
+                <span class="acc-label">{{ 'CREDITS' | translate }}</span>
+                <span class="acc-value">{{ p.credits }}</span>
+              </div>
+
+              <div class="acc-row">
+                <span class="acc-label">{{ 'PRICE' | translate }}</span>
+                <span class="acc-value">{{ p.price | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="acc-row">
+                <span class="acc-label">{{ 'DISCOUNT_PERCENT' | translate }} %</span>
+                <span class="acc-value">{{ p.discountPercentage }}</span>
+              </div>
+
+              <div class="acc-row acc-row-button d-flex gap-2">
+                <button type="button"
+                        class="btn btn-outline-light btn-sm w-100"
+                        (click)="openEditModal(p)"
+                        [disabled]="saving">
+                  {{ 'EDIT' | translate }}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SERVER PAGER -->
+    <div class="admin-pager d-flex justify-content-between align-items-center mt-3">
+      <button class="btn btn-outline-light btn-sm"
+              [disabled]="page <= 1 || loading"
+              (click)="prevPage()">
+        {{ 'PREVIOUS' | translate }}
+      </button>
+
+      <div class="small text-muted">
+        {{ 'ADMIN.PAGE' | translate }} {{ page }} / {{ totalPages }} · {{ 'ADMIN.TOTAL' | translate }}: {{ total }}
+      </div>
+
+      <button class="btn btn-outline-light btn-sm"
+              [disabled]="page >= totalPages || loading"
+              (click)="nextPage()">
+        {{ 'NEXT' | translate }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- BLUR BACKDROP -->
+  <div class="modal-backdrop blur show" *ngIf="showFormModal"></div>
+
+  <!-- MODAL (glass style like users-list) -->
+  <div class="custom-modal" *ngIf="showFormModal">
+    <div class="custom-modal-dialog confirm-dialog">
+      <div class="custom-modal-content glass">
+
+        <div class="custom-modal-header">
+          <h5 class="modal-title">
+            {{ editingPackage ? ('ADMIN.EDIT_PACKAGE' | translate) : ('ADMIN.CREATE_PACKAGE' | translate) }}
+          </h5>
+
+          <button type="button"
+                  class="btn-close btn-close-white"
+                  (click)="closeModal()"></button>
+        </div>
+
+        <div class="custom-modal-body">
+          <form [formGroup]="form" (ngSubmit)="submit()">
+
+            <div class="mb-2">
+              <label class="form-label">{{ 'NAME' | translate }}</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     formControlName="name">
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">{{ 'DESCRIPTION' | translate }}</label>
+              <textarea rows="2"
+                        class="form-control form-control-sm"
+                        formControlName="description"></textarea>
+            </div>
+
+            <div class="row g-2 mb-2">
+              <div class="col-4">
+                <label class="form-label">{{ 'CREDITS' | translate }}</label>
+                <input type="number"
+                       class="form-control form-control-sm"
+                       formControlName="credits">
+              </div>
+
+              <div class="col-4">
+                <label class="form-label">{{ 'PRICE' | translate }}</label>
+                <input type="number"
+                       step="0.01"
+                       class="form-control form-control-sm"
+                       formControlName="price">
+              </div>
+
+              <div class="col-4">
+                <label class="form-label">{{ 'DISCOUNT_PERCENT' | translate }} %</label>
+                <input type="number"
+                       class="form-control form-control-sm"
+                       formControlName="discountPercentage">
+              </div>
+            </div>
+
+            <!-- ONLY place to change isActive -->
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input"
+                     type="checkbox"
+                     formControlName="isActive"
+                     id="isActiveSwitch">
+              <label class="form-check-label" for="isActiveSwitch">{{ 'ACTIVE' | translate }}</label>
+            </div>
+
+            <div *ngIf="form.value?.isActive === false"
+                 class="small text-warning mb-2">
+              {{ 'ADMIN.INACTIVE_PACKAGE_NOTE' | translate }}
+            </div>
+
+            <div class="custom-modal-footer d-flex justify-content-end gap-2">
+              <button type="button"
+                      class="btn btn-outline-light"
+                      (click)="onReset()"
                       [disabled]="saving">
-                Edit
+                {{ 'ADMIN.RESET' | translate }}
               </button>
-            </td>
-          </tr>
 
-          <tr *ngIf="packages.length === 0 && !loading">
-            <td colspan="6" class="text-center small text-muted py-3">
-              No packages yet.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+              <button type="submit"
+                      class="btn btn-primary"
+                      [disabled]="saving || form.invalid">
+                <span *ngIf="!saving">
+                  {{ editingPackage ? ('ADMIN.SAVE_CHANGES' | translate) : ('ADMIN.CREATE_PACKAGE' | translate) }}
+                </span>
+                <span *ngIf="saving">
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                  {{ 'SAVING' | translate }}
+                </span>
+              </button>
+            </div>
 
-    <div class="card-footer small text-muted d-flex justify-content-between">
-      <span>Per page: {{ perPage }}</span>
+          </form>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <!-- MODAL BACKDROP -->
-  <div *ngIf="showFormModal"
-       class="modal-backdrop-custom"
-       (click)="closeModal()"></div>
-
-  <!-- MODAL -->
-  <div *ngIf="showFormModal"
-       class="modal-custom"
-       (click)="$event.stopPropagation()">
-
-    <div class="card form-card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <span>{{ editingPackage ? 'Edit package' : 'Create package' }}</span>
-
-        <button type="button"
-                class="btn-close btn-close-white"
-                aria-label="Close"
-                (click)="closeModal()"></button>
-      </div>
-
-      <div class="card-body">
-        <form [formGroup]="form" (ngSubmit)="submit()">
-
-          <div class="mb-2">
-            <label class="form-label">Name</label>
-            <input type="text"
-                   class="form-control form-control-sm"
-                   formControlName="name">
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label">Description</label>
-            <textarea rows="2"
-                      class="form-control form-control-sm"
-                      formControlName="description"></textarea>
-          </div>
-
-          <div class="row g-2 mb-2">
-            <div class="col-4">
-              <label class="form-label">Credits</label>
-              <input type="number"
-                     class="form-control form-control-sm"
-                     formControlName="credits">
-            </div>
-
-            <div class="col-4">
-              <label class="form-label">Price</label>
-              <input type="number"
-                     step="0.01"
-                     class="form-control form-control-sm"
-                     formControlName="price">
-            </div>
-
-            <div class="col-4">
-              <label class="form-label">Discount %</label>
-              <input type="number"
-                     class="form-control form-control-sm"
-                     formControlName="discountPercentage">
-            </div>
-          </div>
-
-          <!-- ONLY place to change isActive -->
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input"
-                   type="checkbox"
-                   formControlName="isActive"
-                   id="isActiveSwitch">
-            <label class="form-check-label" for="isActiveSwitch">Active</label>
-          </div>
-
-          <div *ngIf="form.value?.isActive === false"
-               class="small text-warning mb-3">
-            Inactive packages won’t be available to users.
-          </div>
-
-          <div class="d-flex justify-content-between">
-            <button type="button"
-                    class="btn btn-outline-secondary btn-sm"
-                    (click)="onReset()"
-                    [disabled]="saving">
-              Reset
-            </button>
-
-            <button type="submit"
-                    [disabled]="saving || form.invalid"
-                    class="btn btn-primary btn-sm">
-              <span *ngIf="!saving">
-                {{ editingPackage ? 'Save changes' : 'Create package' }}
-              </span>
-              <span *ngIf="saving">
-                <span class="spinner-border spinner-border-sm me-1"></span>
-                Saving...
-              </span>
-            </button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-
-  </div>
 </section>

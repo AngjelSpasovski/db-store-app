@@ -267,6 +267,9 @@
 
   "ONLY_PDF": "Само PDF-фајлови се дозволени.",
 
+  "PRICE": "Цена",
+  "DESCRIPTION": "Опис",
+
   "ADMIN": {
     "DASHBOARD": "Контролна табла",
     "USERS": "Корисници",
@@ -282,7 +285,30 @@
     "ACTIVATE": "Активирај",
     "DEACTIVATE": "Деактивирај",
     "USER_DETAILS_TITLE": "Детали за корисникот",
-    "UPDATED_AT": "Ажурирано"
+    "UPDATED_AT": "Ажурирано",
+    "PACKAGES": "Пакети",
+    "SEARCH": "Пребарај",
+    "SEARCH_PACKAGES_PLACEHOLDER": "Пребарај пакети…",
+    "CLEAR_SEARCH": "Исчисти пребарување",
+    "ROWS": "Редови",
+
+    "NEW_PACKAGE": "Нов пакет",
+    "CREATE_PACKAGE": "Креирај пакет",
+    "EDIT_PACKAGE": "Уреди пакет",
+    "SAVE_CHANGES": "Зачувај промени",
+    "RESET": "Ресетирај",
+
+    "LOADING_PACKAGES": "Вчитување пакети...",
+    "INACTIVE_PACKAGE_NOTE": "Неактивните пакети нема да бидат достапни за корисниците.",
+
+    "ERROR_LOAD_PACKAGES": "Неуспешно вчитување на пакети",
+    "ERROR_CREATE_PACKAGE": "Неуспешно креирање на пакет",
+    "ERROR_UPDATE_PACKAGE": "Неуспешно ажурирање на пакет",
+    "ERROR_DEACTIVATE_PACKAGE": "Неуспешно деактивирање на пакет",
+
+    "PACKAGE_CREATED_OK": "Пакетот е успешно креиран",
+    "PACKAGE_UPDATED_OK": "Пакетот е успешно ажуриран",
+    "PACKAGE_DEACTIVATED_OK": "Пакетот е успешно деактивиран"
   },
 
   "RECEIPT": "Добиеница",

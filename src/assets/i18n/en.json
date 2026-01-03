@@ -268,6 +268,9 @@
 
   "ONLY_PDF": "Only PDF files are allowed.",
 
+  "PRICE": "Price",
+  "DESCRIPTION": "Description",
+
   "ADMIN": {
     "DASHBOARD": "Dashboard",
     "USERS": "Users",
@@ -283,7 +286,30 @@
     "ACTIVATE": "Activate",
     "DEACTIVATE": "Deactivate",
     "USER_DETAILS_TITLE": "User details",
-    "UPDATED_AT": "Updated"
+    "UPDATED_AT": "Updated",
+    "PACKAGES": "Packages",
+    "SEARCH": "Search",
+    "SEARCH_PACKAGES_PLACEHOLDER": "Search packages…",
+    "CLEAR_SEARCH": "Clear search",
+    "ROWS": "Rows",
+
+    "NEW_PACKAGE": "New package",
+    "CREATE_PACKAGE": "Create package",
+    "EDIT_PACKAGE": "Edit package",
+    "SAVE_CHANGES": "Save changes",
+    "RESET": "Reset",
+
+    "LOADING_PACKAGES": "Loading packages…",
+    "INACTIVE_PACKAGE_NOTE": "Inactive packages won’t be available to users.",
+
+    "ERROR_LOAD_PACKAGES": "Failed to load packages",
+    "ERROR_CREATE_PACKAGE": "Failed to create package",
+    "ERROR_UPDATE_PACKAGE": "Failed to update package",
+    "ERROR_DEACTIVATE_PACKAGE": "Failed to deactivate package",
+
+    "PACKAGE_CREATED_OK": "Package created successfully",
+    "PACKAGE_UPDATED_OK": "Package updated successfully",
+    "PACKAGE_DEACTIVATED_OK": "Package deactivated successfully"
   },
 
   "RECEIPT": "Receipt",
