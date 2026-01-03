@@ -230,7 +230,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   public onLoginClick(): void {
-    this.router.navigate(['/login'], { queryParams: { tab: 'login' } });
+    this.router.navigateByUrl('/login');
   }
 
   public logout(): void {

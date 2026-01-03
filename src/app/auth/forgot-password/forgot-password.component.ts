@@ -85,6 +85,6 @@ export class ForgotPasswordComponent implements OnInit {
 
   // Navigate back to login
   goBackToLogin(): void {
-    this.router.navigate(['/login'], { queryParams: { tab: 'login' } });
+    this.router.navigateByUrl('/login');
   }
 }

@@ -6,20 +6,31 @@ import { guestGuard } from './auth/guest.guard';
 //import { superadminCanMatch, superadminGuard } from './auth/superadmin.guard';
 
 export const appRoutes: Routes = [
+  // default redirects
   { path: '', redirectTo: 'home', pathMatch: 'full' },
+
+  // legacy redirect
   { path: 'account', redirectTo: 'user/account', pathMatch: 'full' },
 
+  // HOME PAGE
   {
     path: 'home',
     loadComponent: () => import('./home/home.page').then(m => m.HomePage),
     data: { title: 'HOME' }
   },
 
+  // LOGIN / SIGNUP / FORGOT PASSWORD / RESET PASSWORD
   {
     path: 'login',
     loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent),
     canActivate: [guestGuard],
-    data: { title: 'LOGIN' }
+    data: { title: 'LOGIN', tab: 'login' }
+  },
+  {
+    path: 'signup',
+    loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent),
+    canActivate: [guestGuard],
+    data: { title: 'SIGNUP', tab: 'signup' }
   },
 
   {
@@ -40,6 +51,7 @@ export const appRoutes: Routes = [
     data: { title: 'RESET_PASSWORD' }
   },
 
+  // USER AREA
   {
     path: 'user',
     loadChildren: () => import('./user/user.module').then(m => m.UserModule),
@@ -51,6 +63,7 @@ export const appRoutes: Routes = [
     }
   },
 
+  // ADMIN AREA
   {
     path: 'admin',
     canActivate: [authGuard, roleGuard],

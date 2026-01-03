@@ -121,7 +121,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private mapUrlToViewMode(url: string): typeof this.viewMode {
-    if (url.includes('/login')) return 'login';
+    if (url.includes('/login') || url.includes('/signup')) return 'login';
     if (url.includes('/forgot-password')) return 'forgot-password';
     if (url.includes('/reset-password')) return 'reset-password';
     if (url.includes('/admin')) return 'admin';

@@ -85,12 +85,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // if tolken exists, redirect to user/buy-credits or admin based on role
   if (token && (role || email)) {
-    // ✅ special-case: admin by email
-    // if (email === 'angjel.spasovski@gmail.com') {
-    //   this.router.navigateByUrl('/admin', { replaceUrl: true });
-    //   return;
-    // }
-
     const target =
     role === 'superadmin' ? '/admin' :
     /* adminuser и user одат исто */   '/user/buy-credits';
@@ -153,15 +147,26 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     this.digitsOnly('vat', 11);
     this.digitsOnly('phoneNumber', 15);
 
-    // Секогаш кога LoginComponent се активира, постави login таб и ресетирај ги формите
-    this.activeForm = 'login';
-    this.resetAllForms();
+    // ✅ route -> tab sync (login vs signup)
+    this.sub = new Subscription();
 
-    this.sub = this.auth.isAuthed$.subscribe(isAuthed => {
-      if (!isAuthed) {
-        this.resetAllForms();
-      }
-    });
+    // initial tab from route data
+    this.sub.add(
+      this.routeActive.data.subscribe(d => {
+        const tab = (d['tab'] || 'login') as 'login' | 'signup';
+        this.applyTab(tab);
+      })
+    );
+
+    // ✅ твојот existing auth subscription
+    this.sub.add(
+      this.auth.isAuthed$.subscribe(isAuthed => {
+        if (!isAuthed) {
+          this.resetAllForms();
+        }
+      })
+    );
+
   }
 
   ngAfterViewInit() {}
@@ -193,13 +198,11 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   switchToLogin() {
-    this.activeForm = 'login';
-    this.resetAllForms();
+    this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 
   switchToSignup() {
-    this.activeForm = 'signup';
-    this.resetAllForms();
+    this.router.navigateByUrl('/signup', { replaceUrl: true });
   }
 
   // LOGIN FORM
@@ -617,6 +620,13 @@ private async prepareFileForEmail(file: File): Promise<File | undefined> {
       const cleaned = String(v).replace(/\D+/g, '').slice(0, maxLen);
       if (cleaned !== v) c?.setValue(cleaned, { emitEvent: false });
     });
+  }
+
+  private applyTab(tab: 'login' | 'signup') {
+    if (this.activeForm !== tab) {
+      this.activeForm = tab;
+    }
+    this.resetAllForms();
   }
 
 }
