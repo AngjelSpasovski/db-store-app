@@ -5,7 +5,7 @@
     <!-- TOOLBAR -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 admin-toolbar">
 
-      <div class="form-label small mb-0">
+      <div class="form-label mb-0">
         {{ 'ADMIN.USERS' | translate:{ default:'Users' } }}
       </div>
 
@@ -22,7 +22,7 @@
             class="form-control form-control-sm search-input"
             [(ngModel)]="searchText"
             (input)="applyQuickFilter()"
-            [placeholder]="'ADMIN.SEARCH_USERS' | translate:{ default:'Search users…' }" />
+            [placeholder]="'ADMIN.SEARCH_USERS_PLACEHOLDER' | translate:{ default:'Search users…' }" />
 
           <button
             type="button"
@@ -81,7 +81,7 @@
     <div *ngIf="isMobile" class="admin-mobile-list mt-3">
       <div class="accordion" id="usersAccordion">
 
-        <div class="accordion-item" *ngFor="let u of rows; let i = index">
+        <div class="accordion-item" *ngFor="let u of filteredRows; let i = index">
           <h2 class="accordion-header" [id]="'uHead' + i">
             <button
               class="accordion-button collapsed mobile-acc-btn"
@@ -289,7 +289,7 @@
                   [class.btn-danger]="!confirmNextActive"
                   [disabled]="confirmBusy"
                   (click)="confirmToggle()">
-            {{ confirmBusy ? ('LOADING' | translate:{default:'Loading'}) : ('CONFIRM' | translate:{default:'Confirm'}) }}
+            {{ confirmBusy ? ('LOADING' | translate:{default:'Loading'}) : ('ADMIN.CONFIRM' | translate:{default:'Confirm'}) }}
           </button>
         </div>
       </div>

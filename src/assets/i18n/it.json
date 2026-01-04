@@ -290,8 +290,11 @@
     "PACKAGES": "Pacchetti",
     "SEARCH": "Ricerca",
     "SEARCH_PACKAGES_PLACEHOLDER": "Ricerca pacchetti...",
+    "SEARCH_USERS_PLACEHOLDER": "Ricerca utenti...",
     "CLEAR_SEARCH": "Cancella ricerca",
     "ROWS": "Righe",
+    "CONFIRM_TOGGLE": "Sei sicuro di voler cambiare lo stato di ",
+    "CONFIRM": "Conferma",
 
     "NEW_PACKAGE": "Nuovo pacchetto",
     "CREATE_PACKAGE": "Crea pacchetto",

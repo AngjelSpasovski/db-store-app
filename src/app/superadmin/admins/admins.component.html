@@ -43,6 +43,10 @@
               </span>
             </td>
             <td class="actions">
+              <button class="btn btn-dark-outline" type="button" (click)="openEdit(a)" [disabled]="loading">
+                Edit
+              </button>
+
               <button class="btn btn-danger-outline" type="button" (click)="deleteAdmin(a)" [disabled]="loading">
                 Delete
               </button>
@@ -70,7 +74,7 @@
     </div>
   </div>
 
-  <!-- ✅ CUSTOM MODAL (renamed classes to avoid Bootstrap conflict) -->
+  <!-- CREATE MODAL -->
   <div class="sa-backdrop" *ngIf="showCreateModal" (click)="closeCreate()">
     <div class="sa-modal" (click)="$event.stopPropagation()">
       <div class="sa-head">
@@ -118,17 +122,56 @@
           <div class="err" *ngIf="isTouchedInvalid('password')">Password required (min 8)</div>
         </div>
 
-        <div class="row">
-          <label class="switch">
-            <input type="checkbox" formControlName="isActive" />
-            <span class="slider"></span>
-          </label>
-          <span class="switch-label">Active</span>
-        </div>
+        <!-- ✅ ТРГНАТО isActive, затоа што backend POST schema нема isActive -->
 
         <div class="sa-actions">
           <button class="btn btn-dark-outline" type="button" (click)="closeCreate()">Cancel</button>
           <button class="btn btn-primary" type="submit" [disabled]="loading">Create admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="sa-backdrop" *ngIf="showEditModal" (click)="closeEdit()">
+    <div class="sa-modal" (click)="$event.stopPropagation()">
+      <div class="sa-head">
+        <div class="sa-title">EDIT ADMIN</div>
+        <button class="icon-btn" type="button" (click)="closeEdit()">✕</button>
+      </div>
+
+      <form class="sa-body" [formGroup]="editForm" (ngSubmit)="submitEdit()">
+        <div class="grid-2">
+          <div class="field">
+            <label>First name</label>
+            <input type="text" formControlName="firstName" />
+            <div class="err" *ngIf="isTouchedInvalidEdit('firstName')">Required</div>
+          </div>
+
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" formControlName="lastName" />
+            <div class="err" *ngIf="isTouchedInvalidEdit('lastName')">Required</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Company</label>
+          <input type="text" formControlName="companyName" />
+        </div>
+
+        <div class="field">
+          <label>New password (optional)</label>
+          <input type="password" formControlName="password" autocomplete="new-password" />
+          <div class="hint">Leave empty to keep current password.</div>
+          <div class="err" *ngIf="editForm.controls.password.touched && editForm.controls.password.hasError('minlength')">
+            Min 8 characters
+          </div>
+        </div>
+
+        <div class="sa-actions">
+          <button class="btn btn-dark-outline" type="button" (click)="closeEdit()">Cancel</button>
+          <button class="btn btn-primary" type="submit" [disabled]="loading">Save changes</button>
         </div>
       </form>
     </div>

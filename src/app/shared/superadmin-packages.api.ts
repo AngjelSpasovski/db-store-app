@@ -37,6 +37,7 @@ export class SuperadminPackagesApi {
 
   constructor(private http: HttpClient) {}
 
+  // GET /superadmin/packages
   getPackages(perPage = 50, page = 1): Observable<PackagesListResponse> {
     const params = new HttpParams()
       .set('perPage', String(perPage))
@@ -45,14 +46,17 @@ export class SuperadminPackagesApi {
     return this.http.get<PackagesListResponse>(this.baseUrl, { params });
   }
 
+  // POST /superadmin/packages
   createPackage(payload: PackagePayload): Observable<SuperadminPackageDto> {
     return this.http.post<SuperadminPackageDto>(this.baseUrl, payload);
   }
 
+  // PATCH /superadmin/packages/{id}
   updatePackage(id: number, payload: PackagePayload): Observable<SuperadminPackageDto> {
     return this.http.patch<SuperadminPackageDto>(`${this.baseUrl}/${id}`, payload);
   }
 
+  // DELETE /superadmin/packages/{id}
   deactivatePackage(id: number): Observable<{ status: boolean }> {
     return this.http.patch<{ status: boolean }>(`${this.baseUrl}/${id}/deactivate`, {});
   }

@@ -5,7 +5,7 @@
     <!-- TOOLBAR (same UX pattern as users-list) -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 admin-toolbar">
 
-      <div class="form-label small mb-0">
+      <div class="form-label mb-0">
         {{ 'ADMIN.PACKAGES' | translate }}
       </div>
 
@@ -96,7 +96,7 @@
     <div *ngIf="isMobile" class="admin-mobile-list mt-3">
       <div class="accordion" id="packagesAccordion">
 
-        <div class="accordion-item" *ngFor="let p of packages; let i = index">
+        <div class="accordion-item" *ngFor="let p of filteredPackages; let i = index">
           <h2 class="accordion-header" [id]="'pHead' + i">
             <button
               class="accordion-button collapsed mobile-acc-btn"
@@ -120,10 +120,14 @@
               <div class="acc-sub-line">
                 <span class="acc-email">
                   {{ 'PACKAGE_CREDITS' | translate }}: {{ p.credits }}
-                · {{ 'PACKAGE_PRICE' | translate }}: {{ p.price | number:'1.2-2' }}
-                · {{ 'DISCOUNT_PERCENT' | translate }}: {{ p.discountPercentage }}%
+                  · {{ 'PACKAGE_PRICE' | translate }}: {{ p.price | number:'1.2-2' }}
+                </span>
+
+                <span class="acc-email">
+                  {{ 'DISCOUNT_PERCENT' | translate }}: {{ p.discountPercentage }}%
                 </span>
               </div>
+
             </button>
           </h2>
 

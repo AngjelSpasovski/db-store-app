@@ -110,6 +110,27 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
   // tooltips
   private tooltipInstances: any[] = [];
 
+  get filteredRows(): AdminUserRow[] {
+    const q = (this.searchText ?? '').trim().toLowerCase();
+    if (!q) return this.rows;
+
+    return this.rows.filter(u => {
+      const fullName = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim().toLowerCase();
+      const email = (u.email ?? '').toLowerCase();
+      const company = (u.companyName ?? '').toLowerCase();
+      const role = (u.role ?? '').toLowerCase();
+      const id = String(u.id ?? '');
+
+      return (
+        id.includes(q) ||
+        email.includes(q) ||
+        fullName.includes(q) ||
+        company.includes(q) ||
+        role.includes(q)
+      );
+    });
+  }
+
   constructor(
     private usersApi: AdminUsersApi,
     private toast: ToastService,
@@ -167,7 +188,7 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
       textColor: '#e9eef6',
       cellTextColor: '#e9eef6',
       borderColor: 'rgba(255,255,255,.10)',
-      rowHeight: this.isMobile ? 38 : 40,
+      rowHeight: this.isMobile ? 38 : 45,
       headerHeight: this.isMobile ? 40 : 46,
       fontFamily: 'Inter, system-ui, Roboto, sans-serif',
       fontSize: this.isMobile ? '13px' : '14px',
@@ -181,6 +202,7 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
 
   onGridReady(e: GridReadyEvent<AdminUserRow>): void {
     this.gridApi = e.api;
+    this.applyQuickFilter();
     setTimeout(() => this.initTooltips(), 0);
   }
 
@@ -220,12 +242,24 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
 
   // SEARCH (ag-grid quick filter)
   applyQuickFilter(): void {
-    if (!this.gridApi) return;
-
     const text = (this.searchText ?? '').trim();
 
-    try { (this.gridApi as any).setGridOption?.('quickFilterText', text); } catch {}
-    try { (this.gridApi as any).setQuickFilter?.(text); } catch {}
+    // ✅ Mobile view uses accordion (filteredRows), so nothing else is required there.
+    // ✅ Desktop grid needs ag-grid quick filter.
+    if (!this.gridApi) return;
+
+    const anyApi = this.gridApi as any;
+
+    // Prefer older API if it exists (many projects still on it)
+    if (typeof anyApi.setQuickFilter === 'function') {
+      anyApi.setQuickFilter(text);
+      return;
+    }
+
+    // v31+ style
+    if (typeof anyApi.setGridOption === 'function') {
+      anyApi.setGridOption('quickFilterText', text);
+    }
   }
 
   clearSearch(): void {
@@ -503,4 +537,5 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
     }
     this.tooltipInstances = [];
   }
+
 }

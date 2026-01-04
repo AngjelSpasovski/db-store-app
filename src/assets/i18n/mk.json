@@ -289,8 +289,11 @@
     "PACKAGES": "Пакети",
     "SEARCH": "Пребарај",
     "SEARCH_PACKAGES_PLACEHOLDER": "Пребарај пакети…",
+    "SEARCH_USERS_PLACEHOLDER": "Пребарај корисници…",
     "CLEAR_SEARCH": "Исчисти пребарување",
     "ROWS": "Редови",
+    "CONFIRM_TOGGLE": "Дали сте сигурни дека сакате да го промените статусот на ",
+    "CONFIRM": "Потврди",
 
     "NEW_PACKAGE": "Нов пакет",
     "CREATE_PACKAGE": "Креирај пакет",

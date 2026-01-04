@@ -1,4 +1,4 @@
-// src/app/shared/superadmin-admin.api.ts
+// src/app/shared/superadmin-admins.api.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -27,7 +27,6 @@ export interface CreateAdminPayload {
   firstName: string;
   lastName: string;
   companyName?: string | null;
-  isActive?: boolean;
 }
 
 export interface UpdateAdminPayload {
@@ -39,10 +38,12 @@ export interface UpdateAdminPayload {
 
 @Injectable({ providedIn: 'root' })
 export class SuperadminAdminsApi {
-  private readonly baseUrl = `${environment.baseApiUrl}/superadmin/admins`;
+  private readonly apiBase = (environment.baseApiUrl ?? '').replace(/\/+$/, '');
+  private readonly baseUrl = `${this.apiBase}/superadmin/admins`;
 
   constructor(private http: HttpClient) {}
 
+  // GET /superadmin/admins
   getAdmins(perPage = 20, page = 1): Observable<AdminsListResponse> {
     const params = new HttpParams()
       .set('perPage', String(perPage))
@@ -51,15 +52,24 @@ export class SuperadminAdminsApi {
     return this.http.get<AdminsListResponse>(this.baseUrl, { params });
   }
 
-  createAdmin(payload: CreateAdminPayload): Observable<{ user: SuperadminAdminDto }> {
-    return this.http.post<{ user: SuperadminAdminDto }>(this.baseUrl, payload);
+  // GET /superadmin/admins/{id}
+  getAdmin(id: number): Observable<{ user: SuperadminAdminDto }> {
+    return this.http.get<{ user: SuperadminAdminDto }>(`${this.baseUrl}/${id}`);
   }
 
-  updateAdmin(id: number, payload: UpdateAdminPayload): Observable<{ user: SuperadminAdminDto }> {
-    return this.http.patch<{ user: SuperadminAdminDto }>(`${this.baseUrl}/${id}`, payload);
+  // POST /superadmin/admins
+  createAdmin(payload: CreateAdminPayload): Observable<SuperadminAdminDto> {
+    return this.http.post<SuperadminAdminDto>(this.baseUrl, payload);
   }
 
+  // PATCH /superadmin/admins/{id}
+  updateAdmin(id: number, payload: UpdateAdminPayload): Observable<SuperadminAdminDto> {
+    return this.http.patch<SuperadminAdminDto>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  // DELETE /superadmin/admins/{id}
   deleteAdmin(id: number): Observable<{ status: true }> {
     return this.http.delete<{ status: true }>(`${this.baseUrl}/${id}`);
   }
 }
+

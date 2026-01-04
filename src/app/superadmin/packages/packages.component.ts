@@ -1,5 +1,5 @@
 // src/app/superadmin/packages/packages.component.ts
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -17,6 +17,7 @@ import { themeAlpine } from 'ag-grid-community';
 
 import { SuperadminPackagesApi, SuperadminPackageDto, PackagePayload } from '../../shared/superadmin-packages.api';
 import { ToastService } from 'src/app/shared/toast.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-superadmin-packages',
@@ -25,10 +26,9 @@ import { ToastService } from 'src/app/shared/toast.service';
   templateUrl: './packages.component.html',
   styleUrls: ['./packages.component.scss'],
 })
-export class PackagesComponent implements OnInit {
-  // =========================
+export class PackagesComponent implements OnInit, OnDestroy  {
+
   // SERVER / LIST STATE
-  // =========================
   packages: SuperadminPackageDto[] = [];
   total = 0;
 
@@ -40,27 +40,20 @@ export class PackagesComponent implements OnInit {
   perPage = 10;
   pageOptions = [10, 20, 50, 100];
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil((this.total || 0) / (this.perPage || 1)));
-  }
-
-  // =========================
-  // TOOLBAR STATE
-  // =========================
+  // SEARCH STATE
   searchText = '';
 
-  // =========================
-  // GRID STATE
-  // =========================
+  // aG-Grid API STATE
   private gridApi?: GridApi;
 
-  /** Keep defaultColDef separate so template binding is clean */
+  // Ag-Grid default column definition
   defaultColDef: ColDef = {
     sortable: true,
     filter: true,
     resizable: true,
   };
 
+  // Ag-Grid options
   gridOptions: GridOptions = {
     rowHeight: 44,
     headerHeight: 44,
@@ -69,6 +62,7 @@ export class PackagesComponent implements OnInit {
     rowSelection: 'single',
   };
 
+  // Ag-Grid theme
   public theme = themeAlpine.withParams({
     backgroundColor: '#151821',
     foregroundColor: '#e9eef6',
@@ -84,6 +78,7 @@ export class PackagesComponent implements OnInit {
     accentColor: '#0d6efd',
   });
 
+  // Ag-Grid column definitions
   columnDefs: ColDef<SuperadminPackageDto>[] = [
     { 
       headerName: 'Name', 
@@ -139,7 +134,7 @@ export class PackagesComponent implements OnInit {
       cellClass: 'ag-edit-cell',
       cellRenderer: () => `
         <div class="ag-edit icon-only">
-          <button class="btn ag-icon-btn" data-action="edit" title="Edit">✎</button>
+          <button class="btn btn-info ag-icon-btn" data-action="edit" title="Edit">✎</button>
         </div>
       `,
       onCellClicked: (e) => {
@@ -150,17 +145,37 @@ export class PackagesComponent implements OnInit {
     },
   ];
 
-  // =========================
   // MOBILE STATE
-  // =========================
   isMobile = false;
 
-  // =========================
   // MODAL / FORM STATE
-  // =========================
   showFormModal = false;
   editingPackage: SuperadminPackageDto | null = null;
   form!: FormGroup;
+
+  
+  private mq?: MediaQueryList;
+  private mqHandler?: (e: MediaQueryListEvent) => void;
+
+  // 
+  private langSub?: Subscription;
+
+  // PAGING HELPERS
+  get totalPages(): number {
+    return Math.max(1, Math.ceil((this.total || 0) / (this.perPage || 1)));
+  }
+
+  // FILTERING HELPERS
+  get filteredPackages(): SuperadminPackageDto[] {
+    const q = (this.searchText ?? '').trim().toLowerCase();
+    if (!q) return this.packages;
+
+    return this.packages.filter(p => {
+      const name = (p.name ?? '').toLowerCase();
+      const desc = (p.description ?? '').toLowerCase();
+      return name.includes(q) || desc.includes(q);
+    });
+  }
 
   constructor(
     private api: SuperadminPackagesApi,
@@ -170,25 +185,54 @@ export class PackagesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.computeIsMobile();
-    this.initForm();
+    this.initForm(); // initialize form
+
+    this.mq = window.matchMedia('(max-width: 768px)');
+    this.isMobile = this.mq.matches;
+
+    this.setTheme();
     this.buildColumnDefs();
     this.loadPackages();
 
-    this.translate.onLangChange.subscribe(() => {
+    this.mqHandler = (e: MediaQueryListEvent) => {
+      this.isMobile = e.matches;
+      this.setTheme();
       this.buildColumnDefs();
-      this.gridApi?.refreshHeader();
-      this.gridApi?.refreshCells({ force: true });
+      if (this.gridApi) (this.gridApi as any).setGridOption?.('columnDefs', this.columnDefs as any);
+    };
+
+    this.mq.addEventListener?.('change', this.mqHandler);
+    (this.mq as any).addListener?.(this.mqHandler);
+
+    this.langSub = this.translate.onLangChange.subscribe(() => {
+      this.buildColumnDefs();
+      if (this.gridApi) (this.gridApi as any).setGridOption?.('columnDefs', this.columnDefs as any);
     });
   }
 
-  @HostListener('window:resize')
-  onResize(): void {
-    this.computeIsMobile();
+  ngOnDestroy(): void {
+    this.langSub?.unsubscribe();
+    if (this.mq && this.mqHandler) {
+      this.mq.removeEventListener?.('change', this.mqHandler);
+      (this.mq as any).removeListener?.(this.mqHandler);
+    }
   }
 
-  private computeIsMobile(): void {
-    this.isMobile = window.innerWidth <= 768;
+  private setTheme(): void {
+    this.theme = themeAlpine.withParams({
+      backgroundColor: '#151821',
+      foregroundColor: '#e9eef6',
+      headerBackgroundColor: '#252a36',
+      headerTextColor: '#cfd6e4',
+      textColor: '#e9eef6',
+      cellTextColor: '#e9eef6',
+      borderColor: 'rgba(255,255,255,.10)',
+      rowHeight: this.isMobile ? 38 : 40,
+      headerHeight: this.isMobile ? 40 : 44,
+      fontFamily: 'Inter, system-ui, Roboto, sans-serif',
+      fontSize: this.isMobile ? '13px' : '14px',
+      accentColor: '#0d6efd',
+    });
   }
 
   // =========================
@@ -227,7 +271,7 @@ export class PackagesComponent implements OnInit {
         cellClass: 'ag-edit-cell',
         cellRenderer: () => `
         <div class="ag-edit icon-only">
-          <button class="btn ag-icon-btn" data-action="edit" title="${this.translate.instant('EDIT')}">✎</button>
+          <button class="btn btn-info ag-icon-btn" data-action="edit" title="${this.translate.instant('EDIT')}">✎</button>
         </div>
       `,
         onCellClicked: (e) => {
@@ -245,21 +289,19 @@ export class PackagesComponent implements OnInit {
    * - api.setGridOption('quickFilterText', text) (newer)
    */
   applyQuickFilter(): void {
+    // ✅ mobile: accordion се update-ира преку filteredPackages getter (ништо не треба тука)
+    if (this.isMobile) return;
+
+    // ✅ desktop: ag-grid quick filter
     if (!this.gridApi) return;
 
-    const text = this.searchText ?? '';
+    const text = (this.searchText ?? '').trim();
     const anyApi = this.gridApi as any;
 
-    if (typeof anyApi.setQuickFilter === 'function') {
-      anyApi.setQuickFilter(text);
-      return;
-    }
-
-    // v31+ style
-    if (typeof anyApi.setGridOption === 'function') {
-      anyApi.setGridOption('quickFilterText', text);
-    }
+    try { anyApi.setGridOption?.('quickFilterText', text); } catch {}
+    try { anyApi.setQuickFilter?.(text); } catch {}
   }
+
 
   clearSearch(): void {
     this.searchText = '';
@@ -453,4 +495,5 @@ export class PackagesComponent implements OnInit {
       },
     });
   }
+
 }
