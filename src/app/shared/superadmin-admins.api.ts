@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 export interface SuperadminAdminDto {
   id: number;
@@ -9,10 +10,10 @@ export interface SuperadminAdminDto {
   lastName: string;
   email: string;
   companyName: string | null;
-  role?: string;              // backend може да враќа "adminUser" / "superadmin" / ...
+  role?: string;
   isActive: boolean;
-  createdAt: string;          // ISO
-  updatedAt: string;          // ISO
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdminsListResponse {
@@ -26,7 +27,7 @@ export interface CreateAdminPayload {
   firstName: string;
   lastName: string;
   companyName?: string | null;
-  isActive?: boolean;         // ако backend го прифаќа (во swagger не секогаш е наведено)
+  isActive?: boolean;
 }
 
 export interface UpdateAdminPayload {
@@ -38,14 +39,14 @@ export interface UpdateAdminPayload {
 
 @Injectable({ providedIn: 'root' })
 export class SuperadminAdminsApi {
-  private readonly baseUrl = '/api/v1/superadmin/admins';
+  private readonly baseUrl = `${environment.baseApiUrl}/superadmin/admins`;
 
   constructor(private http: HttpClient) {}
 
   getAdmins(perPage = 20, page = 1): Observable<AdminsListResponse> {
     const params = new HttpParams()
-      .set('perPage', perPage)
-      .set('page', page);
+      .set('perPage', String(perPage))
+      .set('page', String(page));
 
     return this.http.get<AdminsListResponse>(this.baseUrl, { params });
   }
