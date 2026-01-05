@@ -1,0 +1,86 @@
+<div class="pkg-modal">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="title">
+      {{ 'ADMIN.ASSIGN_PACKAGES' | translate:{ default:'Assign packages' } }}
+      <span class="email" *ngIf="userEmail">— {{ userEmail }}</span>
+    </div>
+
+    <button type="button" class="btn btn-sm btn-outline-light" (click)="doClose()">
+      {{ 'CLOSE' | translate:{ default:'Close' } }}
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="text-muted small py-3">
+    {{ 'LOADING' | translate:{ default:'Loading' } }}…
+  </div>
+
+  <!-- ASSIGN FORM -->
+  <div class="assign-box" *ngIf="!loading">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-5">
+        <label class="form-label mini">
+          {{ 'ADMIN.PACKAGE' | translate:{ default:'Package' } }}
+        </label>
+
+        <select class="form-select" [(ngModel)]="selectedPackageId">
+          <option [ngValue]="null">—</option>
+          <option *ngFor="let p of activePackages" [ngValue]="p.id">
+            {{ p.name }} ({{ p.credits }} credits)
+          </option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-5">
+        <label class="form-label mini">
+          {{ 'ADMIN.REASON' | translate:{ default:'Reason (optional)' } }}
+        </label>
+
+        <input class="form-control" [(ngModel)]="reason"
+               [placeholder]="'ADMIN.REASON_PLACEHOLDER' | translate:{ default:'e.g. promo / compensation' }" />
+      </div>
+
+      <div class="col-12 col-md-2 d-grid">
+        <button class="btn btn-primary"
+                [disabled]="!canAssign()"
+                (click)="assign()">
+          {{ assigning ? ('LOADING' | translate:{ default:'Loading' }) : ('ADMIN.ASSIGN' | translate:{ default:'Assign' }) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div class="mt-3" *ngIf="!loading">
+    <div class="list-title">
+      {{ 'ADMIN.USER_PACKAGES' | translate:{ default:'User packages' } }}
+      <span class="small text-muted">({{ userPackages.length }})</span>
+    </div>
+
+    <div *ngIf="userPackages.length === 0" class="empty text-muted small py-3">
+      {{ 'ADMIN.NO_PACKAGES' | translate:{ default:'No packages assigned.' } }}
+    </div>
+
+    <div class="pkg-list" *ngIf="userPackages.length > 0">
+      <div class="pkg-row" *ngFor="let up of userPackages; trackBy: trackById">
+        <div class="left">
+          <div class="name">{{ up.packageName }}</div>
+          <div class="meta">
+            <span class="chip">{{ 'ADMIN.REMAINING' | translate:{default:'Remaining'} }}: <b>{{ up.creditsRemaining }}</b></span>
+            <span class="chip" *ngIf="up.expiresAt">{{ 'ADMIN.EXPIRES' | translate:{default:'Expires'} }}: {{ up.expiresAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="right">
+          <button class="btn btn-sm btn-outline-danger"
+                  [disabled]="removingId === up.id"
+                  (click)="remove(up)">
+            {{ removingId === up.id ? ('LOADING' | translate:{default:'Loading'}) : ('REMOVE' | translate:{default:'Remove'}) }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

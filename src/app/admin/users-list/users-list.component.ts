@@ -16,17 +16,19 @@ import { AdminUsersApi } from '../../shared/admin-users.api';
 import { ToastService } from '../../shared/toast.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { AuthService } from '../../auth/auth.service'; 
+import { UserPackagesModalComponent } from '../../superadmin/user-packages-modal/user-packages-modal.component';
 
 type AdminUserRow = {
-  id: number;
+  id:           number;
   companyName?: string | null;
-  email: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  isActive: boolean;
-  role: string;
+  email:        string;
+  firstName?:   string | null;
+  lastName?:    string | null;
+  createdAt?:   string | null;
+  updatedAt?:   string | null;
+  isActive:     boolean;
+  role:         string;
 };
 
 type UsersListResponse = {
@@ -37,7 +39,7 @@ type UsersListResponse = {
 @Component({
   standalone: true,
   selector: 'app-admin-users-list',
-  imports: [CommonModule, FormsModule, AgGridModule, TranslateModule],
+  imports: [CommonModule, FormsModule, AgGridModule, TranslateModule, UserPackagesModalComponent],
   providers: [DatePipe],
   templateUrl: './users-list.component.html',
   styleUrls: ['./users-list.component.scss'],
@@ -68,11 +70,15 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
 
   // responsive
   isMobile = false;
+
+  // auth (for superadmin guard)
   private mq?: MediaQueryList;
   private mqHandler?: (e: MediaQueryListEvent) => void;
 
+  // ag-grid columns
   columnDefs: ColDef<AdminUserRow>[] = [];
 
+  // auth (for superadmin guard)
   defaultColDef: ColDef = {
     sortable: true,
     filter: true,
@@ -81,8 +87,10 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
     minWidth: 100,
   };
 
+  // ag-grid API
   private gridApi!: GridApi<AdminUserRow>;
 
+  // ag-grid options
   gridOptions: GridOptions<AdminUserRow> = {
     domLayout: 'normal',
     alwaysShowHorizontalScroll: true,
@@ -90,6 +98,7 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
     suppressScrollOnNewData: true,
   };
 
+  // theme for ag-grid
   public theme = themeAlpine.withParams({
     backgroundColor: '#151821',
     foregroundColor: '#e9eef6',
@@ -105,11 +114,16 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
     accentColor: '#0d6efd',
   });
 
+  //
   private langSub?: Subscription;
-
   // tooltips
   private tooltipInstances: any[] = [];
 
+  // user packages modal
+  packagesVisible = false;
+  packagesUser: AdminUserRow | null = null;
+
+  // GETTERS FOR FILTERED ROWS (mobile accordion)
   get filteredRows(): AdminUserRow[] {
     const q = (this.searchText ?? '').trim().toLowerCase();
     if (!q) return this.rows;
@@ -137,7 +151,12 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
     private datePipe: DatePipe,
     private translate: TranslateService,
     private host: ElementRef<HTMLElement>,
+    private auth: AuthService,
   ) {}
+
+  get isSuperadmin(): boolean {
+    return (this.auth.getCurrentUser()?.role || '').toLowerCase() === 'superadmin';
+  }
 
   ngOnInit(): void {
     // responsive
@@ -392,25 +411,43 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
           ? (this.translate.instant('ADMIN.CANNOT_TOGGLE_SUPERADMIN') || 'Cannot change superadmin')
           : actTip;
 
-        const toggleIcon = row?.isActive ? '⛔' : '✅';
+        const toggleIcon  = row?.isActive ? '⛔' : '✅';
         const toggleClass = row?.isActive ? 'btn-danger' : 'btn-success';
+
+        const pkgTip = this.translate.instant('ADMIN.ASSIGN_PACKAGES') || 'Assign packages';
+
+        // ова е за иконата на пакети (само ако е суперадмин)
+        // го вметнуваме во actions return-от подолу
+        //
+        // <button type="button"
+        //   class="btn btn-info icon ag-icon-btn"
+        //   data-action="packages"
+        //   aria-label="${pkgTip}"
+        //   data-bs-toggle="tooltip"
+        //   data-bs-title="${pkgTip}">
+        //   <span class="icon-btn">📦</span>
+        // </button>
 
         return `
           <div class="ag-actions icon-only">
             <button type="button"
-              class="btn btn-secondary icon"
+              class="btn btn-secondary icon ag-icon-btn"
               data-action="view"
               aria-label="${viewTip}"
               data-bs-toggle="tooltip"
-              data-bs-title="${viewTip}"><span class="icon-btn">👁</span></button>
+              data-bs-title="${viewTip}"><span class="icon-btn">👁</span>
+            </button>
 
             <button type="button"
-              class="btn ${toggleClass} icon"
+              class="btn ${toggleClass} icon ag-icon-btn"
               data-action="toggle"
               aria-label="${toggleTip}"
               data-bs-toggle="tooltip"
               data-bs-title="${toggleTip}"
-              ${disabled}><span class="icon-btn">${isBusy ? '…' : toggleIcon}</span></button>
+              ${disabled}><span class="icon-btn">${isBusy ? '…' : toggleIcon}</span>
+            </button>
+
+
           </div>
         `;
       },
@@ -421,13 +458,21 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
 
         const row: AdminUserRow = e.data;
 
+        // handle actions
         if (action === 'view') this.openDetails(row);
 
+        // toggle active/inactive
         if (action === 'toggle') {
           if (!row || row.role === 'superadmin') return;
           if (this.togglingId === row.id) return;
           this.openConfirmToggle(row);
         }
+
+        // open packages modal
+        // if (action === 'packages') {
+        //   if (!this.isSuperadmin) return;
+        //   this.openPackages(row);
+        // }
       },
     };
 
@@ -475,7 +520,8 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
         activeCol,
         actionsCol,
       ];
-    } else {
+    } 
+    else {
       // ✅ DESKTOP
       this.columnDefs = [
         { field: 'id', headerName: t('ID', '#'), maxWidth: 80 },
@@ -536,6 +582,17 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
       try { t.dispose?.(); } catch {}
     }
     this.tooltipInstances = [];
+  }
+
+  
+  openPackages(u: AdminUserRow) {
+    this.packagesUser = u;
+    this.packagesVisible = true;
+  }
+
+  closePackages() {
+    this.packagesVisible = false;
+    this.packagesUser = null;
   }
 
 }

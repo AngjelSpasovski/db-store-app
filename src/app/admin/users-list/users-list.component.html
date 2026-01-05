@@ -112,41 +112,41 @@
             </button>
           </h2>
 
-          <div
-            [id]="'uCol' + i"
-            class="accordion-collapse collapse"
-            [attr.aria-labelledby]="'uHead' + i"
-            data-bs-parent="#usersAccordion">
+          <div [id]="'uCol' + i" class="accordion-collapse collapse"
+               [attr.aria-labelledby]="'uHead' + i" data-bs-parent="#usersAccordion">
 
             <div class="accordion-body">
 
+              <!-- COMPANY -->
               <div class="acc-row" *ngIf="u.companyName">
                 <span class="acc-label">{{ 'COMPANY' | translate:{default:'Company'} }}</span>
                 <span class="acc-value">{{ u.companyName }}</span>
               </div>
-
+              <!-- ROLE -->
               <div class="acc-row">
                 <span class="acc-label">{{ 'ROLE' | translate:{default:'Role'} }}</span>
                 <span class="acc-value">{{ u.role }}</span>
               </div>
-
+              <!-- CREATED AT -->
               <div class="acc-row" *ngIf="u.createdAt">
                 <span class="acc-label">{{ 'CREATED_AT' | translate:{default:'Created'} }}</span>
                 <span class="acc-value">{{ u.createdAt | date:'dd/MM/yyyy' }}</span>
               </div>
-
+              <!-- UPDATED AT -->
               <div class="acc-row" *ngIf="u.updatedAt">
                 <span class="acc-label">{{ 'ADMIN.UPDATED_AT' | translate:{default:'Updated'} }}</span>
                 <span class="acc-value">{{ u.updatedAt | date:'dd/MM/yyyy' }}</span>
               </div>
 
               <div class="acc-row acc-row-button d-flex gap-2">
+                <!-- VIEW DETAILS BUTTON -->
                 <button type="button"
                         class="btn btn-outline-light btn-sm w-100"
                         (click)="openDetails(u)">
                   {{ 'VIEW' | translate:{default:'View'} }}
                 </button>
 
+                <!-- TOGGLE ACTIVE BUTTON -->
                 <button type="button"
                         class="btn btn-sm w-100"
                         [class.btn-success]="!u.isActive"
@@ -155,6 +155,14 @@
                         (click)="openConfirmToggle(u)">
                   {{ togglingId === u.id ? ('LOADING' | translate:{default:'Loading'}) : (u.isActive ? ('DEACTIVATE' | translate:{default:'Deactivate'}) : ('ACTIVATE' | translate:{default:'Activate'})) }}
                 </button>
+
+                <!-- ASSIGN PACKAGES BUTTON -->
+                <!-- <button type="button"
+                        class="btn btn-outline-info btn-sm w-100"
+                        [disabled]="!isSuperadmin"
+                        (click)="openPackages(u)">
+                  {{ 'ADMIN.ASSIGN_PACKAGES' | translate:{default:'Packages'} }}
+                </button> -->
               </div>
 
               <div class="small text-muted mt-2" *ngIf="u.role === 'superadmin'">
@@ -190,8 +198,8 @@
 
   </div>
 
-  <!-- BLUR BACKDROP (for View + Confirm) -->
-  <div class="modal-backdrop blur show" *ngIf="detailsVisible || confirmVisible"></div>
+  <!-- BLUR BACKDROP (for View + Confirm + Packages) -->
+  <div class="modal-backdrop blur show" *ngIf="detailsVisible || confirmVisible || packagesVisible"></div>
 
   <!-- VIEW MODAL -->
   <div class="custom-modal" *ngIf="detailsVisible">
@@ -291,6 +299,32 @@
                   (click)="confirmToggle()">
             {{ confirmBusy ? ('LOADING' | translate:{default:'Loading'}) : ('ADMIN.CONFIRM' | translate:{default:'Confirm'}) }}
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PACKAGES MODAL -->
+  <div class="custom-modal" *ngIf="packagesVisible">
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-content glass">
+        <div class="custom-modal-header">
+          <h5 class="modal-title">
+            {{ 'ADMIN.ASSIGN_PACKAGES' | translate:{ default:'Assign packages' } }}
+            – {{ packagesUser?.email }}
+          </h5>
+
+          <button type="button" class="btn-close btn-close-white" (click)="closePackages()"></button>
+        </div>
+
+        <div class="custom-modal-body">
+          <app-user-packages-modal
+            *ngIf="packagesUser"
+            [userId]="packagesUser.id"
+            [userEmail]="packagesUser.email"
+            (close)="closePackages()"
+            (changed)="load()">
+          </app-user-packages-modal>
         </div>
       </div>
     </div>

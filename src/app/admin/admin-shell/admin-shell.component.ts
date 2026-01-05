@@ -1,3 +1,4 @@
+// src/app/admin/admin-shell/admin-shell.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';

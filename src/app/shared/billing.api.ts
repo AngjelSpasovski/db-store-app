@@ -7,24 +7,24 @@ export interface BillingRow {
   id: number;
   timestamp: string;
 
-  credits: number;
-  amount: number;
-  status: BillingStatus;
+  credits:  number;
+  amount:   number;
+  status:   BillingStatus;
 
-  stripeSessionId: string;
-  createdAt: string;
+  stripeSessionId:  string;
+  createdAt:        string;
 
   // 🔽 package info (од Invoice)
-  packageName?: string;
-  packageCredits?: number;
-  packagePrice?: number;
-  packageDiscountPercentage?: string;
-  packageIsActive?: boolean;
-  packageCreatedAt?: string;
-  packageUpdatedAt?: string;
+  packageName?:               string;
+  packageCredits?:            number;
+  packagePrice?:              number;
+  packageDiscountPercentage?: number | string;
+  packageIsActive?:           boolean;
+  packageCreatedAt?:          string;
+  packageUpdatedAt?:          string;
 
   // 🔽 за frontend
-  receiptUrl?: string | null;
+  receiptUrl?:                string | null;
 }
 
 

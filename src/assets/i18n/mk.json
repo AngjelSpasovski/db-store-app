@@ -311,7 +311,19 @@
 
     "PACKAGE_CREATED_OK": "Пакетот е успешно креиран",
     "PACKAGE_UPDATED_OK": "Пакетот е успешно ажуриран",
-    "PACKAGE_DEACTIVATED_OK": "Пакетот е успешно деактивиран"
+    "PACKAGE_DEACTIVATED_OK": "Пакетот е успешно деактивиран",
+
+    "ASSIGN_PACKAGES": "Додели пакети",
+    "PACKAGE": "Пакет",
+    "REASON": "Мотив (опционално)",
+    "REASON_PLACEHOLDER": "нпр. промоција / компензација",
+    "ASSIGN": "Додели",
+    "USER_PACKAGES": "Кориснички пакети",
+    "NO_PACKAGES": "Нема доделени пакети.",
+    "REMAINING": "Преостанато",
+    "EXPIRES": "Истекува",
+    "PACKAGE_ASSIGNED": "Пакетот е доделен",
+    "PACKAGE_REMOVED": "Пакетот е отстранет"
   },
 
   "RECEIPT": "Добиеница",

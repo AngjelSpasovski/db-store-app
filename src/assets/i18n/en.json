@@ -312,7 +312,19 @@
 
     "PACKAGE_CREATED_OK": "Package created successfully",
     "PACKAGE_UPDATED_OK": "Package updated successfully",
-    "PACKAGE_DEACTIVATED_OK": "Package deactivated successfully"
+    "PACKAGE_DEACTIVATED_OK": "Package deactivated successfully",
+
+    "ASSIGN_PACKAGES": "Assign packages",
+    "PACKAGE": "Package",
+    "REASON": "Reason (optional)",
+    "REASON_PLACEHOLDER": "e.g. promo / compensation",
+    "ASSIGN": "Assign",
+    "USER_PACKAGES": "User packages",
+    "NO_PACKAGES": "No packages assigned.",
+    "REMAINING": "Remaining",
+    "EXPIRES": "Expires",
+    "PACKAGE_ASSIGNED": "Package assigned",
+    "PACKAGE_REMOVED": "Package removed"
   },
 
   "RECEIPT": "Receipt",

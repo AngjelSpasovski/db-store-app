@@ -11,7 +11,7 @@ export interface InvoicePackage {
   description?:         string;
   credits:              number;
   price:                number;
-  discountPercentage?:  string;
+  discountPercentage?:  number |string;
   isActive:             boolean;
   createdAt:            string;
   updatedAt:            string;

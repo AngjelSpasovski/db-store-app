@@ -4,39 +4,82 @@ import { environment } from '../auth/auth.environment';
 import { catchError, map, of } from 'rxjs';
 
 export interface User {
-    id: number | string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    companyName: string;
-    role: 'user' | 'admin' | 'superadmin';
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
+    id:             number | string;
+    firstName:      string;
+    lastName:       string;
+    email:          string;
+    companyName:    string;
+    role:           'user' | 'admin' | 'superadmin';
+    isActive:       boolean;
+    createdAt:      string;
+    updatedAt:      string;
 }
 
 export interface UpdateMeReq {
-  firstName?: string;
-  lastName?: string;
+  firstName?:   string;
+  lastName?:    string;
   companyName?: string;
-  password?: string;
+  password?:    string;
 }
 
-export interface Package { id: number; name: string; description: string; credits: number; price: number; discountPercentage: number; isActive: boolean; createdAt: string; updatedAt: string; }
-export interface UserPackage { id: number; userId: number; packageId: number; package: Package; creditsRemaining: number; expiresAt: string; createdAt: string; updatedAt: string; }
+export interface Package { 
+    id:                 number; 
+    name:               string; 
+    description:        string; 
+    credits:            number; 
+    price:              number; 
+    discountPercentage: number | string; 
+    isActive:           boolean; 
+    createdAt:          string; 
+    updatedAt:          string; 
+}
+
+export interface UserPackage { 
+    id:                 number; 
+    userId:             number; 
+    packageId:          number; 
+    package:            Package; 
+    creditsRemaining:   number; 
+    expiresAt:          string; 
+    createdAt:          string; 
+    updatedAt:          string; 
+}
 
 export interface BillingDetails {
-    id: number; userId: number; email: string; companyName: string;
-    address1: string; address2?: string; buildingNumber?: string;
-    zipcode: string; city: string; stateCode: string; nation: string;
-    vatNumber: string; createdAt: string; updatedAt: string;
+    id:                 number; 
+    userId:             number; 
+    email:              string; 
+    companyName:        string;
+    address1:           string; 
+    address2?:          string; 
+    buildingNumber?:    string;
+    zipcode:            string; 
+    city:               string; 
+    stateCode:          string; 
+    nation:             string;
+    vatNumber:          string; 
+    createdAt:          string; 
+    updatedAt:          string;
 }
 
 export interface UserDetailsDTO {
     user: User;
     userPackages: UserPackage[];
-    creditUsages: { id: number; userId: number; credits: number; createdAt: string; updatedAt: string }[];
-    transactions: { id: number; userId: number; packageId: number; amount: number; createdAt: string; updatedAt: string }[];
+    creditUsages: { 
+        id:         number; 
+        userId:     number; 
+        credits:    number; 
+        createdAt:  string; 
+        updatedAt:  string 
+    }[];
+    transactions: { 
+        id:         number; 
+        userId:     number; 
+        packageId:  number; 
+        amount:     number; 
+        createdAt:  string; 
+        updatedAt:  string 
+    }[];
     billingDetails: BillingDetails | null;
 }
 

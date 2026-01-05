@@ -312,7 +312,19 @@
 
     "PACKAGE_CREATED_OK": "Pacchetto creato con successo",
     "PACKAGE_UPDATED_OK": "Pacchetto aggiornato con successo",
-    "PACKAGE_DEACTIVATED_OK": "Pacchetto disattivato con successo"
+    "PACKAGE_DEACTIVATED_OK": "Pacchetto disattivato con successo",
+
+    "ASSIGN_PACKAGES": "Assegna pacchetti",
+    "PACKAGE": "Pacchetto",
+    "REASON": "Motivo (opzionale)",
+    "REASON_PLACEHOLDER": "es. promozione / compensazione",
+    "ASSIGN": "Assegna",
+    "USER_PACKAGES": "Pacchetti utente",
+    "NO_PACKAGES": "Nessun pacchetto assegnato.",
+    "REMAINING": "Rimanenti",
+    "EXPIRES": "Scade",
+    "PACKAGE_ASSIGNED": "Pacchetto assegnato",
+    "PACKAGE_REMOVED": "Pacchetto rimosso"
   },
 
   "RECEIPT": "Ricevuta",

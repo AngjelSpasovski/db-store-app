@@ -1,0 +1,66 @@
+:host { display: block; }
+
+.pkg-modal {
+  color: #e9eef6;
+
+  .title {
+    font-weight: 650;
+    letter-spacing: .2px;
+  }
+  .email { opacity: .75; font-weight: 500; }
+
+  .assign-box {
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+  }
+
+  .mini {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .10em;
+    opacity: .75;
+    margin-bottom: 6px;
+  }
+
+  .form-control, .form-select {
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.16);
+    color: #e9eef6;
+  }
+
+  .list-title {
+    font-weight: 650;
+    margin: 10px 0 8px;
+  }
+
+  .pkg-list {
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(0,0,0,.18);
+  }
+
+  .pkg-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-top: 1px solid rgba(255,255,255,.08);
+
+    &:first-child { border-top: 0; }
+  }
+
+  .name { font-weight: 650; }
+  .meta { margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .chip {
+    font-size: .78rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+    opacity: .9;
+  }
+}

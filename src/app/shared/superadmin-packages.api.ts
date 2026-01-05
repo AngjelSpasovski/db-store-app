@@ -5,15 +5,15 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 export interface SuperadminPackageDto {
-  id: number;
-  name: string;
-  description: string | null;
-  credits: number;
-  price: number;
-  discountPercentage: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  id:                 number;
+  name:               string;
+  description:        string | null;
+  credits:            number;
+  price:              number;
+  discountPercentage: number | string;
+  isActive:           boolean;
+  createdAt:          string;
+  updatedAt:          string;
 }
 
 export interface PackagesListResponse {
@@ -22,12 +22,12 @@ export interface PackagesListResponse {
 }
 
 export interface PackagePayload {
-  name: string;
-  description?: string | null;
-  credits: number;
-  price: number;
-  discountPercentage: number;
-  isActive: boolean;
+  name:               string;
+  description?:       string | null;
+  credits:            number;
+  price:              number;
+  discountPercentage: number | string;
+  isActive:           boolean;
 }
 
 @Injectable({ providedIn: 'root' })

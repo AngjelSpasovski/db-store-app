@@ -6,6 +6,7 @@ import { finalize, Subscription } from 'rxjs';
 
 import { SuperadminAdminsApi, SuperadminAdminDto } from '../../shared/superadmin-admins.api';
 import { ToastService } from '../../shared/toast.service';
+import { ApiErrorUtil } from 'src/app/shared/api-error.util';
 
 type CreateAdminForm = FormGroup<{
   firstName:    FormControl<string>;
@@ -119,7 +120,10 @@ export class AdminsComponent implements OnInit, OnDestroy {
     this.showCreateModal = false;
   }
 
- submitCreate(): void {
+  submitCreate(): void {
+    // очисти претходни api errors
+    ApiErrorUtil.clearApiErrors(this.createForm);
+
     if (this.createForm.invalid) {
       this.createForm.markAllAsTouched();
       this.toast.show('Please fill all required fields correctly.', false, 3500, 'top-end');
@@ -146,7 +150,7 @@ export class AdminsComponent implements OnInit, OnDestroy {
           this.closeCreate();
           this.load();
         },
-        error: (err) => this.handleHttpError(err, 'Save failed.')
+        error: (err) => this.handleHttpError(err, 'Save failed.', this.createForm)
       });
 
     this.sub.add(s);
@@ -172,6 +176,9 @@ export class AdminsComponent implements OnInit, OnDestroy {
   }
 
   submitEdit(): void {
+    // очисти претходни api errors
+    ApiErrorUtil.clearApiErrors(this.editForm);
+
     if (!this.editingId) return;
 
     if (this.editForm.invalid) {
@@ -204,7 +211,7 @@ export class AdminsComponent implements OnInit, OnDestroy {
           this.closeEdit();
           this.load();
         },
-        error: (err) => this.handleHttpError(err, 'Update failed.')
+        error: (err) => this.handleHttpError(err, 'Update failed.', this.editForm)
       });
 
     this.sub.add(s);
@@ -242,30 +249,36 @@ export class AdminsComponent implements OnInit, OnDestroy {
     return !!(c.touched && c.invalid);
   }
 
-  private handleHttpError(err: any, fallbackMsg: string) {
-    const apiErrors = err?.error?.errors;
-
-    // email exists special case
-    const emailMsg = apiErrors?.email;
-    if (emailMsg && typeof emailMsg === 'string' && /already exists/i.test(emailMsg)) {
-      const emailControl = this.createForm?.controls?.email;
-      if (emailControl) {
-        emailControl.setErrors({ ...(emailControl.errors || {}), emailExists: true });
-        emailControl.markAsTouched();
+  private handleHttpError(err: any, fallbackMsg: string, form?: FormGroup) {
+    // 422 validation (унифицирано)
+    if (err?.status === 422) {
+      if (form) {
+        ApiErrorUtil.applyToForm(form, err);
       }
-      this.toast.show('Email already exists. Choose another email.', false, 4500, 'top-end');
+
+      // специјален UX за email exists (ако backend враќа така)
+      const fe = ApiErrorUtil.getFieldErrors(err);
+      const emailMsgs = fe?.['email'] || [];
+      const emailExists = emailMsgs.some(m => /already exists/i.test(m));
+
+      if (emailExists && this.createForm?.controls?.email) {
+        // optional: ако сакаш да задржиш твое "emailExists" правило
+        const c = this.createForm.controls.email;
+        c.setErrors({ ...(c.errors || {}), emailExists: true });
+        c.markAsTouched();
+        this.toast.show('Email already exists. Choose another email.', false, 4500, 'top-end');
+        return;
+      }
+
+      // default 422 message
+      this.toast.show(ApiErrorUtil.toMessage(err), false, 4500, 'top-end');
       return;
     }
 
-    if (apiErrors && typeof apiErrors === 'object') {
-      const parts: string[] = [];
-      for (const k of Object.keys(apiErrors)) parts.push(`${k}: ${String(apiErrors[k])}`);
-      this.toast.show(parts.join(' • '), false, 4500, 'top-end');
-      return;
-    }
-
-    const msg = err?.error?.message || err?.message || fallbackMsg;
+    // другите статуси
+    const msg = ApiErrorUtil.toMessage(err) || fallbackMsg;
     this.toast.show(String(msg), false, 4000, 'top-end');
   }
+
   
 }

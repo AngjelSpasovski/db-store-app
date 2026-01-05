@@ -18,6 +18,7 @@ import { themeAlpine } from 'ag-grid-community';
 import { SuperadminPackagesApi, SuperadminPackageDto, PackagePayload } from '../../shared/superadmin-packages.api';
 import { ToastService } from 'src/app/shared/toast.service';
 import { Subscription } from 'rxjs';
+import { ApiErrorUtil } from 'src/app/shared/api-error.util';
 
 @Component({
   selector: 'app-superadmin-packages',
@@ -424,6 +425,9 @@ export class PackagesComponent implements OnInit, OnDestroy  {
   // SUBMIT (CREATE / UPDATE + deactivate rule)
   // =========================
   submit(): void {
+    // очисти претходни api errors
+    ApiErrorUtil.clearApiErrors(this.form);
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -443,10 +447,17 @@ export class PackagesComponent implements OnInit, OnDestroy  {
           this.closeModal();
           this.loadPackages();
         },
-        error: (err: unknown) => {
+        error: (err: any) => {
           console.error(err);
-          this.error = 'ADMIN.ERROR_CREATE_PACKAGE';
           this.saving = false;
+
+          if (err?.status === 422) {
+            ApiErrorUtil.applyToForm(this.form, err);
+            this.toast.error(ApiErrorUtil.toMessage(err), { position: 'top-end' });
+            return;
+          }
+
+          this.error = 'ADMIN.ERROR_CREATE_PACKAGE';
           this.toast.error(this.translate.instant(this.error), { position: 'top-end' });
         },
       });
@@ -468,10 +479,17 @@ export class PackagesComponent implements OnInit, OnDestroy  {
           this.editingPackage = null;
           this.loadPackages();
         },
-        error: (err: unknown) => {
+        error: (err: any) => {
           console.error(err);
-          this.error = 'ADMIN.ERROR_DEACTIVATE_PACKAGE';
           this.saving = false;
+
+          if (err?.status === 422) {
+            ApiErrorUtil.applyToForm(this.form, err);
+            this.toast.error(ApiErrorUtil.toMessage(err), { position: 'top-end' });
+            return;
+          }
+
+          this.error = 'ADMIN.ERROR_DEACTIVATE_PACKAGE';
           this.toast.error(this.translate.instant(this.error), { position: 'top-end' });
         },
       });
@@ -487,10 +505,17 @@ export class PackagesComponent implements OnInit, OnDestroy  {
         this.editingPackage = null;
         this.loadPackages();
       },
-      error: (err: unknown) => {
+      error: (err: any) => {
         console.error(err);
-        this.error = 'ADMIN.ERROR_UPDATE_PACKAGE';
         this.saving = false;
+
+        if (err?.status === 422) {
+          ApiErrorUtil.applyToForm(this.form, err);
+          this.toast.error(ApiErrorUtil.toMessage(err), { position: 'top-end' });
+          return;
+        }
+
+        this.error = 'ADMIN.ERROR_UPDATE_PACKAGE';
         this.toast.error(this.translate.instant(this.error), { position: 'top-end' });
       },
     });
