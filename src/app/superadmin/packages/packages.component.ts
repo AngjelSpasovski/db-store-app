@@ -1,24 +1,27 @@
 // src/app/superadmin/packages/packages.component.ts
-import { Component, HostListener, OnInit, OnDestroy  } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { AgGridAngular } from 'ag-grid-angular';
-import type { 
-  ColDef, 
-  GridApi, 
-  GridOptions, 
-  GridReadyEvent, 
-  ICellRendererParams
+import type {
+  ColDef,
+  GridApi,
+  GridOptions,
+  GridReadyEvent,
 } from 'ag-grid-community';
 
-import { themeAlpine } from 'ag-grid-community'; 
+import { themeAlpine } from 'ag-grid-community';
 
 import { SuperadminPackagesApi, SuperadminPackageDto, PackagePayload } from '../../shared/superadmin-packages.api';
 import { ToastService } from 'src/app/shared/toast.service';
 import { Subscription } from 'rxjs';
 import { ApiErrorUtil } from 'src/app/shared/api-error.util';
+
+type UiPackage = SuperadminPackageDto & {
+  priceCents?: number; // keep original cents for debugging
+};
 
 @Component({
   selector: 'app-superadmin-packages',
@@ -27,10 +30,10 @@ import { ApiErrorUtil } from 'src/app/shared/api-error.util';
   templateUrl: './packages.component.html',
   styleUrls: ['./packages.component.scss'],
 })
-export class PackagesComponent implements OnInit, OnDestroy  {
+export class PackagesComponent implements OnInit, OnDestroy {
 
   // SERVER / LIST STATE
-  packages: SuperadminPackageDto[] = [];
+  packages: UiPackage[] = [];
   total = 0;
 
   loading = false;
@@ -79,86 +82,20 @@ export class PackagesComponent implements OnInit, OnDestroy  {
     accentColor: '#0d6efd',
   });
 
-  // Ag-Grid column definitions
-  columnDefs: ColDef<SuperadminPackageDto>[] = [
-    { 
-      headerName: 'Name', 
-      field: 'name', 
-      minWidth: 180, 
-      flex: 1 
-    },
-
-    {
-      headerName: 'Credits',
-      field: 'credits',
-      type: 'numericColumn',
-      width: 130,
-      cellClass: 'ag-right-aligned-cell',
-    },
-
-    {
-      headerName: 'Price',
-      field: 'price',
-      type: 'numericColumn',
-      width: 140,
-      valueFormatter: (p) => Number(p.value ?? 0).toFixed(2),
-      cellClass: 'ag-right-aligned-cell',
-    },
-
-    {
-      headerName: 'Discount %',
-      field: 'discountPercentage',
-      type: 'numericColumn',
-      width: 140,
-      cellClass: 'ag-right-aligned-cell',
-    },
-
-    {
-      headerName: 'Active',
-      field: 'isActive',
-      width: 120,
-      cellClass: 'ag-center-aligned-cell',
-      cellRenderer: (p: ICellRendererParams<SuperadminPackageDto>) => {
-        const active = !!p.value;
-        const cls = active ? 'bg-success' : 'bg-secondary';
-        return `<span class="badge ${cls}">${active ? 'Yes' : 'No'}</span>`;
-      },
-    },
-
-    {
-      headerName: 'Edit',
-      colId: 'edit',
-      width: 110,
-      sortable: false,
-      filter: false,
-      resizable: false,
-      cellClass: 'ag-edit-cell',
-      cellRenderer: () => `
-        <div class="ag-edit icon-only">
-          <button class="btn btn-info ag-icon-btn" data-action="edit" title="Edit">✎</button>
-        </div>
-      `,
-      onCellClicked: (e) => {
-        const el = (e.event?.target as HTMLElement | null)?.closest?.('[data-action]');
-        const action = el?.getAttribute?.('data-action');
-        if (action === 'edit' && e.data) this.openEditModal(e.data);
-      },
-    },
-  ];
+  // Ag-Grid column definitions (runtime translated)
+  columnDefs: ColDef<UiPackage>[] = [];
 
   // MOBILE STATE
   isMobile = false;
 
   // MODAL / FORM STATE
   showFormModal = false;
-  editingPackage: SuperadminPackageDto | null = null;
+  editingPackage: UiPackage | null = null;
   form!: FormGroup;
 
-  
   private mq?: MediaQueryList;
   private mqHandler?: (e: MediaQueryListEvent) => void;
 
-  // 
   private langSub?: Subscription;
 
   // PAGING HELPERS
@@ -167,7 +104,7 @@ export class PackagesComponent implements OnInit, OnDestroy  {
   }
 
   // FILTERING HELPERS
-  get filteredPackages(): SuperadminPackageDto[] {
+  get filteredPackages(): UiPackage[] {
     const q = (this.searchText ?? '').trim().toLowerCase();
     if (!q) return this.packages;
 
@@ -186,7 +123,7 @@ export class PackagesComponent implements OnInit, OnDestroy  {
   ) {}
 
   ngOnInit(): void {
-    this.initForm(); // initialize form
+    this.initForm();
 
     this.mq = window.matchMedia('(max-width: 768px)');
     this.isMobile = this.mq.matches;
@@ -247,9 +184,20 @@ export class PackagesComponent implements OnInit, OnDestroy  {
   private buildColumnDefs(): void {
     this.columnDefs = [
       { headerName: this.translate.instant('NAME'), field: 'name', minWidth: 180, flex: 1 },
+
       { headerName: this.translate.instant('CREDITS'), field: 'credits', type: 'numericColumn', width: 130, cellClass: 'ag-right-aligned-cell' },
-      { headerName: this.translate.instant('PRICE'), field: 'price', type: 'numericColumn', width: 140, valueFormatter: (p) => Number(p.value ?? 0).toFixed(2), cellClass: 'ag-right-aligned-cell' },
+
+      {
+        headerName: this.translate.instant('PRICE'),
+        field: 'price',
+        type: 'numericColumn',
+        width: 140,
+        valueFormatter: (p) => Number(p.value ?? 0).toFixed(2), // price is in EUR in UI
+        cellClass: 'ag-right-aligned-cell',
+      },
+
       { headerName: this.translate.instant('DISCOUNT_PERCENT'), field: 'discountPercentage', type: 'numericColumn', width: 140, cellClass: 'ag-right-aligned-cell' },
+
       {
         headerName: this.translate.instant('ACTIVE'),
         field: 'isActive',
@@ -262,6 +210,7 @@ export class PackagesComponent implements OnInit, OnDestroy  {
           return `<span class="badge ${cls}">${label}</span>`;
         },
       },
+
       {
         headerName: this.translate.instant('EDIT'),
         colId: 'edit',
@@ -271,10 +220,10 @@ export class PackagesComponent implements OnInit, OnDestroy  {
         resizable: false,
         cellClass: 'ag-edit-cell',
         cellRenderer: () => `
-        <div class="ag-edit icon-only">
-          <button class="btn btn-info ag-icon-btn" data-action="edit" title="${this.translate.instant('EDIT')}">✎</button>
-        </div>
-      `,
+          <div class="ag-edit icon-only">
+            <button class="btn btn-info ag-icon-btn" data-action="edit" title="${this.translate.instant('EDIT')}">✎</button>
+          </div>
+        `,
         onCellClicked: (e) => {
           const el = (e.event?.target as HTMLElement | null)?.closest?.('[data-action]');
           if (el?.getAttribute?.('data-action') === 'edit' && e.data) this.openEditModal(e.data);
@@ -290,10 +239,7 @@ export class PackagesComponent implements OnInit, OnDestroy  {
    * - api.setGridOption('quickFilterText', text) (newer)
    */
   applyQuickFilter(): void {
-    // ✅ mobile: accordion се update-ира преку filteredPackages getter (ништо не треба тука)
     if (this.isMobile) return;
-
-    // ✅ desktop: ag-grid quick filter
     if (!this.gridApi) return;
 
     const text = (this.searchText ?? '').trim();
@@ -302,7 +248,6 @@ export class PackagesComponent implements OnInit, OnDestroy  {
     try { anyApi.setGridOption?.('quickFilterText', text); } catch {}
     try { anyApi.setQuickFilter?.(text); } catch {}
   }
-
 
   clearSearch(): void {
     this.searchText = '';
@@ -318,7 +263,15 @@ export class PackagesComponent implements OnInit, OnDestroy  {
 
     this.api.getPackages(this.perPage, this.page).subscribe({
       next: (res) => {
-        this.packages = res.list ?? [];
+        const list = (res.list ?? []) as SuperadminPackageDto[];
+
+        // ✅ API returns cents; UI works with EUR
+        this.packages = list.map(p => ({
+          ...p,
+          priceCents: Number(p.price ?? 0),
+          price: this.toUiPrice(p.price),
+        }));
+
         this.total = res.total ?? 0;
         this.loading = false;
 
@@ -357,7 +310,7 @@ export class PackagesComponent implements OnInit, OnDestroy  {
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: [''],
       credits: [0, [Validators.required, Validators.min(0)]],
-      price: [0, [Validators.required, Validators.min(0)]],
+      price: [0, [Validators.required, Validators.min(0)]], // EUR in UI
       discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
       isActive: [true],
     });
@@ -374,7 +327,8 @@ export class PackagesComponent implements OnInit, OnDestroy  {
     });
   }
 
-  private patchFormFromPackage(pkg: SuperadminPackageDto): void {
+  private patchFormFromPackage(pkg: UiPackage): void {
+    // pkg.price is already EUR in UI
     this.form.reset({
       name: pkg.name ?? '',
       description: pkg.description ?? '',
@@ -392,11 +346,15 @@ export class PackagesComponent implements OnInit, OnDestroy  {
 
   private buildPayloadFromForm(): PackagePayload {
     const v = this.form.value;
+
     return {
       name: (v.name ?? '').toString().trim(),
       description: (v.description ?? '').toString().trim() || null,
       credits: Number(v.credits) || 0,
-      price: Number(v.price) || 0,
+
+      // ✅ UI EUR -> API cents
+      price: this.toApiPrice(v.price),
+
       discountPercentage: Number(v.discountPercentage) || 0,
       isActive: !!v.isActive,
     };
@@ -411,7 +369,7 @@ export class PackagesComponent implements OnInit, OnDestroy  {
     this.showFormModal = true;
   }
 
-  openEditModal(pkg: SuperadminPackageDto): void {
+  openEditModal(pkg: UiPackage): void {
     this.editingPackage = pkg;
     this.patchFormFromPackage(pkg);
     this.showFormModal = true;
@@ -425,7 +383,6 @@ export class PackagesComponent implements OnInit, OnDestroy  {
   // SUBMIT (CREATE / UPDATE + deactivate rule)
   // =========================
   submit(): void {
-    // очисти претходни api errors
     ApiErrorUtil.clearApiErrors(this.form);
 
     if (this.form.invalid) {
@@ -521,4 +478,17 @@ export class PackagesComponent implements OnInit, OnDestroy  {
     });
   }
 
+  // =========================
+  // PRICE MAPPERS (Stripe cents <-> UI EUR)
+  // =========================
+  private toUiPrice(cents: any): number {
+    const n = Number(cents ?? 0);
+    return Number.isFinite(n) ? n / 100 : 0;
+  }
+
+  private toApiPrice(eur: any): number {
+    const n = Number(eur ?? 0);
+    if (!Number.isFinite(n)) return 0;
+    return Math.round(n * 100);
+  }
 }
