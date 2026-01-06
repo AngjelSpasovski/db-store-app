@@ -1,22 +1,41 @@
 <!-- src/app/user/side-bar/side-bar.component.html -->
 
 <aside class="sidebar" [class.open]="isOpen" [class.closed]="!isOpen">
-  <!-- HEADER: toggle + user info (мало модерно картче) -->
-  <div class="sidebar__header">
-    <button class="sidebar__toggle navbar-toggler" type="button" (click)="toggle()">
+
+  <!-- HEADER -->
+  <div class="sidebar__header" [class.no-toggle]="isMobile">
+
+    <!-- Toggle само на DESKTOP -->
+    <button
+      *ngIf="!isMobile"
+      class="sidebar__toggle navbar-toggler"
+      type="button"
+      (click)="toggle()"
+      aria-label="Toggle sidebar">
       <fa-icon [icon]="isOpen ? faToggleOpen : faToggleClosed"></fa-icon>
     </button>
 
+    <!-- Profile -->
     <div class="sidebar__profile" *ngIf="currentUser">
-      <div class="avatar">
-        {{ (currentUser.firstName)[0] | uppercase }}
-      </div>
-      <div class="info">
-        <div class="email" title="{{ currentUser.firstName }} {{currentUser.lastName}}">
-          {{ currentUser.firstName }}
+      <!-- Left: avatar + role -->
+      <div class="badge-col">
+        <div class="avatar">
+          {{ (currentUser.firstName || 'U')[0] | uppercase }}
         </div>
-        <div class="role" *ngIf="currentUser.role">
-          {{ (currentUser.role | uppercase) | translate  }}
+
+        <div class="role-pill">
+          {{ ((currentUser.role || 'user') | uppercase) | translate }}
+        </div>
+      </div>
+
+      <!-- Right: name + email -->
+      <div class="text-col">
+        <div class="name" title="{{ currentUser.firstName }} {{ currentUser.lastName }}">
+          {{ currentUser.firstName }} {{ currentUser.lastName }}
+        </div>
+
+        <div class="email" *ngIf="currentUser.email" [title]="currentUser.email">
+          {{ currentUser.email }}
         </div>
       </div>
     </div>
@@ -77,4 +96,9 @@
 </aside>
 
 <!-- Backdrop (се рендерира од user.component, ова останува како што беше ако го имаш) -->
-<div class="sidebar-backdrop" *ngIf="isMobile && isOpen" aria-hidden="true" role="presentation"></div>
+<div class="sidebar-backdrop"
+    *ngIf="isMobile && isOpen"
+    aria-hidden="true"
+    role="presentation"
+    (click)="close.emit()">
+</div>

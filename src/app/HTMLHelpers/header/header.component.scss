@@ -413,4 +413,42 @@ $light:  #ffffff;
       z-index: 3000;
     }
   }
+
+}
+/* =========================
+  Header backdrop (mobile only)
+  ========================= */
+  
+/* Backdrop behind header collapse (mobile only) */
+.header-backdrop {
+  position: fixed;
+  inset: 0;
+  top: 64px;
+  z-index: 1400; // над content, под header collapse panel
+  background: rgba(0, 0, 0, .45);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  animation: hbFade .18s ease forwards;
+  pointer-events: all;
+}
+
+/* Make sure opened collapse is above the backdrop */
+.header-user #userNavbarContent.collapse.show,
+.header-admin #adminNavbarContent.collapse.show,
+.header-home #homeNavbarContent.collapse.show {
+  position: relative;
+  z-index: 1500;
+}
+
+@keyframes hbFade {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Desktop: no backdrop needed */
+@media (min-width: 992px) {
+  .header-backdrop {
+    display: none !important;
+  }
 }

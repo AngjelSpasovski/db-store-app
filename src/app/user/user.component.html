@@ -1,21 +1,20 @@
-<!-- src/app/user/user.component.html -->
-
-<!-- Mobile “hamburger” only when sidebar closed -->
-<nav class="mobile-nav navbar navbar-dark bg-dark"
-     *ngIf="isMobile && !sidebarIsOpen">
-
-  <button class="navbar-toggler"
-          type="button"
-          (click)="sidebarIsOpen = true">
+<!-- Mobile floating nav (always visible on mobile) -->
+<nav class="mobile-nav navbar navbar-dark" *ngIf="isMobile">
+  <button
+    class="mobile-menu-btn navbar-toggler"
+    type="button"
+    (click)="toggleSidebar()"
+    [class.is-open]="sidebarIsOpen"
+    [attr.aria-expanded]="sidebarIsOpen"
+    aria-label="Toggle menu">
     <span class="navbar-toggler-icon"></span>
   </button>
-
 </nav>
 
-<!-- Updated sidebar binding -->
 <app-sidebar
   [isOpen]="sidebarIsOpen"
-  (close)="sidebarIsOpen = false">
+  (openChange)="onSidebarOpenChange($event)"
+  (close)="onSidebarClose()">
 </app-sidebar>
 
 <div class="user-wrap">

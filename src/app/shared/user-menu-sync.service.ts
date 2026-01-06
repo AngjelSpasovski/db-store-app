@@ -3,17 +3,22 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UserMenuSyncService {
-  private sidebarOpenSubject = new BehaviorSubject<boolean>(false);
-  sidebarOpen$ = this.sidebarOpenSubject.asObservable();
+  private readonly sidebarOpenSubject = new BehaviorSubject<boolean>(false);
+  readonly sidebarOpen$ = this.sidebarOpenSubject.asObservable();
 
-  private headerMenuOpenSubject = new BehaviorSubject<boolean>(false);
-  headerMenuOpen$ = this.headerMenuOpenSubject.asObservable();
+  private readonly headerMenuOpenSubject = new BehaviorSubject<boolean>(false);
+  readonly headerMenuOpen$ = this.headerMenuOpenSubject.asObservable();
 
-  setSidebarOpen(open: boolean): void {
-    this.sidebarOpenSubject.next(open);
+  setSidebarOpen(isOpen: boolean): void {
+    this.sidebarOpenSubject.next(isOpen);
   }
 
-  setHeaderMenuOpen(open: boolean): void {
-    this.headerMenuOpenSubject.next(open);
+  setHeaderMenuOpen(isOpen: boolean): void {
+    this.headerMenuOpenSubject.next(isOpen);
+  }
+
+  closeAll(): void {
+    this.setSidebarOpen(false);
+    this.setHeaderMenuOpen(false);
   }
 }

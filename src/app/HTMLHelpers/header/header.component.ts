@@ -140,47 +140,89 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   // togglers
-  toggleUserNav()  {
-    this.isUserNavOpen  = !this.isUserNavOpen;
-    this.menuSync.setHeaderMenuOpen(this.isUserNavOpen);
+  toggleUserNav() {
+    const next = !this.isUserNavOpen;
+    this.isUserNavOpen = next;
+
+    // ✅ кога header се отвора → затвори sidebar
+    if (next) {
+      this.menuSync.setSidebarOpen(false);
+    }
+
+    this.menuSync.setHeaderMenuOpen(next);
   }
-  toggleHomeNav()  { this.isHomeNavOpen  = !this.isHomeNavOpen; }
-  toggleAdminNav() { this.isAdminNavOpen = !this.isAdminNavOpen; }
+
+  // toggles
+  toggleHomeNav() {
+    const next = !this.isHomeNavOpen;
+    this.isHomeNavOpen = next;
+    if (next) {
+      this.isUserNavOpen = false;
+      this.isAdminNavOpen = false;
+      this.menuSync.setHeaderMenuOpen(false);
+    }
+  }
+
+  toggleAdminNav() {
+    const next = !this.isAdminNavOpen;
+    this.isAdminNavOpen = next;
+    if (next) {
+      this.isHomeNavOpen = false;
+      this.isUserNavOpen = false;
+      this.menuSync.setHeaderMenuOpen(false);
+    }
+  }
+  toggleSettings(): void {
+    this.showSettingsMenu = !this.showSettingsMenu;
+  }
 
   // closers
-  closeUserNav()   { this.isUserNavOpen  = false; }
+  closeUserNav() {
+    this.isUserNavOpen = false;
+    this.menuSync.setHeaderMenuOpen(false);
+  }
   closeHomeNav()   { this.isHomeNavOpen  = false; }
   closeAdminNav()  { this.isAdminNavOpen = false; }
+  closeAnyNav(): void {
+    this.isUserNavOpen = false;
+    this.isAdminNavOpen = false;
+    this.isHomeNavOpen = false;
+
+    // ✅ само user header се синхронизира со sidebar преку service
+    this.menuSync.setHeaderMenuOpen(false);
+  }
 
   scrollToSection(id: string, evt: Event) {
     evt.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  toggleSettings(): void {
-    this.showSettingsMenu = !this.showSettingsMenu;
-  }
-
-  // Затвори dropdown и нав кога кликнуваш надвор
+  // ✅ затвори менијата ако се кликне надвор од header
   @HostListener('document:click', ['$event'])
   onDocClick(evt: MouseEvent) {
     const target = evt.target as HTMLElement;
 
-    // ако не е кликнато во header → затвори ги менијата
     if (!target.closest('.app-header')) {
       this.isAdminNavOpen = false;
       this.isUserNavOpen = false;
       this.isHomeNavOpen = false;
+
+      // ✅ sync
+      this.menuSync.setHeaderMenuOpen(false);
     }
 
     this.showSettingsMenu = false;
   }
 
+  // ✅ затвори менијата ако се притисне ESC
   @HostListener('document:keydown.escape')
   onEsc() {
     this.showSettingsMenu = false;
     this.isUserNavOpen = false;
     this.isAdminNavOpen = false;
+
+    // ✅ sync
+    this.menuSync.setHeaderMenuOpen(false);
   }
 
 }

@@ -88,16 +88,18 @@ export class UserService {
     private base = (environment.baseApiUrl ?? '/api').replace(/\/+$/, '');
     constructor(private http: HttpClient) { }
 
+    // GET /api/users/me/details
     getMeDetails() {
         return this.http.get<UserDetailsDTO>(`${this.base}/users/me/details`);
     }
 
+    // GET /api/users/me/credits
     getCredits() {
         return this.http.get<{ credits: number }>(`${this.base}/users/me/credits`)
             .pipe(catchError(() => of({ credits: 0 })));
     }
 
-    /** Edit profile (first/last/company + optional password) */
+    // PATCH /api/users/me
     updateMe(payload: UpdateMeReq) {
         return this.http.patch<User>(`${this.base}/users/me`, payload);
     }

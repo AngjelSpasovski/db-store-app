@@ -1,44 +1,86 @@
 $black:     #000000;
-$dark:       #222428;
-$darker:     #1e1e1e;
-$light:      #ffffff;
-$primary:    #4d8dff;
-$secondary:  #555;
+$dark:      #222428;
+$darker:    #1e1e1e;
+$light:     #ffffff;
+$primary:   #4d8dff;
+$secondary: #555;
 
-// MOBILE NAV (исто како до сега)
+$mobile-nav-height: 56px;
+$app-header-height: 64px;
+
+/* MOBILE NAV (floating) */
 .mobile-nav {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  display: none;
 
-  background: var(--dark);
-  color: var(--light);
-  padding: .35rem .75rem;
-  border-bottom: 1px solid $secondary;
+  .mobile-menu-btn {
+    width: 46px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.25);
+    background: rgba(255,255,255,.06);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-direction: column;
+    padding: 0;
+    cursor: pointer;
+
+    .line {
+      width: 20px;
+      height: 2px;
+      background: rgba(255,255,255,.92);
+      border-radius: 2px;
+      transition: transform .18s ease, opacity .18s ease, width .18s ease;
+    }
+
+    &.is-open {
+      .line:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+      .line:nth-child(2) { opacity: 0; width: 0; }
+      .line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    }
+  }
+
+  @media (max-width: 991.98px) {
+    display: flex;
+    align-items: center;
+
+    position: fixed;
+    top: $app-header-height;
+    left: 0;
+    right: 0;
+    height: $mobile-nav-height;
+
+    padding: .35rem .75rem;
+    background: rgba(34, 36, 40, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+
+    z-index: 2000; // ✅ над content/backdrop
+  }
 
   .navbar-toggler {
     border-color: rgba(255, 255, 255, .4);
   }
 
   .navbar-toggler-icon {
-    filter: brightness(3);   // ја осветлува линијата
-    opacity: 0.9;
-  }
-
-  @media (min-width: 992px) {
-    display: none;
+    opacity: .95;
   }
 }
-
 
 /* ===== MAIN LAYOUT ===== */
 
 .user-wrap {
   display: flex;
-  min-height: 93.3vh;   // целата user страна барем колку viewport
+  min-height: 93.3vh;
   background: $black;
   color: $secondary;
-  overflow-y: auto;    // скрол по потреба (desktop + mobile)
+  overflow-y: auto;
+
+  /* на мобилен треба да има простор за fixed mobile-nav */
+  @media (max-width: 991.98px) {
+    padding-top: $mobile-nav-height;
+  }
 }
 
 .content {
@@ -50,15 +92,15 @@ $secondary:  #555;
   .main-header-wrap {
     background-color: #262a32;
     padding: 1.1rem 0.75rem;
-    flex: 0 0 auto;      // header со природна висина
+    flex: 0 0 auto;
     box-shadow: 0 0 18px rgba(0, 0, 0, .55);
   }
 
   .main-router-wrap {
     padding: 1rem;
     background-color: $dark;
-    flex: 1 1 auto;      // 👈 го пополнува просторот меѓу header и footer
-    overflow-y: auto;    // 👈 скрол за содржината (billing, account, ...)
+    flex: 1 1 auto;
+    overflow-y: auto;
     box-shadow: 0 0 18px rgba(0, 0, 0, .55);
   }
 
@@ -68,7 +110,7 @@ $secondary:  #555;
     align-items: center;
     background-color: $darker;
     padding: 0.35rem 0.75rem;
-    flex: 0 0 auto;      // footer фиксен, секогаш на дното на content
+    flex: 0 0 auto;
     box-shadow: 0 0 18px rgba(0, 0, 0, .55);
   }
 }
@@ -83,10 +125,8 @@ app-sidebar.closed ~ .user-wrap .content {
 }
 
 /* На мобилен sidebar не поместува content */
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   app-sidebar ~ .user-wrap .content {
     margin-left: 0 !important;
   }
 }
-
-

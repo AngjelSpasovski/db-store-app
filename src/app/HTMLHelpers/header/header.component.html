@@ -25,7 +25,7 @@
 
       <div class="navbar-collapse collapse" [class.show]="isHomeNavOpen" id="homeNavbarContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="#home"      (click)="scrollToSection('home',     $event)">{{ 'HOME' | translate }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="#home"         (click)="scrollToSection('home',        $event)">{{ 'HOME' | translate }}</a></li>
           <li class="nav-item"><a class="nav-link" href="#about"        (click)="scrollToSection('about',       $event)">{{ 'ABOUT' | translate }}</a></li>
           <li class="nav-item"><a class="nav-link" href="#how-it-works" (click)="scrollToSection('how-it-works',$event)">{{ 'HOW_IT_WORKS' | translate }}</a></li>
           <!-- <li class="nav-item"><a class="nav-link" href="#features" (click)="scrollToSection('features',  $event)">{{ 'FEATURES' | translate }}</a></li> -->
@@ -195,5 +195,18 @@
 
     </div>
   </nav>
+
+  <!-- Backdrop (mobile only) – behind the opened collapse menus -->
+  <div
+    class="header-backdrop"
+    *ngIf="
+      (viewMode === 'user'  && isUserNavOpen)  ||
+      (viewMode === 'admin' && isAdminNavOpen) ||
+      (viewMode === 'home'  && isHomeNavOpen)
+    "
+    aria-hidden="true"
+    role="presentation"
+    (click)="closeAnyNav()">
+  </div>
 
 </header>

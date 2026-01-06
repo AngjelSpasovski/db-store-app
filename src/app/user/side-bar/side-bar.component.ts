@@ -46,7 +46,9 @@ import {
 })
 export class SidebarComponent implements OnInit {
   @Input() isOpen = false;
-  @Output() close = new EventEmitter<void>();
+
+  @Output() close       = new EventEmitter<void>();
+  @Output() openChange  = new EventEmitter<boolean>();
 
   @HostBinding('class.open') get opened() {
     return this.isOpen;
@@ -87,9 +89,6 @@ export class SidebarComponent implements OnInit {
     this.currentUser = this.auth.getCurrentUser();
 
     this.isMobile = window.innerWidth < 992;
-    if (this.isMobile) {
-      this.isOpen = false;
-    }
   }
 
   // GET FUNCTIONS
@@ -103,8 +102,11 @@ export class SidebarComponent implements OnInit {
   //------------
 
   toggle(): void {
-    this.isOpen = !this.isOpen;
-    if (this.isMobile && !this.isOpen) {
+     const next = !this.isOpen;
+     this.openChange.emit(next);
+
+    // кога се затвора на мобилен — извести го parent-от
+    if (this.isMobile && !next) {
       this.close.emit();
     }
   }
@@ -123,6 +125,5 @@ export class SidebarComponent implements OnInit {
   @HostListener('window:resize')
   onResize(): void {
     this.isMobile = window.innerWidth < 992;
-    this.isOpen = !this.isMobile;
   }
 }
