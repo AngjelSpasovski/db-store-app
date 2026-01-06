@@ -133,6 +133,46 @@
     height: 1rem;
   }
 
+  .card-header.price-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+
+    .price-left {
+      display: inline-flex;
+      align-items: baseline;
+      gap: .6rem;
+      min-width: 0;
+    }
+
+    .old-price {
+      opacity: .65;
+      text-decoration: line-through;
+      font-weight: 600;
+      font-size: .95rem;
+      letter-spacing: .06em;
+    }
+
+    .new-price {
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: .06em;
+      color: var(--text-0);
+    }
+
+    .discount-badge {
+      background: #dc3545;
+      color: #fff;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: .18rem .55rem;
+      font-size: .78rem;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+  }
+
   @media (max-width: 576px) {
     .price {
       font-size: 1.8rem;

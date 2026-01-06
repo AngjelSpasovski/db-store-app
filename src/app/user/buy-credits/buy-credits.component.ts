@@ -125,4 +125,25 @@ export class BuyCreditsComponent implements OnInit {
       }, 4000);
     }
   }
+
+  // discount related helpers for price calculations
+  public discountPct(pkg: CreditPackage): number {
+    const n = Number(pkg.discountPercentage ?? 0);
+    if (!Number.isFinite(n)) return 0;
+    return Math.min(100, Math.max(0, n));
+  }
+
+  // discount related helpers for having discount
+  public hasDiscount(pkg: CreditPackage): boolean {
+    return this.discountPct(pkg) > 0;
+  }
+
+  // discount related helpers for discounted price
+  public discountedPrice(pkg: CreditPackage): number {
+    const d = this.discountPct(pkg);
+    const base = Number(pkg.price ?? 0);
+    const final = base * (1 - d / 100);
+    return Number(final.toFixed(2));
+  }
+
 }

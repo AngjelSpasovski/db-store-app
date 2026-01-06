@@ -10,17 +10,25 @@ import type {
   GridApi,
   GridOptions,
   GridReadyEvent,
+  ICellRendererParams
 } from 'ag-grid-community';
-
 import { themeAlpine } from 'ag-grid-community';
 
-import { SuperadminPackagesApi, SuperadminPackageDto, PackagePayload } from '../../shared/superadmin-packages.api';
+import {
+  SuperadminPackagesApi,
+  SuperadminPackageDto,
+  PackagePayload
+} from '../../shared/superadmin-packages.api';
+
 import { ToastService } from 'src/app/shared/toast.service';
 import { Subscription } from 'rxjs';
 import { ApiErrorUtil } from 'src/app/shared/api-error.util';
 
-type UiPackage = SuperadminPackageDto & {
-  priceCents?: number; // keep original cents for debugging
+type UiPackage = Omit<SuperadminPackageDto, 'price'> & {
+  /** UI price in EUR */
+  price: number;
+  /** original backend cents (debug / trace) */
+  priceCents: number;
 };
 
 @Component({
@@ -50,14 +58,23 @@ export class PackagesComponent implements OnInit, OnDestroy {
   // aG-Grid API STATE
   private gridApi?: GridApi;
 
-  // Ag-Grid default column definition
+  // MOBILE STATE
+  isMobile = false;
+
+  // MODAL / FORM STATE
+  showFormModal = false;
+  editingPackage: UiPackage | null = null;
+  form!: FormGroup;
+
+  // Ag-Grid
+  columnDefs: ColDef<UiPackage>[] = [];
+
   defaultColDef: ColDef = {
     sortable: true,
     filter: true,
     resizable: true,
   };
 
-  // Ag-Grid options
   gridOptions: GridOptions = {
     rowHeight: 44,
     headerHeight: 44,
@@ -66,7 +83,6 @@ export class PackagesComponent implements OnInit, OnDestroy {
     rowSelection: 'single',
   };
 
-  // Ag-Grid theme
   public theme = themeAlpine.withParams({
     backgroundColor: '#151821',
     foregroundColor: '#e9eef6',
@@ -82,20 +98,8 @@ export class PackagesComponent implements OnInit, OnDestroy {
     accentColor: '#0d6efd',
   });
 
-  // Ag-Grid column definitions (runtime translated)
-  columnDefs: ColDef<UiPackage>[] = [];
-
-  // MOBILE STATE
-  isMobile = false;
-
-  // MODAL / FORM STATE
-  showFormModal = false;
-  editingPackage: UiPackage | null = null;
-  form!: FormGroup;
-
   private mq?: MediaQueryList;
   private mqHandler?: (e: MediaQueryListEvent) => void;
-
   private langSub?: Subscription;
 
   // PAGING HELPERS
@@ -189,10 +193,10 @@ export class PackagesComponent implements OnInit, OnDestroy {
 
       {
         headerName: this.translate.instant('PRICE'),
-        field: 'price',
+        field: 'price', // ✅ UI EUR already
         type: 'numericColumn',
         width: 140,
-        valueFormatter: (p) => Number(p.value ?? 0).toFixed(2), // price is in EUR in UI
+        valueFormatter: (p) => Number(p.value ?? 0).toFixed(2),
         cellClass: 'ag-right-aligned-cell',
       },
 
@@ -203,7 +207,7 @@ export class PackagesComponent implements OnInit, OnDestroy {
         field: 'isActive',
         width: 120,
         cellClass: 'ag-center-aligned-cell',
-        cellRenderer: (p: { value: any; }) => {
+        cellRenderer: (p: { value: any }) => {
           const active = !!p.value;
           const cls = active ? 'bg-success' : 'bg-secondary';
           const label = active ? this.translate.instant('ADMIN.YES') : this.translate.instant('ADMIN.NO');
@@ -232,12 +236,6 @@ export class PackagesComponent implements OnInit, OnDestroy {
     ];
   }
 
-  /**
-   * ag-Grid quick filter API changes across versions.
-   * We support both:
-   * - api.setQuickFilter(text) (older)
-   * - api.setGridOption('quickFilterText', text) (newer)
-   */
   applyQuickFilter(): void {
     if (this.isMobile) return;
     if (!this.gridApi) return;
@@ -265,12 +263,15 @@ export class PackagesComponent implements OnInit, OnDestroy {
       next: (res) => {
         const list = (res.list ?? []) as SuperadminPackageDto[];
 
-        // ✅ API returns cents; UI works with EUR
-        this.packages = list.map(p => ({
-          ...p,
-          priceCents: Number(p.price ?? 0),
-          price: this.toUiPrice(p.price),
-        }));
+        // ✅ backend cents -> UI EUR
+        this.packages = list.map(dto => {
+          const cents = Number((dto as any).price ?? 0);
+          return {
+            ...dto,
+            priceCents: Number.isFinite(cents) ? cents : 0,
+            price: this.toUiPrice(cents),
+          };
+        });
 
         this.total = res.total ?? 0;
         this.loading = false;
@@ -310,7 +311,7 @@ export class PackagesComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: [''],
       credits: [0, [Validators.required, Validators.min(0)]],
-      price: [0, [Validators.required, Validators.min(0)]], // EUR in UI
+      price: [0, [Validators.required, Validators.min(0)]], // ✅ UI EUR
       discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
       isActive: [true],
     });
@@ -328,12 +329,11 @@ export class PackagesComponent implements OnInit, OnDestroy {
   }
 
   private patchFormFromPackage(pkg: UiPackage): void {
-    // pkg.price is already EUR in UI
     this.form.reset({
       name: pkg.name ?? '',
       description: pkg.description ?? '',
       credits: pkg.credits ?? 0,
-      price: pkg.price ?? 0,
+      price: pkg.price ?? 0, // ✅ already EUR
       discountPercentage: pkg.discountPercentage ?? 0,
       isActive: !!pkg.isActive,
     });
@@ -351,10 +351,8 @@ export class PackagesComponent implements OnInit, OnDestroy {
       name: (v.name ?? '').toString().trim(),
       description: (v.description ?? '').toString().trim() || null,
       credits: Number(v.credits) || 0,
-
       // ✅ UI EUR -> API cents
       price: this.toApiPrice(v.price),
-
       discountPercentage: Number(v.discountPercentage) || 0,
       isActive: !!v.isActive,
     };
@@ -479,7 +477,7 @@ export class PackagesComponent implements OnInit, OnDestroy {
   }
 
   // =========================
-  // PRICE MAPPERS (Stripe cents <-> UI EUR)
+  // PRICE MAPPERS (cents <-> eur)
   // =========================
   private toUiPrice(cents: any): number {
     const n = Number(cents ?? 0);

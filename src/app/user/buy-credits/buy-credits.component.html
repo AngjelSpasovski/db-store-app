@@ -27,14 +27,29 @@
     </div>
 
     <!-- Cards -->
-    <div
-      *ngIf="!loadingPackages && !packagesError && packages.length > 0"
+    <div *ngIf="!loadingPackages && !packagesError && packages.length > 0"
       class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
-
+    
       <div class="col" *ngFor="let pkg of packages; trackBy: trackByPkg">
         <div class="card acc-card credit-card h-100">
-          <div class="card-header">
-            {{ pkg.price | number:'1.0-0' }}€
+          
+          <div class="card-header price-header" [class.has-discount]="hasDiscount(pkg)">
+            <div class="price-left">
+              <!-- Old price -->
+              <span *ngIf="hasDiscount(pkg)" class="old-price">
+                {{ pkg.price | number:'1.2-2' }}€
+              </span>
+    
+              <!-- New / final price -->
+              <span class="new-price">
+                {{ (hasDiscount(pkg) ? discountedPrice(pkg) : pkg.price) | number:'1.2-2' }}€
+              </span>
+            </div>
+    
+            <!-- Discount badge -->
+            <span *ngIf="hasDiscount(pkg)" class="discount-badge">
+              -{{ discountPct(pkg) }}%
+            </span>
           </div>
 
           <div class="card-body text-center">
