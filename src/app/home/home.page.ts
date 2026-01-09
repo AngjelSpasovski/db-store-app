@@ -1,3 +1,4 @@
+// src/app/home/home.page.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -26,7 +27,8 @@ export class HomePage implements OnInit, OnDestroy {
   private routerSub!: Subscription;
 
   public currentYear = new Date().getFullYear();
-  public sections = ['home', 'about', 'people', 'packages', 'contact', 'info'];
+  public sections = ['home', 'about', 'how-it-works', 'packages', 'statistics', 'showcase', 'people', 'contact', 'info'];
+
 
   public infoData = {
     company:  'OUR_COMPANY_NAME',
@@ -144,6 +146,7 @@ export class HomePage implements OnInit, OnDestroy {
       });
   }
 
+  // Cooldown check for sending
   private canSendNow(): boolean {
     const key = 'contact_last_sent_at';
     const last = Number(localStorage.getItem(key) || '0');
@@ -153,6 +156,7 @@ export class HomePage implements OnInit, OnDestroy {
     return true;
   }
 
+  // Setup IntersectionObservers
   private setupObservers(): void {
     // Disconnect existing observers
     this.obsSubs.forEach(o => o.disconnect());
@@ -171,16 +175,43 @@ export class HomePage implements OnInit, OnDestroy {
     document.querySelectorAll<HTMLElement>('.animate-on-scroll').forEach(el => animateObserver.observe(el));
     this.obsSubs.push(animateObserver);
 
-    // Active section observer
-    const sectionObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const id = entry.target.id;
-        document.querySelectorAll<HTMLAnchorElement>('.nav-link').forEach(link => {
-          link.classList.toggle('active', link.getAttribute('href')?.substring(1) === id);
-        });
+    const headerEl = document.querySelector('header.app-header') as HTMLElement | null;
+    const headerH = headerEl?.offsetHeight ?? 0;
+
+    // Active section observer (choose BEST candidate, not "last entry")
+    const sectionObserver = new IntersectionObserver((entries) => {
+      const candidates = entries.filter(e => e.isIntersecting);
+      if (!candidates.length) return;
+
+      const line = headerH + 12; // “activation line” under header
+
+      const best = candidates.reduce((acc, cur) => {
+        const accDist = Math.abs(acc.boundingClientRect.top - line);
+        const curDist = Math.abs(cur.boundingClientRect.top - line);
+        return curDist < accDist ? cur : acc;
       });
-    }, { root, threshold: 0.5 });
+
+      const id = (best.target as HTMLElement).id;
+
+      // ✅ само header nav линкови (да не ти ги меша footer links)
+      document
+        .querySelectorAll<HTMLAnchorElement>('.app-header a.nav-link')
+        .forEach(link => {
+          const href = link.getAttribute('href') || '';
+          const linkId = href.startsWith('#') ? href.slice(1) : href;
+          link.classList.toggle('active', linkId === id);
+        });
+
+    }, {
+      root: this.getScrollRoot(),
+      threshold: [0.15, 0.25, 0.35],
+      // ✅ исечи горе (header) и долу (за да не активира следна секција предвреме)
+      rootMargin: `-${headerH + 8}px 0px -60% 0px`
+    });
+
+    document.querySelectorAll<HTMLElement>('.section-scroll').forEach(sec => sectionObserver.observe(sec));
+    this.obsSubs.push(sectionObserver);
+
 
     // section-scroll elements
     document.querySelectorAll<HTMLElement>('.section-scroll').forEach(sec => sectionObserver.observe(sec));
@@ -211,17 +242,43 @@ export class HomePage implements OnInit, OnDestroy {
     this.obsSubs.push(statsObserver);
   }
 
-  public scrollToSection(id: string, ev: Event): void {
-    ev.preventDefault();                                          // Prevent default anchor click behavior
+  // Scroll handling
+  private getScrollRoot(): HTMLElement | null {
+    // 1) if using a custom scrollable div
+    const wrap = document.getElementById('content-wrap');
+    if (wrap) return wrap;
 
-    const root = document.getElementById('content-wrap');         // Get the root element for scrolling
-    const sec = document.getElementById(id);                      // Get the target section element by ID
-
-    if (!root || !sec) return;                                    // If root or section is not found, exit
-
-    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });   // Scroll to the section smoothly
+    // 2) Ionic: real scroller е во ion-content shadow (.inner-scroll)
+    const ion = document.querySelector('ion-content') as any;
+    const inner = ion?.shadowRoot?.querySelector('.inner-scroll') as HTMLElement | null;
+    return inner ?? null;
   }
 
+  // Scroll to section with header offset
+  public scrollToSection(id: string, ev: Event): void {
+    ev.preventDefault();
+
+    const sec = document.getElementById(id);
+    if (!sec) return;
+
+    const headerEl = document.querySelector('header.app-header') as HTMLElement | null;
+    const headerH = headerEl?.offsetHeight ?? 0;
+
+    const root = this.getScrollRoot();
+
+    if (root) {
+      const rootTop = root.getBoundingClientRect().top;
+      const secTop = sec.getBoundingClientRect().top;
+
+      const top = (secTop - rootTop) + root.scrollTop - headerH - 8;
+      root.scrollTo({ top, behavior: 'smooth' });
+    } else {
+      const top = sec.getBoundingClientRect().top + window.scrollY - headerH - 8;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  }
+
+  // Restore scroll position to top
   private restoreScrollPosition(): void {
     const root = document.getElementById('content-wrap');
     if (root) {
@@ -229,15 +286,18 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
+  // Authentication navigation
   public onLoginClick(): void {
     this.router.navigateByUrl('/login');
   }
 
+  // Logout
   public logout(): void {
     sessionStorage.clear();
     this.router.navigate(['/home']);
   }
 
+  // Number animation
   private animateNumber(el: HTMLElement, target: number) {
     const duration = 1400; // ms
     let start: number | null = null;
@@ -265,19 +325,28 @@ export class HomePage implements OnInit, OnDestroy {
     'localhost'
   ]);
 
+  // Check if current origin is allowed
   private isAllowedOrigin(): boolean {
     const host = window.location.hostname;
     return this.allowedHosts.has(host);
   }
 
+  // Flash success message
   private flashSuccess(ms = 5000) {
     this.flashSub?.unsubscribe();
     this.flashSub = timer(ms).subscribe(() => (this.sendOk = false));
   }
 
+  // Flash error message
   private flashError(ms = 5000) {
     this.flashSub?.unsubscribe();
     this.flashSub = timer(ms).subscribe(() => (this.sendErr = false));
+  }
+
+  toTel(phone: string): string {
+    if (!phone) return '';
+    // keep only + and digits (removes spaces, dashes, etc.)
+    return phone.replace(/[^\d+]/g, '');
   }
 
 }

@@ -206,19 +206,71 @@ $light:  #ffffff;
 .header-home {
   .navbar {
     background-color: #212529 !important;
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   .nav-link {
-    color: rgba(255,255,255,.70);
+    color: rgba(255, 255, 255, .70);
     transition: color .2s ease;
 
-    &:hover { color: #fff; }
+    &:hover {
+      color: #fff;
+    }
 
     &.active {
       font-weight: 600;
       color: #fff;
-      border-bottom: 2px solid rgba(255,255,255,.6);
+      border-bottom: 2px solid rgba(255, 255, 255, .6);
+    }
+  }
+
+  @media (max-width: 991.98px) {
+    .navbar>.container-fluid {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    #homeNavbarContent.collapse.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* листата да е центрирана */
+    #homeNavbarContent .navbar-nav {
+      width: 100%;
+      align-items: center;
+    }
+
+    #homeNavbarContent .navbar-nav .nav-item {
+      width: 100%;
+    }
+
+    /* language selector wrapper да е центриран */
+    #homeNavbarContent app-language-selector {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: .75rem;
+    }
+
+    /* ако твојот language selector има button, форсирај auto width и центар */
+    #homeNavbarContent app-language-selector button {
+      width: auto !important;
+      min-width: 140px;          /* по желба */
+      justify-content: center;
+    }
+    
+  }
+
+  /* 1920+ да не стане “претерано тесно” */
+  @media (min-width: 1920px) {
+    .navbar>.container-fluid {
+      padding-left: clamp(2rem, 8vw, 220px);
+      padding-right: clamp(2rem, 8vw, 220px);
     }
   }
 }
@@ -452,3 +504,49 @@ $light:  #ffffff;
     display: none !important;
   }
 }
+
+
+/* =========================
+  Medium screens tweaks
+  ========================= */
+@media (min-width: 992px) and (max-width: 1089px) {
+
+  /* navbar layout да не се прекршува */
+  .navbar .navbar-collapse {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  /* list да не wrap-нува */
+  .navbar .navbar-nav {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .navbar .navbar-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* линковите да бидат покомпактни */
+  .navbar .navbar-nav .nav-link {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.92rem;
+    white-space: nowrap;
+  }
+
+  /* brand да не јаде многу простор */
+  .navbar .navbar-brand {
+    margin-right: 0.75rem;
+  }
+
+  /* десната страна (јазик/копче) да не се “стиска” */
+  .navbar .navbar-right,
+  .navbar .lang-wrap {
+    flex: 0 0 auto;
+    margin-left: 0.5rem;
+  }
+}
+

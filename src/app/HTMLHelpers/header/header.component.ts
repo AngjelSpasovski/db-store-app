@@ -192,9 +192,38 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.menuSync.setHeaderMenuOpen(false);
   }
 
+  private getScrollRoot(): HTMLElement | null {
+    const wrap = document.getElementById('content-wrap');
+    if (wrap) return wrap;
+
+    const ion = document.querySelector('ion-content') as any;
+    const inner = ion?.shadowRoot?.querySelector('.inner-scroll') as HTMLElement | null;
+    return inner ?? null;
+  }
+
   scrollToSection(id: string, evt: Event) {
     evt.preventDefault();
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const sec = document.getElementById(id);
+    if (!sec) return;
+
+    const headerEl = document.querySelector('header.app-header') as HTMLElement | null;
+    const headerH = headerEl?.offsetHeight ?? 0;
+
+    const root = this.getScrollRoot();
+
+    if (root) {
+      const rootTop = root.getBoundingClientRect().top;
+      const secTop = sec.getBoundingClientRect().top;
+      const top = (secTop - rootTop) + root.scrollTop - headerH - 8;
+      root.scrollTo({ top, behavior: 'smooth' });
+    } else {
+      const top = sec.getBoundingClientRect().top + window.scrollY - headerH - 8;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+
+    // optional: затвори мобилно мени после клик
+    this.isHomeNavOpen = false;
   }
 
   // ✅ затвори менијата ако се кликне надвор од header

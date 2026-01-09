@@ -1,5 +1,5 @@
+<!-- src/app/home/home.page.html -->
 <!-- HomeComponent HTML Template -->
-<!-- This template includes a navigation bar, a home section, an about section, a test section, a packages section, a contact form, and a footer. -->
 <div id="home-component" class="home-component">
   <div class="home-wrapper">
 
@@ -9,11 +9,13 @@
       <div class="home-content">
         <h1>{{ 'HOME_INFO' | translate }}</h1>
         <p>{{ 'APP_DESCRIPTION' | translate }}</p>
+
         <div class="action-buttons">
           <button class="btn btn-primary" (click)="onLoginClick()">
             {{ 'LOGIN_BTN' | translate }}
           </button>
         </div>
+
         <!-- <div class="download-buttons">
           <a href="https://play.google.com/store/apps/details?id=your.app.id" target="_blank" class="btn btn-google-play">
             <i class="fab fa-google-play"></i><span class="download-app-info">{{'DOWNLOAD_GOOGLE_PLAY' | translate}}</span>
@@ -28,15 +30,19 @@
     <!-- ABOUT SECTION -->
     <section id="about" class="about-container py-5 section-scroll text-dark">
       <div class="container">
-        <h2 class="display-4 text-center mb-4">{{ 'ABOUT' | translate }}</h2>
-        <div class="row align-items-center">
-          <div class="col-lg-6 mb-4 mb-lg-0">
-            <h2 class="fw-bold">{{ 'ABOUT_TITLE' | translate }}</h2>
-            <p class="lead">
-                {{ 'ABOUT_TEXT' | translate }}
-            </p>
-            <!-- <a href="#contact" class="btn btn-outline-primary mt-3">Let’s Work Together</a> -->
+
+        <div class="text-center mb-4">
+          <div class="section-heading">
+            <h2 class="display-4 section-title">{{ 'ABOUT' | translate }}</h2>
           </div>
+        </div>
+
+        <div class="row align-items-center">
+          <div class="col-lg-6 mb-4 mb-lg-0 about-text">
+            <h2 class="fw-bold">{{ 'ABOUT_TITLE' | translate }}</h2>
+            <p class="lead">{{ 'ABOUT_TEXT' | translate }}</p>
+          </div>
+
           <div class="col-lg-6 text-center">
             <img src="../../assets/images/about.jpg" class="img-fluid" alt="...">
           </div>
@@ -47,164 +53,131 @@
     <!-- How It Works Section -->
     <section id="how-it-works" class="how-it-works-container py-5 section-scroll bg-dark">
       <div class="container">
-        <h2 class="display-4 text-center mb-4">{{ 'HOW_IT_WORKS' | translate }}</h2>
+
+        <div class="text-center mb-4">
+          <div class="section-heading">
+            <h2 class="display-4 section-title">{{ 'HOW_IT_WORKS' | translate }}</h2>
+          </div>
+        </div>
+
         <div class="row align-items-center">
+          <div class="col-lg-6 text-center pb-3">
+            <img src="../../assets/images/how-it-works-background_2.jpg" class="img-fluid" alt="...">
+          </div>
 
-            <div class="col-lg-6 text-center">
-                <img src="../../assets/images/how-it-works-background_2.jpg" class="img-fluid" alt="...">
-            </div>
-
-          <div class="col-lg-6 mb-4 mb-lg-0">
+          <div class="col-lg-6 mb-4 mb-lg-0 how-text">
             <h2 class="fw-bold">{{ 'HOW_IT_WORKS_TITLE' | translate }}</h2>
             <p class="lead">{{ 'HOW_IT_WORKS_TEXT1' | translate }}</p>
             <p class="lead fontWeight-bold">{{ 'HOW_IT_WORKS_TEXT2' | translate }}</p>
-            <p class="lead"><span class="fontWeight-bold">{{ 'HOW_IT_WORKS_TEXT3' | translate }}</span> - <span>{{ 'HOW_IT_WORKS_TEXT3_1' | translate }}</span></p>
-            <p class="lead"><span class="fontWeight-bold">{{ 'HOW_IT_WORKS_TEXT5' | translate }}</span> - <span>{{ 'HOW_IT_WORKS_TEXT5_1' | translate }}</span></p>
+            <p class="lead">
+              <span class="fontWeight-bold">{{ 'HOW_IT_WORKS_TEXT3' | translate }}</span> -
+              <span>{{ 'HOW_IT_WORKS_TEXT3_1' | translate }}</span>
+            </p>
+            <p class="lead">
+              <span class="fontWeight-bold">{{ 'HOW_IT_WORKS_TEXT5' | translate }}</span> -
+              <span>{{ 'HOW_IT_WORKS_TEXT5_1' | translate }}</span>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Packages Section -->
+    <section id="packages" class="packages-container section-scroll bg-dark">
+      <div class="container p-5">
+
+        <div class="text-center mb-5">
+          <div class="section-heading">
+            <h2 class="display-4 section-title">{{ 'PACKAGES_TITLE' | translate }}</h2>
+            <p class="lead section-subtitle">{{ 'PACKAGES_TEXT3' | translate }}</p>
+            <p class="lead section-subtitle">{{ 'PACKAGES_TEXT1' | translate }} <b>{{ 'PACKAGES_TEXT2' | translate }}</b></p>
+          </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+          <!-- Package 1 -->
+          <div class="col">
+            <div class="card h-100 border-primary">
+              <div class="card-header bg-primary text-white">
+                <h3 class="h4 mb-0">01</h3>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title text-primary">
+                  <i class="fas fa-check-circle text-success me-2"></i>{{ 'INTELIGENT_MATCHING' | translate }}
+                </h4>
+                <ul class="list-unstyled">
+                  <li class="mb-2">{{ 'INTELIGENT_MATCHING_TEXT' | translate }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Package 2 -->
+          <div class="col">
+            <div class="card h-100 border-success">
+              <div class="card-header bg-success text-white">
+                <h3 class="h4 mb-0">02</h3>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title text-success">
+                  <i class="fas fa-check-circle text-success me-2"></i>{{ 'CONSTANT_UPDATES' | translate }}
+                </h4>
+                <ul class="list-unstyled">
+                  <li class="mb-2">{{ 'CONSTANT_UPDATES_TEXT' | translate }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Package 3 -->
+          <div class="col">
+            <div class="card h-100 border-warning">
+              <div class="card-header bg-warning text-dark">
+                <h3 class="h4 mb-0">03</h3>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title text-warning">
+                  <i class="fas fa-check-circle text-success me-2"></i>{{ 'EASY_TO_USE' | translate }}
+                </h4>
+                <ul class="list-unstyled">
+                  <li class="mb-2">{{ 'EASY_TO_USE_TEXT' | translate }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Package 4 -->
+          <div class="col">
+            <div class="card h-100 border-info">
+              <div class="card-header bg-info text-white">
+                <h3 class="h4 mb-0">04</h3>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title text-info">
+                  <i class="fas fa-check-circle text-success me-2"></i>{{ 'ZERO_WASTE' | translate }}
+                </h4>
+                <ul class="list-unstyled">
+                  <li class="mb-2">{{ 'ZERO_WASTE_TEXT' | translate }}</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- Features Section -->
-    <!-- <section id="features" class="features-container py-5 section-scroll">
-      <div class="container">
-          <h2 class="display-4 text-center mb-4">{{ 'FEATURES' | translate }}</h2>
-          <div class="row g-4">
-              <div class="col-md-6">
-                  <div class="ratio ratio-16x9">
-                      <iframe src="https://www.youtube.com/embed/dwp1IRP-qOU" allowfullscreen title="Video 1"></iframe>
-                  </div>
-                  <p class="lead mt-3 text-center">Pippo Franco - Chi chi Chi co Co Co</p>
-              </div>
-              <div class="col-md-6">
-                  <div class="ratio ratio-16x9">
-                      <iframe src="https://www.youtube.com/embed/GeB5LOwK85E" allowfullscreen title="Video 2"></iframe>
-                  </div>
-                  <p class="lead mt-3 text-center">Pippo Franco - Chi chi Chi co Co Co (Metal)</p>
-              </div>
-          </div>
-      </div>
-    </section> -->
-
-    <!-- Packages Section -->
-    <section id="packages" class="packages-container py-5 section-scroll bg-dark">
-      <div class="container">
-          <div class="text-center mb-5 text-dark">
-              <h2 class="display-4">{{ 'PACKAGES_TITLE' | translate }}</h2>
-              <p class="lead">{{ 'PACKAGES_TEXT3' | translate }} </p>
-              <p class="lead">{{ 'PACKAGES_TEXT1' | translate }} <b>{{ 'PACKAGES_TEXT2' | translate }}</b></p>
-          </div>
-
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
-              <!-- Package 1 -->
-              <div class="col">
-                  <div class="card h-100 border-primary">
-                      <div class="card-header bg-primary text-white">
-                          <h3 class="h4 mb-0">01</h3>
-                      </div>
-                      <div class="card-body">
-                          <h4 class="card-title text-primary"><i class="fas fa-check-circle text-success me-2"></i>{{ 'INTELIGENT_MATCHING' | translate }}</h4>
-                          <ul class="list-unstyled">
-                            <li class="mb-2">{{ 'INTELIGENT_MATCHING_TEXT' | translate }}</li>
-                          </ul>
-                      </div>
-                      <!-- <div class="card-footer bg-transparent border-top-0">
-                          <button class="btn btn-outline-primary w-100">Choose Plan</button>
-                      </div> -->
-                  </div>
-              </div>
-
-              <!-- Package 2 -->
-              <div class="col">
-                  <div class="card h-100 border-success">
-                      <div class="card-header bg-success text-white">
-                          <h3 class="h4 mb-0">02</h3>
-                      </div>
-                      <div class="card-body">
-                          <h4 class="card-title text-success"><i class="fas fa-check-circle text-success me-2"></i>{{ 'CONSTANT_UPDATES' | translate }}</h4>
-                          <ul class="list-unstyled">
-                              <li class="mb-2">{{ 'CONSTANT_UPDATES_TEXT' | translate }}</li>
-                          </ul>
-                      </div>
-                      <!-- <div class="card-footer bg-transparent border-top-0">
-                          <button class="btn btn-outline-success w-100">Choose Plan</button>
-                      </div> -->
-                  </div>
-              </div>
-
-              <!-- Package 3 -->
-              <div class="col">
-                  <div class="card h-100 border-warning">
-                      <div class="card-header bg-warning text-dark">
-                          <h3 class="h4 mb-0">03</h3>
-                      </div>
-                      <div class="card-body">
-                          <h4 class="card-title text-warning"><i class="fas fa-check-circle text-success me-2"></i>{{ 'EASY_TO_USE' | translate }}</h4>
-                          <ul class="list-unstyled">
-                              <li class="mb-2">{{ 'EASY_TO_USE_TEXT' | translate }}</li>
-                          </ul>
-                      </div>
-                      <!-- <div class="card-footer bg-transparent border-top-0">
-                          <button class="btn btn-outline-warning w-100">Choose Plan</button>
-                      </div> -->
-                  </div>
-              </div>
-
-              <!-- Package 4 -->
-              <div class="col">
-                  <div class="card h-100 border-info">
-                      <div class="card-header bg-info text-white">
-                          <h3 class="h4 mb-0">04</h3>
-                      </div>
-                      <div class="card-body">
-                          <h4 class="card-title text-info"><i class="fas fa-check-circle text-success me-2"></i>{{ 'ZERO_WASTE' | translate }}</h4>
-                          <ul class="list-unstyled">
-                             <li class="mb-2">{{ 'ZERO_WASTE_TEXT' | translate }}</li>
-                          </ul>
-                      </div>
-                      <!-- <div class="card-footer bg-transparent border-top-0">
-                          <button class="btn btn-outline-info w-100">Choose Plan</button>
-                      </div> -->
-                  </div>
-              </div>
-
-              <!-- Package 5 -->
-              <!-- <div class="col">
-                  <div class="card h-100 border-danger">
-                      <div class="card-header bg-danger text-white">
-                          <h3 class="h4 mb-0">05</h3>
-                      </div>
-                      <div class="card-body">
-                          <h4 class="card-title text-danger"><i class="fas fa-check-circle text-success me-2"></i>{{ 'PRIVACY_PROTECTION' | translate }}</h4>
-                          <ul class="list-unstyled">
-                              <li class="mb-2">{{ 'PRIVACY_PROTECTION_TEXT' | translate }}</li>
-                          </ul>
-                      </div>
-                  </div>
-              </div> -->
-
-              <!-- Package 6 -->
-              <!-- <div class="col">
-                  <div class="card h-100 border-dark">
-                      <div class="card-header bg-dark text-white">
-                          <h3 class="h4 mb-0">06</h3>
-                      </div>
-                      <div class="card-body">
-                          <h4 class="card-title text-dark"><i class="fas fa-check-circle text-success me-2"></i>{{ 'DEDICATED_SUPPORT' | translate }}</h4>
-                          <ul class="list-unstyled">
-                              <li class="mb-2">{{ 'DEDICATED_SUPPORT_TEXT' | translate }}</li>
-                          </ul>
-                      </div>
-                  </div>
-              </div> -->
-          </div>
-      </div>
-    </section>
-
     <!-- Statistics Section -->
     <section id="statistics" class="statistics-container py-5 section-scroll bg-dark">
       <div class="container numbers">
+
+        <div class="text-center mb-4">
+          <div class="section-heading">
+            <h2 class="display-4 section-title">{{ 'STATISTICS' | translate }}</h2>
+          </div>
+        </div>
+
         <div class="row text-center">
           <div class="col-md-3">
             <div class="stat-card">
@@ -234,218 +207,226 @@
             </div>
           </div>
         </div>
+
       </div>
     </section>
 
     <!-- Showcase Section -->
     <section id="showcase" class="showcase-container py-5 section-scroll">
       <div class="container px-0">
-        <h2 class="display-4 text-center mb-4">{{ 'SHOWCASE' | translate }}</h2>
-        <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-indicators">
-                  <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active"></button>
-                  <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
-                  <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
-              </div>
 
-              <div class="carousel-inner">
-                  <div class="carousel-item active">
-                      <img src="../../assets/images/coffee.jpg" class="d-block w-100" style="object-fit: cover;" alt="First slide">
-                      <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
-                          <h5>{{ 'PROMOTION' | translate }} 1</h5>
-                          <p>{{ 'PROMOTION_TEXT' | translate }}</p>
-                      </div>
-                  </div>
-
-                  <div class="carousel-item">
-                      <img src="../../assets/images/desk.jpg" class="d-block w-100" style="object-fit: cover;" alt="Second slide">
-                      <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
-                          <h5>{{ 'PROMOTION' | translate }} 2</h5>
-                          <p>{{ 'PROMOTION_TEXT' | translate }}</p>
-                      </div>
-                  </div>
-
-                  <div class="carousel-item">
-                      <img src="../../assets/images/keyboard.jpg" class="d-block w-100" style="object-fit: cover;" alt="Third slide">
-                      <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
-                          <h5>{{ 'PROMOTION' | translate }} 3</h5>
-                          <p>{{ 'PROMOTION_TEXT' | translate }}</p>
-                      </div>
-                  </div>
-              </div>
-
-              <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">{{ 'PREVIOUS' | translate}}</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">{{ 'NEXT' | translate }}</span>
-              </button>
+        <div class="text-center mb-4">
+          <div class="section-heading">
+            <h2 class="display-4 section-title">{{ 'SHOWCASE' | translate }}</h2>
           </div>
+        </div>
+
+        <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
+          </div>
+
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="../../assets/images/coffee.jpg" class="d-block w-100" style="object-fit: cover;" alt="First slide">
+              <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3 promotion-plate">
+                <h5>{{ 'PROMOTION' | translate }} 1</h5>
+                <p>{{ 'PROMOTION_TEXT' | translate }}</p>
+              </div>
+            </div>
+
+            <div class="carousel-item">
+              <img src="../../assets/images/desk.jpg" class="d-block w-100" style="object-fit: cover;" alt="Second slide">
+              <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3 promotion-plate">
+                <h5>{{ 'PROMOTION' | translate }} 2</h5>
+                <p>{{ 'PROMOTION_TEXT' | translate }}</p>
+              </div>
+            </div>
+
+            <div class="carousel-item">
+              <img src="../../assets/images/keyboard.jpg" class="d-block w-100" style="object-fit: cover;" alt="Third slide">
+              <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3 promotion-plate">
+                <h5>{{ 'PROMOTION' | translate }} 3</h5>
+                <p>{{ 'PROMOTION_TEXT' | translate }}</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">{{ 'PREVIOUS' | translate}}</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">{{ 'NEXT' | translate }}</span>
+          </button>
+        </div>
+
       </div>
     </section>
 
     <!-- People Section -->
     <section id="people" class="people-container py-5 section-scroll bg-dark text-white">
       <div class="container">
-          <div class="text-center mb-5">
-              <h2 class="display-4">{{ 'PEOPLE' | translate }}</h2>
-              <p class="lead">{{ 'MEET_PEOPLE' | translate }}</p>
+
+        <div class="text-center mb-5">
+          <div class="section-heading">
+            <h2 class="display-4 section-title">{{ 'PEOPLE' | translate }}</h2>
+            <p class="lead section-subtitle">{{ 'MEET_PEOPLE' | translate }}</p>
+          </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-4 justify-content-center">
+          <!-- Person 1 -->
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+              <img src="../../assets/images/people_1.avif" class="card-img-top" alt="Enrico" style="height: 200px; object-fit: cover;">
+              <div class="card-body text-center">
+                <h5 class="card-title">Alberto</h5>
+                <p class="card-text">{{ 'CEO' | translate }}</p>
+                <div class="social-links">
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-4 justify-content-center">
-              <!-- Person 1 -->
-              <div class="col">
-                  <div class="card h-100 border-0 shadow-sm">
-                      <img src="../../assets/images/people_1.avif"
-                          class="card-img-top" alt="Enrico" style="height: 200px; object-fit: cover;">
-                      <div class="card-body text-center">
-                          <h5 class="card-title">Alberto</h5>
-                          <p class="card-text">{{ 'CEO' | translate }}</p>
-                          <div class="social-links">
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
-                          </div>
-                      </div>
-                  </div>
+          <!-- Person 3 -->
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+              <img src="../../assets/images/people_3.avif" class="card-img-top" alt="Roberto" style="height: 200px; object-fit: cover;">
+              <div class="card-body text-center">
+                <h5 class="card-title">Antonio</h5>
+                <p class="card-text">{{ 'SALES_MANAGER' | translate }}</p>
+                <div class="social-links">
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
+                </div>
               </div>
-
-              <!-- Person 3 -->
-              <div class="col">
-                  <div class="card h-100 border-0 shadow-sm">
-                      <img src="../../assets/images/people_3.avif"
-                          class="card-img-top" alt="Roberto" style="height: 200px; object-fit: cover;">
-                      <div class="card-body text-center">
-                          <h5 class="card-title">Antonio</h5>
-                          <p class="card-text">{{ 'SALES_MANAGER' | translate }}</p>
-                          <div class="social-links">
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- Person 2 -->
-              <div class="col">
-                  <div class="card h-100 border-0 shadow-sm">
-                      <img src="../../assets/images/people_2.avif"
-                          class="card-img-top" alt="Valeria" style="height: 200px; object-fit: cover;">
-                      <div class="card-body text-center">
-                          <h5 class="card-title">Valeria</h5>
-                          <p class="card-text">{{ 'SOFTWARE_ENGINEER' | translate}}</p>
-                          <div class="social-links">
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- Person 4 -->
-              <div class="col">
-                  <div class="card h-100 border-0 shadow-sm">
-                      <img src="../../assets/images/people_4.avif"
-                          class="card-img-top" alt="Alessandro" style="height: 200px; object-fit: cover;">
-                      <div class="card-body text-center">
-                          <h5 class="card-title">Alessandro</h5>
-                          <p class="card-text">{{ 'SOFTWARE_ENGINEER' | translate}}</p>
-                          <div class="social-links">
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- Person 5 -->
-              <div class="col">
-                  <div class="card h-100 border-0 shadow-sm">
-                      <img src="../../assets/images/people_5.avif"
-                          class="card-img-top" alt="Angjel" style="height: 200px; object-fit: cover;">
-                      <div class="card-body text-center">
-                          <h5 class="card-title">Angjel</h5>
-                          <p class="card-text">{{ 'SOFTWARE_ENGINEER' | translate }}</p>
-                          <div class="social-links">
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- Person 6 -->
-              <div class="col">
-                  <div class="card h-100 border-0 shadow-sm">
-                      <img src="../../assets/images/people_6.jpg"
-                          class="card-img-top" alt="Marija" style="height: 200px; object-fit: cover;">
-                      <div class="card-body text-center">
-                          <h5 class="card-title">Marija</h5>
-                          <p class="card-text">{{ 'ADMINISTRATIVE_MANAGER' | translate}}</p>
-                          <div class="social-links">
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
-                              <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+            </div>
           </div>
+
+          <!-- Person 2 -->
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+              <img src="../../assets/images/people_2.avif" class="card-img-top" alt="Valeria" style="height: 200px; object-fit: cover;">
+              <div class="card-body text-center">
+                <h5 class="card-title">Valeria</h5>
+                <p class="card-text">{{ 'SOFTWARE_ENGINEER' | translate}}</p>
+                <div class="social-links">
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Person 4 -->
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+              <img src="../../assets/images/people_4.avif" class="card-img-top" alt="Alessandro" style="height: 200px; object-fit: cover;">
+              <div class="card-body text-center">
+                <h5 class="card-title">Alessandro</h5>
+                <p class="card-text">{{ 'SOFTWARE_ENGINEER' | translate}}</p>
+                <div class="social-links">
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Person 5 -->
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+              <img src="../../assets/images/people_5.avif" class="card-img-top" alt="Angjel" style="height: 200px; object-fit: cover;">
+              <div class="card-body text-center">
+                <h5 class="card-title">Angjel</h5>
+                <p class="card-text">{{ 'SOFTWARE_ENGINEER' | translate }}</p>
+                <div class="social-links">
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Person 6 -->
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+              <img src="../../assets/images/people_6.jpg" class="card-img-top" alt="Marija" style="height: 200px; object-fit: cover;">
+              <div class="card-body text-center">
+                <h5 class="card-title">Marija</h5>
+                <p class="card-text">{{ 'ADMINISTRATIVE_MANAGER' | translate}}</p>
+                <div class="social-links">
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-linkedin"></i></a>
+                  <a href="#" class="text-primary mx-2"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
 
     <!-- Contact Section -->
     <section id="contact" class="contact-container py-5 section-scroll">
       <div class="row justify-content-center">
-          <div class="col-lg-8">
-              <h2 class="display-4 text-center mb-4">{{ 'CONTACT' | translate }}</h2>
-              <div class="card shadow">
-                  <div class="card-body p-4">
+        <div class="col-lg-8">
 
-                    <form #contactForm="ngForm"
-                          #formEl
-                          id="contactForm"
-                          class="contact-form"
-                          (ngSubmit)="onContactSubmit(formEl)" >
-                      <div class="mb-3">
-                        <label for="name" class="form-label">{{ 'YOUR_NAME' | translate }}</label>
-                        <input type="text" id="name" name="name" class="form-control" placeholder="{{ 'ENTER_YOUR_NAME' | translate }}" required [disabled]="sending">
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="email" class="form-label">{{ 'EMAIL_ADDRESS' | translate }}</label>
-                        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required [disabled]="sending">
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="messageTextarea" class="form-label">{{ 'YOUR_MESSAGE' | translate }}</label>
-                        <textarea id="messageTextarea" name="message" class="form-control message-textarea" placeholder="{{ 'WRITE_YOUR_MESSAGE' | translate }}" required [disabled]="sending"></textarea>
-                      </div>
-
-                      <!-- optional: title/subject token за template -->
-                      <input type="hidden" name="title" value="DBStore Contact Form" />
-
-                      <!-- honeypot field -->
-                      <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp-field" />
-
-                      <!-- optional: To email ако ти е во template -->
-                      <input type="hidden" name="to_email" value="contact@dbstore.online" />
-
-                      <div class="d-grid">
-                        <button type="submit" class="btn btn-primary" [disabled]="sending">
-                          <i class="fas fa-paper-plane me-2"></i>
-                          {{ sending ? ('SENDING' | translate) : ('SEND_MESSAGE' | translate) }}
-                        </button>
-                      </div>
-
-                      <!-- status message -->
-                      <div *ngIf="sendOk" class="alert alert-success mt-3">{{ 'MESSAGE_SENT_OK' | translate }}</div>
-                      <div *ngIf="sendErr" class="alert alert-danger mt-3">{{ 'MESSAGE_SENT_ERR' | translate }}</div>
-                    </form>
-
-                  </div>
-              </div>
+          <div class="text-center mb-4">
+            <div class="section-heading">
+              <h2 class="display-4 section-title">{{ 'CONTACT' | translate }}</h2>
+            </div>
           </div>
+
+          <div class="card shadow">
+            <div class="card-body p-4">
+
+              <form #contactForm="ngForm"
+                    #formEl
+                    id="contactForm"
+                    class="contact-form"
+                    (ngSubmit)="onContactSubmit(formEl)" >
+                <div class="mb-3">
+                  <label for="name" class="form-label">{{ 'YOUR_NAME' | translate }}</label>
+                  <input type="text" id="name" name="name" class="form-control" placeholder="{{ 'ENTER_YOUR_NAME' | translate }}" required [disabled]="sending">
+                </div>
+
+                <div class="mb-3">
+                  <label for="email" class="form-label">{{ 'EMAIL_ADDRESS' | translate }}</label>
+                  <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required [disabled]="sending">
+                </div>
+
+                <div class="mb-3">
+                  <label for="messageTextarea" class="form-label">{{ 'YOUR_MESSAGE' | translate }}</label>
+                  <textarea id="messageTextarea" name="message" class="form-control message-textarea" placeholder="{{ 'WRITE_YOUR_MESSAGE' | translate }}" required [disabled]="sending"></textarea>
+                </div>
+
+                <input type="hidden" name="title" value="DBStore Contact Form" />
+                <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp-field" />
+                <input type="hidden" name="to_email" value="contact@dbstore.online" />
+
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary" [disabled]="sending">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    {{ sending ? ('SENDING' | translate) : ('SEND_MESSAGE' | translate) }}
+                  </button>
+                </div>
+
+                <div *ngIf="sendOk" class="alert alert-success mt-3">{{ 'MESSAGE_SENT_OK' | translate }}</div>
+                <div *ngIf="sendErr" class="alert alert-danger mt-3">{{ 'MESSAGE_SENT_ERR' | translate }}</div>
+              </form>
+
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
 
@@ -457,27 +438,49 @@
           <div class="col-lg-4 mb-4 mb-lg-0">
             <h3 class="h4 mb-4">{{ 'CONTACT_INFO' | translate }}</h3>
             <ul class="list-unstyled">
+              <!-- ADDRESS -->
               <li class="mb-3">
                 <i class="fas fa-map-marker-alt me-2"></i>
                 <strong>{{ 'ADDRESS' | translate}}:</strong><br>
-                {{  infoData.street | translate }}<br>
-                {{  infoData.city | translate }}, {{  infoData.state | translate}}
+                {{ infoData.street | translate }}<br>
+                {{ infoData.city | translate }}, {{ infoData.state | translate}}
               </li>
+              <!-- VAT -->
               <li class="mb-3">
                 <i class="fas fa-credit-card me-2"></i>
                 <strong>VAT:</strong><br>
-                {{  infoData.vat }}
+                {{ infoData.vat }}
               </li>
+              <!-- PHONE -->
               <li class="mb-3">
                 <i class="fas fa-phone me-2"></i>
                 <strong>{{ 'PHONE' | translate}}:</strong><br>
-                {{  infoData.phone }}<br>
+
+                <a class="footer-link"
+                  [href]="'tel:' + toTel(infoData.phone)"
+                  [attr.aria-label]="'Call ' + infoData.phone">
+                  {{ infoData.phone }}
+                </a>
               </li>
+              <!-- EMAIL -->
               <li class="mb-3">
                 <i class="fas fa-envelope me-2"></i>
                 <strong>{{ 'EMAIL' | translate }}:</strong><br>
-                {{  infoData.email }}<br>
-                {{  infoData.email2 }}
+                <!-- Primary Email -->
+                <a class="footer-link"
+                  [href]="'mailto:' + infoData.email"
+                  [attr.aria-label]="'Email ' + infoData.email">
+                  {{ infoData.email }}
+                </a>
+
+                <br>
+                <!-- Secondary Email -->
+                <a *ngIf="infoData.email2"
+                  class="footer-link"
+                  [href]="'mailto:' + infoData.email2"
+                  [attr.aria-label]="'Email ' + infoData.email2">
+                  {{ infoData.email2 }}
+                </a>
               </li>
             </ul>
           </div>
@@ -486,15 +489,14 @@
           <div class="col-lg-4 mb-4 mb-lg-0">
             <h3 class="h4 mb-4">{{ 'QUICK_LINKS' | translate }}</h3>
             <ul class="list-unstyled">
-              <li><a href="#home"           (click)="scrollToSection('home', $event)"           class="text-white text-decoration-none">{{ 'HOME' | translate }}</a></li>
-              <li><a href="#about"          (click)="scrollToSection('about', $event)"          class="text-white text-decoration-none">{{ 'ABOUT' | translate }}</a></li>
-              <li><a href="#how-it-works"   (click)="scrollToSection('how-it-works', $event)"   class="text-white text-decoration-none">{{ 'HOW_IT_WORKS' | translate }}</a></li>
-              <!-- <li><a href="#features" (click)="scrollToSection('features', $event)" class="text-white text-decoration-none">Features</a></li> -->
-              <li><a href="#packages"       (click)="scrollToSection('packages', $event)"       class="text-white text-decoration-none">{{ 'WHY_US' | translate}}</a></li>
-              <li><a href="#statistics"     (click)="scrollToSection('statistics', $event)"     class="text-white text-decoration-none">{{ 'STATISTICS' | translate }}</a></li>
-              <li><a href="#showcase"       (click)="scrollToSection('showcase', $event)"       class="text-white text-decoration-none">{{ 'SHOWCASE' | translate }}</a></li>
-              <li><a href="#people"         (click)="scrollToSection('people', $event)"         class="text-white text-decoration-none">{{ 'PEOPLE' | translate }}</a></li>
-              <li><a href="#contact"        (click)="scrollToSection('contact', $event)"        class="text-white text-decoration-none">{{ 'CONTACT' | translate }}</a></li>
+              <li><a href="#home"         (click)="scrollToSection('home', $event)"         class="text-white text-decoration-none">{{ 'HOME' | translate }}</a></li>
+              <li><a href="#about"        (click)="scrollToSection('about', $event)"        class="text-white text-decoration-none">{{ 'ABOUT' | translate }}</a></li>
+              <li><a href="#how-it-works" (click)="scrollToSection('how-it-works', $event)" class="text-white text-decoration-none">{{ 'HOW_IT_WORKS' | translate }}</a></li>
+              <li><a href="#packages"     (click)="scrollToSection('packages', $event)"     class="text-white text-decoration-none">{{ 'WHY_US' | translate}}</a></li>
+              <li><a href="#statistics"   (click)="scrollToSection('statistics', $event)"   class="text-white text-decoration-none">{{ 'STATISTICS' | translate }}</a></li>
+              <li><a href="#showcase"     (click)="scrollToSection('showcase', $event)"     class="text-white text-decoration-none">{{ 'SHOWCASE' | translate }}</a></li>
+              <li><a href="#people"       (click)="scrollToSection('people', $event)"       class="text-white text-decoration-none">{{ 'PEOPLE' | translate }}</a></li>
+              <li><a href="#contact"      (click)="scrollToSection('contact', $event)"      class="text-white text-decoration-none">{{ 'CONTACT' | translate }}</a></li>
             </ul>
           </div>
 
@@ -502,16 +504,16 @@
           <div class="col-lg-4">
             <h3 class="h4 mb-4">{{ 'FOLLOW_US' | translate }}</h3>
             <div class="social-links mb-4">
-              <a href="#" class="text-white me-3"   aria-label="Facebook"><i class="fab fa-facebook-f fa-2x"></i></a>
-              <a href="#" class="text-white me-3"   aria-label="Twitter"><i class="fab fa-twitter fa-2x"></i></a>
-              <a href="#" class="text-white me-3"   aria-label="Instagram"><i class="fab fa-instagram fa-2x"></i></a>
-              <a href="#" class="text-white me-3"   aria-label="LinkedIn"><i class="fab fa-linkedin-in fa-2x"></i></a>
+              <a href="#" class="text-white me-3" aria-label="Facebook"><i class="fab fa-facebook-f fa-2x"></i></a>
+              <a href="#" class="text-white me-3" aria-label="Twitter"><i class="fab fa-twitter fa-2x"></i></a>
+              <a href="#" class="text-white me-3" aria-label="Instagram"><i class="fab fa-instagram fa-2x"></i></a>
+              <a href="#" class="text-white me-3" aria-label="LinkedIn"><i class="fab fa-linkedin-in fa-2x"></i></a>
             </div>
+
             <div class="mb-3">
               <i class="fas fa-heart text-danger"></i> <span>f 💙️ in</span>
             </div>
 
-            <!-- Newsletter (optional) -->
             <form class="mt-4">
               <div class="input-group">
                 <input type="email" class="form-control" placeholder="{{ 'YOUR_EMAIL' | translate }}" aria-label="Your email">
@@ -522,7 +524,6 @@
           </div>
         </div>
 
-        <!-- Copyright -->
         <div class="row mt-5">
           <div class="col-12 text-center">
             <hr class="bg-secondary">
