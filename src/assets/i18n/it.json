@@ -218,7 +218,17 @@
   "LOGGEDIN_AS": "Accedi come",
 
   "ABOUT_TITLE": "Abbiamo ciò di cui hai bisogno!",
-  "ABOUT_TEXT": "Dbstore è la piattaforma che semplifica e velocizza la ricerca di contatti immobiliari nel mercato B2B, consentendo alle aziende di entrare in contatto diretto con i proprietari di immobili in modo rapido ed efficiente. Grazie a Dbstore, la connessione tra domanda e offerta avviene in un solo clic: il cliente trova l'immobile in pochi secondi e noi ti forniamo i contatti diretti per interagire immediatamente con il proprietario.",
+  "ABOUT_TEXT_1": "Dbstore è la piattaforma che semplifica e velocizza la ricerca di contatti immobiliari nel mercato B2B, consentendo alle aziende di entrare in contatto diretto con i proprietari di immobili in modo rapido ed efficiente.",
+  "ABOUT_TEXT_2": "Grazie a Dbstore, la connessione tra domanda e offerta avviene in un solo clic: il cliente trova l'immobile in pochi secondi e noi ti forniamo i contatti diretti per interagire immediatamente con il proprietario.",
+
+  "ABOUT_FEAT_1_TITLE": "Abbinamento veloce",
+  "ABOUT_FEAT_1_TEXT": "Trova i contatti immobiliari giusti in pochi secondi.",
+
+  "ABOUT_FEAT_2_TITLE": "Connessione diretta",
+  "ABOUT_FEAT_2_TEXT": "Raggiungi proprietari e decisori senza intermediari.",
+
+  "ABOUT_FEAT_3_TITLE": "Dati affidabili",
+  "ABOUT_FEAT_3_TEXT": "Informazioni aggiornate con un flusso di lavoro chiaro e semplice.",
 
   "HOW_IT_WORKS_TITLE": "Come funziona Dbstore per il tuo business?",
   "HOW_IT_WORKS_TEXT1": "Accedi a una banca dati sempre aggiornata dei proprietari di immobili, senza la necessità di fare chiamate a freddo o spendere tempo nella ricerca manuale. Dbstore ti offre informazioni precise, in tempo reale, per supportare decisioni veloci e informate.",
@@ -227,6 +237,20 @@
   "HOW_IT_WORKS_TEXT3_1": "In un solo clic, il cliente trova l'immobile che sta cercando e Dbstore si occupa di fornirti i contatti diretti dei proprietari. Questo ti permette di avviare una trattativa in tempo reale, accelerando i tempi e migliorando la tua efficienza operativa.",
   "HOW_IT_WORKS_TEXT5": "Lascia fare a noi",
   "HOW_IT_WORKS_TEXT5_1": "Con Dbstore, la tua azienda avrà sempre accesso a contatti diretti e qualificati, permettendo di concludere trattative in modo più rapido ed efficiente. La piattaforma ti permette di automatizzare i processi di acquisizione, migliorando la gestione delle trattative e aumentando le opportunità di business.",
+  "HOW_IT_WORKS_SUBTITLE": "Dal ricerca alla chiusura dell'affare — DBStore semplifica ogni passaggio.",
+  "HOW_BADGE_3_STEPS": "In 3 semplici passaggi",
+  "HOW_LEFT_STEP_1_TITLE": "Ricerca",
+  "HOW_LEFT_STEP_1_TEXT": "Trova l'immobile giusto in pochi secondi",
+  "HOW_LEFT_STEP_2_TITLE": "Connetti",
+  "HOW_LEFT_STEP_2_TEXT": "Ottieni i contatti diretti del proprietario",
+  "HOW_LEFT_STEP_3_TITLE": "Chiudi",
+  "HOW_LEFT_STEP_3_TEXT": "Negozia più velocemente e chiudi affari",
+
+  "STATISTICS_SUBTITLE": "Uno sguardo alla reale trazione — misurata in utenti, attività, aggiornamenti e integrazioni.",
+
+  "CONTACT_SUBTITLE": "Dicci di cosa hai bisogno — ti risponderemo al più presto.",
+  "CONTACT_TITLE": "Inviaci un messaggio",
+  "CONTACT_NOTE": "Di solito rispondiamo entro 24 ore.",
 
   "MEET_PEOPLE": "Incontra le persone in DBStore",
   "CEO": "CEO",

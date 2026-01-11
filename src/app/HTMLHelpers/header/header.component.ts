@@ -201,28 +201,31 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return inner ?? null;
   }
 
-  scrollToSection(id: string, evt: Event) {
-    evt.preventDefault();
+  scrollToSection(id: string, ev: Event) {
+    ev.preventDefault();
 
     const sec = document.getElementById(id);
     if (!sec) return;
 
+    const root = this.getScrollRoot(); // content-wrap или ion-content .inner-scroll
     const headerEl = document.querySelector('header.app-header') as HTMLElement | null;
     const headerH = headerEl?.offsetHeight ?? 0;
 
-    const root = this.getScrollRoot();
+    // ✅ ако root постои (inner-scroll), rootTop веќе е под header → НЕ одземаме headerH
+    const offset = root ? 8 : (headerH + 8);
 
     if (root) {
       const rootTop = root.getBoundingClientRect().top;
-      const secTop = sec.getBoundingClientRect().top;
-      const top = (secTop - rootTop) + root.scrollTop - headerH - 8;
+      const secTop  = sec.getBoundingClientRect().top;
+
+      const top = (secTop - rootTop) + root.scrollTop - offset;
       root.scrollTo({ top, behavior: 'smooth' });
     } else {
-      const top = sec.getBoundingClientRect().top + window.scrollY - headerH - 8;
+      const top = sec.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: 'smooth' });
     }
 
-    // optional: затвори мобилно мени после клик
+    // optional: затвори мобилно мени
     this.isHomeNavOpen = false;
   }
 

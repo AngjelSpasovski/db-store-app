@@ -9,7 +9,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "optimize:images": "node src/app/shared/optimize-image/optimize-images.mjs"
   },
   "private": true,
   "dependencies": {
@@ -75,6 +76,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "sharp": "^0.34.5",
     "typescript": "~5.8.0"
   },
   "description": "An Ionic project"

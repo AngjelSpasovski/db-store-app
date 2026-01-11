@@ -6,6 +6,7 @@ $light:  #ffffff;
 
 .app-header {
   --chip-width: 132px;
+  --header-offset: 64px; /* height of the header */
 
   width: 100%;
   position: relative;
@@ -207,8 +208,6 @@ $light:  #ffffff;
   .navbar {
     background-color: #212529 !important;
     border-bottom: 1px solid rgba(255, 255, 255, .08);
-    padding-left: 0 !important;
-    padding-right: 0 !important;
   }
 
   .nav-link {
@@ -475,7 +474,7 @@ $light:  #ffffff;
 .header-backdrop {
   position: fixed;
   inset: 0;
-  top: 64px;
+  top: var(--header-offset);
   z-index: 1400; // над content, под header collapse panel
   background: rgba(0, 0, 0, .45);
   backdrop-filter: blur(2px);

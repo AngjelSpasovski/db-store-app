@@ -180,7 +180,6 @@
   "PACKAGES_TEXT2": "Trust DBStore and find the perfect offers for you right away!",
   "PACKAGES_TEXT3": "Why choose Dbstore for your business?",
 
-
   "OWNER": "Owner",
   "MARKETING_MANAGER": "Marketing Manager",
   "MANAGER": "Manager",
@@ -218,7 +217,17 @@
   "LOGGEDIN_AS": "Logged in as",
 
   "ABOUT_TITLE": "We've got what you need!",
-  "ABOUT_TEXT": "Dbstore is the platform that simplifies and expedites the search for real estate contacts in the B2B market, allowing companies to connect directly with property owners quickly and efficiently. With Dbstore, the connection between supply and demand happens in just one click: the customer finds the property in seconds, and we provide direct contact information to immediately interact with the owner.",
+  "ABOUT_TEXT_1": "Dbstore is the platform that simplifies and expedites the search for real estate contacts in the B2B market, allowing companies to connect directly with property owners quickly and efficiently.",
+  "ABOUT_TEXT_2": "With Dbstore, the connection between supply and demand happens in just one click: the customer finds the property in seconds, and we provide direct contact information to immediately interact with the owner.",
+
+  "ABOUT_FEAT_1_TITLE": "Fast matching",
+  "ABOUT_FEAT_1_TEXT": "Find the right real estate contacts in seconds.",
+
+  "ABOUT_FEAT_2_TITLE": "Direct connection",
+  "ABOUT_FEAT_2_TEXT": "Reach owners and decision-makers without intermediaries.",
+
+  "ABOUT_FEAT_3_TITLE": "Reliable data",
+  "ABOUT_FEAT_3_TEXT": "Up-to-date information with a clear, simple workflow.",
 
   "HOW_IT_WORKS_TITLE": "How does Dbstore work for your business?",
   "HOW_IT_WORKS_TEXT1": "Access a constantly updated database of property owners, without the need to make cold calls or spend time manually searching. Dbstore offers you accurate, real-time information to support quick and informed decisions.",
@@ -227,6 +236,20 @@
   "HOW_IT_WORKS_TEXT3_1": "With just one click, the customer finds the property they're looking for, and Dbstore takes care of providing you with the owners' direct contact information. This allows you to start negotiations in real time, speeding up the process and improving your operational efficiency.",
   "HOW_IT_WORKS_TEXT5": "Leave it to us",
   "HOW_IT_WORKS_TEXT5_1": "With Dbstore, your company will always have access to direct, qualified contacts, allowing you to close deals more quickly and efficiently. The platform allows you to automate acquisition processes, improving deal management and increasing business opportunities.",
+  "HOW_IT_WORKS_SUBTITLE": "From searching to closing a deal — DBStore simplifies every step.",
+  "HOW_BADGE_3_STEPS": "In 3 simple steps",
+  "HOW_LEFT_STEP_1_TITLE": "Search",
+  "HOW_LEFT_STEP_1_TEXT": "Find the right property in seconds",
+  "HOW_LEFT_STEP_2_TITLE": "Connect",
+  "HOW_LEFT_STEP_2_TEXT": "Get direct owner contact details",
+  "HOW_LEFT_STEP_3_TITLE": "Close",
+  "HOW_LEFT_STEP_3_TEXT": "Negotiate faster and win deals",
+
+  "STATISTICS_SUBTITLE": "A snapshot of real traction — measured in users, activity, updates and integrations.",
+
+  "CONTACT_SUBTITLE": "Tell us what you need — we’ll get back to you shortly.",
+  "CONTACT_TITLE": "Send us a message",
+  "CONTACT_NOTE": "We usually reply within 24 hours.",
 
   "MEET_PEOPLE": "Meet the people behind DBStore",
   "CEO": "CEO",
