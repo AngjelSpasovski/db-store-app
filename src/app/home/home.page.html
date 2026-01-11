@@ -216,7 +216,7 @@
     <!-- Packages Section -->
     <section id="packages" class="packages-container section-scroll top-y bg-dark">
       <div class="container p-5 section-layout">
-    
+
         <div class="section-top text-center mb-5">
           <div class="section-heading">
             <h2 class="display-8 section-title">{{ 'PACKAGES_TITLE' | translate }}</h2>
@@ -225,10 +225,10 @@
             </p>
           </div>
         </div>
-    
+
         <div class="section-mid">
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
-    
+
             <!-- Package 1 -->
             <div class="col">
               <div class="card h-100 border-primary">
@@ -245,7 +245,7 @@
                 </div>
               </div>
             </div>
-    
+
             <!-- Package 2 -->
             <div class="col">
               <div class="card h-100 border-success">
@@ -262,7 +262,7 @@
                 </div>
               </div>
             </div>
-    
+
             <!-- Package 3 -->
             <div class="col">
               <div class="card h-100 border-warning">
@@ -279,7 +279,7 @@
                 </div>
               </div>
             </div>
-    
+
             <!-- Package 4 -->
             <div class="col">
               <div class="card h-100 border-info">
@@ -296,7 +296,7 @@
                 </div>
               </div>
             </div>
-    
+
           </div>
         </div>
       </div>
@@ -369,13 +369,13 @@
     <!-- Showcase Section -->
     <!-- <section id="showcase" class="showcase-container section-scroll top-y">
       <div class="container p-5 section-layout">
-    
+
         <div class="section-top text-center mb-4">
           <div class="section-heading">
             <h2 class="display-8 section-title">{{ 'SHOWCASE' | translate }}</h2>
           </div>
         </div>
-    
+
         <div class="section-mid">
           <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
 
@@ -384,7 +384,7 @@
               <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
               <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
             </div>
-    
+
             <div class="carousel-inner">
 
               <div class="carousel-item active">
@@ -403,7 +403,7 @@
                   <p>{{ 'PROMOTION_TEXT' | translate }}</p>
                 </div>
               </div>
-    
+
 
               <div class="carousel-item">
                 <picture>
@@ -419,7 +419,7 @@
                   <p>{{ 'PROMOTION_TEXT' | translate }}</p>
                 </div>
               </div>
-    
+
 
               <div class="carousel-item">
                 <picture>
@@ -438,7 +438,7 @@
                 </div>
               </div>
             </div>
-    
+
             <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
               <span class="visually-hidden">{{ 'PREVIOUS' | translate}}</span>
@@ -449,7 +449,7 @@
               <span class="visually-hidden">{{ 'NEXT' | translate }}</span>
             </button>
           </div>
-    
+
         </div>
       </div>
     </section> -->
@@ -469,7 +469,7 @@
         <div class="section-mid">
           <div class="row g-4 justify-content-center people-row">
 
-            <!-- ✅ LG=4 per row, XL=6 per row -->
+            <!-- ✅ LG=4 per row, XL=6 per row (CSS override ќе го направи 4/row на XL, 5/row на ultra-wide) -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
               <div class="person-card h-100">
                 <div class="person-media">
@@ -715,7 +715,6 @@
               <li><a href="#how-it-works" (click)="scrollToSection('how-it-works', $event)" class="text-white text-decoration-none">{{ 'HOW_IT_WORKS' | translate }}</a></li>
               <li><a href="#packages"     (click)="scrollToSection('packages', $event)"     class="text-white text-decoration-none">{{ 'WHY_US' | translate}}</a></li>
               <li><a href="#statistics"   (click)="scrollToSection('statistics', $event)"   class="text-white text-decoration-none">{{ 'STATISTICS' | translate }}</a></li>
-              <li><a href="#showcase"     (click)="scrollToSection('showcase', $event)"     class="text-white text-decoration-none">{{ 'SHOWCASE' | translate }}</a></li>
               <li><a href="#people"       (click)="scrollToSection('people', $event)"       class="text-white text-decoration-none">{{ 'PEOPLE' | translate }}</a></li>
               <li><a href="#contact"      (click)="scrollToSection('contact', $event)"      class="text-white text-decoration-none">{{ 'CONTACT' | translate }}</a></li>
             </ul>
@@ -730,13 +729,27 @@
               <a href="#" class="text-white me-3" aria-label="LinkedIn"><i class="fab fa-linkedin-in fa-2x"></i></a>
             </div>
 
-            <form class="mt-4">
+            <form class="mt-4" #subscribeForm="ngForm" (ngSubmit)="onSubscribe(subscribeForm)" novalidate>
               <div class="input-group">
-                <input type="email" class="form-control" placeholder="{{ 'YOUR_EMAIL' | translate }}" aria-label="Your email">
-                <button class="btn btn-primary" type="submit">{{ 'SURBSCRIBE' | translate }}</button>
+                <input
+                  type="email"
+                  class="form-control"
+                  name="subscribeEmail"
+                  [(ngModel)]="subscribeEmail"
+                  placeholder="{{ 'YOUR_EMAIL' | translate }}"
+                  aria-label="Your email"
+                  required
+                  email
+                />
+
+                <button class="btn btn-primary" type="submit">
+                  {{ 'SURBSCRIBE' | translate }}
+                </button>
               </div>
+
               <small class="text-muted">{{ 'SURBSCRIBE_TO' | translate }}</small>
             </form>
+
           </div>
 
         </div>

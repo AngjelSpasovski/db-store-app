@@ -41,10 +41,17 @@ export class UserComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // save initial body overflow style
     this.prevBodyOverflow = getComputedStyle(document.body).overflow || '';
 
-    // when header menu opens → close sidebar (if open)
+    // ✅ set initial state based on current width (IMPORTANT: before subscriptions)
+    this.isMobile = window.innerWidth < 992;
+    this.sidebarIsOpen = !this.isMobile; // desktop open, mobile closed
+
+    this.menuSync.setHeaderMenuOpen(false);
+    this.menuSync.setSidebarOpen(this.sidebarIsOpen);
+    this.applyBodyScrollLock();
+
+    // then subscribe
     this.menuSync.headerMenuOpen$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(isHeaderOpen => {
@@ -55,7 +62,6 @@ export class UserComponent implements OnInit, OnDestroy {
         }
       });
 
-    // if sidebar state changes externally → update local state
     this.menuSync.sidebarOpen$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(isSidebarOpen => {
@@ -64,10 +70,6 @@ export class UserComponent implements OnInit, OnDestroy {
           this.applyBodyScrollLock();
         }
       });
-
-    // initial sync
-    this.menuSync.setSidebarOpen(this.sidebarIsOpen);
-    this.applyBodyScrollLock();
   }
 
   ngOnDestroy(): void {

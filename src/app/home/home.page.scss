@@ -10,10 +10,33 @@ html { scroll-behavior: smooth; }
   --header-offset: 72px;     /* fallback */
   --scroll-gap: 10px;        /* мал gap под header */
   --section-pad: clamp(3rem, 6vw, 5.5rem);
+
+  /* ✅ NEW: responsive content width for big screens */
+  --content-max: 1100px;     /* default */
+}
+
+/* ✅ NEW: expand content on large screens */
+@media (min-width: 1400px) {
+  :root { --content-max: 1280px; }
+}
+
+@media (min-width: 1600px) {
+  :root { --content-max: 1440px; }
+}
+
+@media (min-width: 1920px) {
+  :root { --content-max: 1680px; }
+}
+
+@media (min-width: 2560px) {
+  :root { --content-max: 1860px; }
 }
 
 .home-component {
   height: 100%;
+
+  /* ✅ NEW: scale entire Home page typography on wide screens */
+  font-size: clamp(16px, 0.35vw + 12px, 22px);
 
   .home-wrapper {
     position: relative;
@@ -40,8 +63,8 @@ html { scroll-behavior: smooth; }
     }
 
     /* =========================================================
-  ✅ SECTION LAYOUT: title горе, content по средина
-    ========================================================= */
+      ✅ SECTION LAYOUT: title горе, content по средина
+      ========================================================= */
     .section-layout {
       height: 100%;
       display: flex;
@@ -80,7 +103,7 @@ html { scroll-behavior: smooth; }
       ========================================================= */
     .section-heading {
       display: inline-block;
-      max-width: 980px;
+      max-width: min(92vw, var(--content-max));
       margin: 0 auto;
       padding: 0.85rem 1.35rem;
       border-radius: 18px;
@@ -175,8 +198,20 @@ html { scroll-behavior: smooth; }
         padding: 0 1rem;
         color: $text-color-light;
 
-        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; animation: fadeInDown 1s; }
-        p  { font-size: 1.5rem; margin-bottom: 2rem; animation: fadeInUp 1s; }
+        /* ✅ NEW: hero typography scales on big screens */
+        h1 {
+          font-size: clamp(2.2rem, 2.6vw, 3.6rem);
+          font-weight: 700;
+          margin-bottom: 1rem;
+          animation: fadeInDown 1s;
+        }
+
+        p {
+          font-size: clamp(1.05rem, 1.35vw, 1.6rem);
+          margin: 0 auto 2rem;
+          max-width: 70ch;
+          animation: fadeInUp 1s;
+        }
 
         .action-buttons {
           display: flex;
@@ -341,7 +376,7 @@ html { scroll-behavior: smooth; }
       .section-top { margin-bottom: clamp(1rem, 2vw, 1.6rem); }
 
       .section-heading {
-        max-width: 980px;
+        max-width: min(92vw, var(--content-max));
         text-align: center;
         padding: 1rem 1.4rem;
         border-radius: 22px;
@@ -370,7 +405,7 @@ html { scroll-behavior: smooth; }
       }
 
       /* ✅ Symmetry: cards same height */
-      .about-row { max-width: 1100px; margin: 0 auto; }
+      .about-row { max-width: var(--content-max); margin: 0 auto; }
 
       .about-card {
         height: 100%;
@@ -545,7 +580,7 @@ html { scroll-behavior: smooth; }
       }
 
       .section-heading {
-        max-width: 980px;
+        max-width: min(92vw, var(--content-max));
         text-align: center;
         padding: 1rem 1.4rem;
         border-radius: 22px;
@@ -568,7 +603,7 @@ html { scroll-behavior: smooth; }
 
       /* keep it aligned like About */
       .how-row {
-        max-width: 1100px;
+        max-width: var(--content-max);
         margin: 0 auto;
       }
 
@@ -898,7 +933,7 @@ html { scroll-behavior: smooth; }
       .numbers {
         position: relative;
         z-index: 1;
-        max-width: 1100px;
+        max-width: var(--content-max);
       }
 
       /* title like About */
@@ -907,7 +942,7 @@ html { scroll-behavior: smooth; }
       }
 
       .section-heading {
-        max-width: 980px;
+        max-width: min(92vw, var(--content-max));
         margin: 0 auto;
         text-align: center;
         padding: 1rem 1.4rem;
@@ -930,7 +965,7 @@ html { scroll-behavior: smooth; }
       }
 
       .stat-grid {
-        max-width: 1100px;
+        max-width: var(--content-max);
         margin: 0 auto;
       }
 
@@ -1089,7 +1124,7 @@ html { scroll-behavior: smooth; }
       .container { position: relative; z-index: 1; }
 
       .section-heading {
-        max-width: 980px;
+        max-width: min(92vw, var(--content-max));
         margin: 0 auto;
         text-align: center;
 
@@ -1125,10 +1160,27 @@ html { scroll-behavior: smooth; }
         padding-top: clamp(0.25rem, 1.2vw, 0.75rem);
       }
 
-      /* ✅ подобар container за grid (да не бидат малечки) */
+      /* ✅ content max */
       .people-row {
-        max-width: 1320px;
+        max-width: var(--content-max);
         margin: 0 auto;
+      }
+
+      /* ✅ NEW: On XL screens reduce columns (bigger cards) */
+      @media (min-width: 1200px) {
+        .people-row > .col-xl-2 {
+          flex: 0 0 auto;
+          width: 25% !important;     /* 4 per row */
+          max-width: 25% !important;
+        }
+      }
+
+      /* ✅ NEW: On ultra-wide show 5 per row */
+      @media (min-width: 1600px) {
+        .people-row > .col-xl-2 {
+          width: 20% !important;     /* 5 per row */
+          max-width: 20% !important;
+        }
       }
 
       /* ✅ Cards */
@@ -1197,10 +1249,6 @@ html { scroll-behavior: smooth; }
         .section-heading { border-radius: 18px; padding: 0.9rem 1.1rem; }
         .people-row { max-width: 100%; }
       }
-
-      @media (min-width: 1400px) {
-        .people-row { max-width: 1400px; }
-      }
     }
 
     /* =========================
@@ -1238,7 +1286,7 @@ html { scroll-behavior: smooth; }
       .section-top { margin-bottom: clamp(0.9rem, 1.8vw, 1.25rem); }
 
       .section-heading {
-        max-width: 980px;
+        max-width: min(92vw, var(--content-max));
         margin: 0 auto;
         text-align: center;
 
@@ -1465,7 +1513,6 @@ html { scroll-behavior: smooth; }
         text-underline-offset: 3px;
       }
     }
-
 
     /* =========================
     ANIMATIONS

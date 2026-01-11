@@ -1,8 +1,8 @@
 // src/app/user/side-bar/side-bar.component.scss
 
-$dark:   #222428;
+$dark: #222428;
 $darker: #1e1e1e;
-$light:  #ffffff;
+$light: #ffffff;
 $primary-blue: #00509e;
 
 $header-total-height: 69px;
@@ -29,35 +29,36 @@ $sidebar-top-height: 64px;
     top: 0;
     z-index: 2;
 
-    display: grid;
-    grid-template-columns: 44px 1fr;
+    display: flex;
     align-items: center;
-    gap: .6rem;
+    gap: .7rem;
 
-    padding: .55rem .65rem;
+    padding: .65rem .75rem;
     background: linear-gradient(180deg, rgba(38, 42, 50, 1), rgba(30, 33, 42, 1));
     border-bottom: 1px solid rgba(255, 255, 255, .08);
   }
 
   /* header без toggle (mobile) */
   &__header.no-toggle {
-    grid-template-columns: 1fr;
+    padding-left: .9rem;
   }
 
-  /* ── профил + toggle (desktop only) ───────────────────────────── */
+  /* ── toggle (desktop only) ───────────────────────────── */
   &__toggle.navbar-toggler {
     width: 40px;
-    height: 36px;
+    height: 40px;
+    flex: 0 0 40px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
     padding: 0;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, .16);
     background: rgba(255, 255, 255, .06);
 
-    transition: background .12s ease, transform .12s ease, border-color .12s ease;
+    transition: background .12s ease, transform .18s ease, border-color .12s ease;
 
     &:hover {
       background: rgba(255, 255, 255, .10);
@@ -67,80 +68,91 @@ $sidebar-top-height: 64px;
 
     fa-icon {
       color: $light;
-      font-size: .9rem;
+      font-size: .95rem;
+      transition: transform .18s ease;
     }
+  }
+
+  /* ✅ кога е OPEN -> мал rotate за да се осети state */
+  &.open .sidebar__toggle fa-icon {
+    transform: rotate(90deg);
   }
 
   /* ── кориснички профил ───────────────────────────────── */
   &__profile {
-    display: grid;
-    grid-template-columns: 52px 1fr;
-    align-items: center;
-    gap: .6rem;
+    flex: 1;
     min-width: 0;
 
-    /* left: avatar + role under it */
-    .badge-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: .35rem;
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .75rem;
+  }
 
-    .avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #4d8dff, #8a5cff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #4d8dff, #8a5cff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-      font-weight: 800;
-      font-size: .95rem;
-      color: $light;
+    font-weight: 800;
+    font-size: .95rem;
+    color: $light;
 
-      border: 2px solid rgba(255,255,255,.14);
-      box-shadow: 0 10px 18px rgba(0, 0, 0, .30);
-    }
+    border: 2px solid rgba(255, 255, 255, .14);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, .30);
+    flex: 0 0 40px;
+  }
 
-    .role-pill {
-      font-size: .42rem;
-      letter-spacing: .08em;
-      text-transform: uppercase;
+  .text-col {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+  }
 
-      padding: .16rem .45rem;
-      border-radius: 999px;
+  .top-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    min-width: 0;
+  }
 
-      background: rgba(77, 141, 255, .14);
-      border: 1px solid rgba(77, 141, 255, .26);
-      color: rgba(233, 238, 246, .92);
-    }
+  .name {
+    font-size: .92rem;
+    font-weight: 800;
+    color: $light;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
 
-    /* right: name + email */
-    .text-col {
-      min-width: 0;
-    }
+  .role-pill {
+    font-size: .80rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
 
-    .name {
-      font-size: .86rem;
-      font-weight: 800;
-      color: $light;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding: 10px 5px;
-    }
+    padding: 0.5rem 2.75rem;
+    border-radius: 999px;
 
-    .email {
-      font-size: .74rem;
-      color: rgba(255,255,255,.62);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding: 5px;
-    }
+    background: rgba(77, 141, 255, .14);
+    border: 1px solid rgba(77, 141, 255, .26);
+    color: rgba(233, 238, 246, .92);
 
+    flex: 0 0 auto;
+  }
+
+  .email {
+    font-size: .74rem;
+    color: rgba(255, 255, 255, .62);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ── главно мени ──────────────────────────────────────── */
@@ -251,9 +263,9 @@ $sidebar-top-height: 64px;
     height: 34px;
     border-radius: 10px;
 
-    border: 1px solid rgba(255,255,255,.16);
-    background: rgba(255,255,255,.06);
-    color: rgba(255,255,255,.9);
+    border: 1px solid rgba(255, 255, 255, .16);
+    background: rgba(255, 255, 255, .06);
+    color: rgba(255, 255, 255, .9);
 
     display: inline-flex;
     align-items: center;
@@ -265,8 +277,8 @@ $sidebar-top-height: 64px;
     transition: background .12s ease, transform .12s ease, border-color .12s ease;
 
     &:hover {
-      background: rgba(255,255,255,.10);
-      border-color: rgba(255,255,255,.26);
+      background: rgba(255, 255, 255, .10);
+      border-color: rgba(255, 255, 255, .26);
       transform: translateY(-1px);
     }
   }
@@ -334,7 +346,9 @@ $sidebar-top-height: 64px;
 }
 
 @keyframes sbFade {
-  to { opacity: 1; }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 991.98px) {
@@ -348,7 +362,6 @@ $sidebar-top-height: 64px;
 
   .sidebar-backdrop {
     top: $sidebar-top-height; // ✅ да не го покрива горниот header
-    z-index: 1800;            // под sidebar
+    z-index: 1800; // под sidebar
   }
 }
-

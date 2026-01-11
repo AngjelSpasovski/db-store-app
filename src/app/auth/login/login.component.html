@@ -118,10 +118,15 @@
           </div>
         </div>
 
+        <div *ngIf="isLoginBlocked" class="alert alert-warning py-2 mb-2" role="alert">
+          <i class="fas fa-hourglass-half me-2"></i>
+          {{ 'TOO_MANY_ATTEMPTS_WAIT' | translate:{ secs: loginBlockRemainingSec } }}
+        </div>
+
         <!-- Submit -->
         <button type="submit"
                 class="btn btn-primary w-100 mt-2"
-                [disabled]="loginForm.invalid || isSubmittingLogin"
+                [disabled]="loginForm.invalid || isSubmittingLogin || isLoginBlocked"
                 [attr.aria-busy]="isSubmittingLogin ? 'true' : null">
           {{ 'LOGIN' | translate }}
           <span *ngIf="isSubmittingLogin"

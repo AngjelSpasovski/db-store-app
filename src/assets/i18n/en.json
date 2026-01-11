@@ -493,6 +493,12 @@
   "FAILED": "Failed",
 
   "MESSAGE_SENT_OK": "Your message has been sent successfully.",
-  "MESSAGE_SENT_ERR": "There was an error sending your message. Please try again later."
+  "MESSAGE_SENT_ERR": "There was an error sending your message. Please try again later.",
+  "PLEASE_WAIT_BEFORE_SENDING": "Please wait a moment before sending another message.",
+  "PLEASE_ENTER_EMAIL": "Please enter a valid email address.",
+  "SUBSCRIBE_OK": "You have successfully subscribed to our newsletter.",
+  "SUBSCRIBE_ERR": "There was an error with your subscription. Please try again later.",
+
+  "TOO_MANY_ATTEMPTS_WAIT": "Too many attempts. Please wait {{secs}}s and try again."
 
 }

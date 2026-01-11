@@ -494,6 +494,12 @@
   "FAILED": "Non riuscito",
 
   "MESSAGE_SENT_OK": "Il tuo messaggio è stato inviato con successo.",
-  "MESSAGE_SENT_ERR": "Si è verificato un errore durante l'invio del tuo messaggio. Riprova più tardi."
+  "MESSAGE_SENT_ERR": "Si è verificato un errore durante l'invio del tuo messaggio. Riprova più tardi.",
+  "PLEASE_WAIT_BEFORE_SENDING": "Per favore aspetta prima di inviare un altro messaggio.",
+  "PLEASE_ENTER_EMAIL": "Inserisci un indirizzo email valido.",
+  "SUBSCRIBE_OK": "Ti sei iscritto con successo alla nostra newsletter.",
+  "SUBSCRIBE_ERR": "Si è verificato un errore con la tua iscrizione. Riprova più tardi.",
+
+  "TOO_MANY_ATTEMPTS_WAIT": "Troppi tentativi. Attendi {{secs}}s e riprova."
 
 }

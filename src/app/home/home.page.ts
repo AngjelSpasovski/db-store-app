@@ -6,8 +6,9 @@ import { Router, NavigationEnd } from '@angular/router';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subscription, timer } from 'rxjs';
 import { filter, finalize } from 'rxjs/operators';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { EmailJsService } from '../auth/mail-server/emailjs.service';
+import { ToastService } from '../shared/toast.service';
 
 @Component({
   selector: 'app-home',
@@ -45,10 +46,13 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   public sendOk = false;
   public sendErr = false;
 
+  public subscribeEmail = '';
+
   constructor(
     private translate: TranslateService,
     private router: Router,
-    private emailJs: EmailJsService
+    private emailJs: EmailJsService,
+    private toast: ToastService
   ) {
     this.routerSub = this.router.events.pipe(
       filter(e => e instanceof NavigationEnd && (e as NavigationEnd).urlAfterRedirects === '/home')
@@ -93,6 +97,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
     if (!this.isAllowedOrigin()) {
       this.sendErr = true;
+      this.toast.info(this.translate.instant('MESSAGE_SENT_ERR'), { position: 'top-end' });
       this.flashError(5000);
       return;
     }
@@ -107,6 +112,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
     if (!this.canSendNow()) {
       this.sendErr = true;
+      this.toast.warn(this.translate.instant('PLEASE_WAIT_BEFORE_SENDING'), { position: 'top-end' });
       this.flashError(5000);
       return;
     }
@@ -118,12 +124,14 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: () => {
           this.sendOk = true;
+          this.toast.success(this.translate.instant('MESSAGE_SENT_OK'), { position: 'top-end' });
           form.reset();
           this.flashSuccess(5000);
         },
         error: (err) => {
           console.error('EmailJS send error:', err);
           this.sendErr = true;
+          this.toast.error(this.translate.instant('MESSAGE_SENT_ERR'), { position: 'top-end' });
           this.flashError(5000);
         }
       });
@@ -137,6 +145,26 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     localStorage.setItem(key, String(now));
     return true;
   }
+
+   /* ========================================================================
+    SUBSCRIBE
+  ======================================================================== */
+  public onSubscribe(form: NgForm): void {
+  // минимална валидација (за да не прикажуваме success за празно/невалидно)
+  if (!form.valid) {
+    this.toast.warn(this.translate.instant('PLEASE_ENTER_EMAIL') || 'Please enter a valid email.', { position: 'top-end' });
+    return;
+  }
+
+  // ✅ Лажно „успешно“ праќање
+  const msg = this.translate.instant('SUBSCRIBE_OK');
+  this.toast.success(msg === 'SUBSCRIBE_OK' ? 'Subscribed successfully!' : msg, { position: 'top-end' });
+
+  // ✅ исчисти input + ресетирај форма (без network)
+  this.subscribeEmail = '';
+  form.resetForm();
+}
+
 
   /* ========================================================================
     SCROLL ROOT + HEADER OFFSET

@@ -11,33 +11,27 @@
       class="sidebar__toggle navbar-toggler"
       type="button"
       (click)="toggle()"
-      aria-label="Toggle sidebar">
-      <fa-icon [icon]="isOpen ? faToggleOpen : faToggleClosed"></fa-icon>
+      aria-label="Toggle sidebar"
+      [attr.aria-expanded]="isOpen">
+      <fa-icon [icon]="faToggle"></fa-icon>
     </button>
 
     <!-- Profile -->
     <div class="sidebar__profile" *ngIf="currentUser">
-      <!-- Left: avatar + role -->
-      <div class="badge-col">
-        <div class="avatar">
-          {{ (currentUser.firstName || 'U')[0] | uppercase }}
-        </div>
 
-        <div class="role-pill">
-          {{ ((currentUser.role || 'user') | uppercase) | translate }}
-        </div>
-      </div>
-
-      <!-- Right: name + email -->
       <div class="text-col">
-        <div class="name" title="{{ currentUser.firstName }} {{ currentUser.lastName }}">
-          {{ currentUser.firstName }} {{ currentUser.lastName }}
+        <div class="top-line">
+
+          <div class="role-pill">
+            {{ ((currentUser.role || 'user') | uppercase) | translate }}
+          </div>
         </div>
 
-        <div class="email" *ngIf="currentUser.email" [title]="currentUser.email">
+        <div class="email" *ngIf="currentUser.email && isMobile" [title]="currentUser.email">
           {{ currentUser.email }}
         </div>
       </div>
+
     </div>
   </div>
 

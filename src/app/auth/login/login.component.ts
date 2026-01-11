@@ -8,7 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../auth.service';
 import { EmailJsService } from '../mail-server/emailjs.service';
-import { Subscription, lastValueFrom, finalize } from 'rxjs';
+import { Subscription, lastValueFrom, finalize, timer } from 'rxjs';
 import { PdfCompressorService } from '../mail-server/pdf-compressor.service';
 import { ToastService } from '../../shared/toast.service';
 import { RouterModule } from '@angular/router';
@@ -61,8 +61,16 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isSubmittingLogin = false;
 
-
   private sub!: Subscription;   // Subscription for logout event
+
+  loginFailCount = 0;
+  loginBlockedUntil = 0;            // timestamp (ms)
+  loginBlockRemainingSec = 0;       // за UI
+  private loginBlockSub?: Subscription;
+
+  get isLoginBlocked(): boolean {
+    return Date.now() < this.loginBlockedUntil;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -173,6 +181,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
+    this.loginBlockSub?.unsubscribe();
   }
 
   get privacyPolicyUrl(): string {
@@ -187,6 +196,36 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       default:
         return 'assets/privacy/privacy-policy/privacy-policy-EN.pdf';
     }
+  }
+
+  private startLoginBlockCountdown(untilMs: number) {
+    this.loginBlockedUntil = untilMs;
+
+    // чистење старо
+    this.loginBlockSub?.unsubscribe();
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((this.loginBlockedUntil - Date.now()) / 1000));
+      this.loginBlockRemainingSec = remaining;
+
+      if (remaining <= 0) {
+        this.loginBlockSub?.unsubscribe();
+        this.loginBlockSub = undefined;
+        this.loginBlockedUntil = 0;
+        this.loginBlockRemainingSec = 0;
+      }
+    };
+
+    // иницијално + секунда по секунда
+    tick();
+    this.loginBlockSub = timer(0, 1000).subscribe(tick);
+  }
+
+  private clearLoginBlock() {
+    this.loginBlockSub?.unsubscribe();
+    this.loginBlockSub = undefined;
+    this.loginBlockedUntil = 0;
+    this.loginBlockRemainingSec = 0;
   }
 
   togglePasswordVisibility() {
@@ -210,13 +249,25 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loginSubmitted = true;
     if (this.loginForm.invalid) return;
 
+    if (this.isLoginBlocked) {
+      const secs = Math.ceil((this.loginBlockedUntil - Date.now()) / 1000);
+      this.toast.warn(this.translate.instant('TOO_MANY_ATTEMPTS_WAIT', { secs }), { position: 'top-end' });
+      return;
+    }
+
     const { email, password, rememberMe } = this.loginForm.value;
     this.isSubmittingLogin = true; // ⟵ старт
 
     this.auth.signIn({ email, password }, !!rememberMe)
     .pipe(finalize(() => this.isSubmittingLogin = false))
     .subscribe({
+
       next: (res) => {
+        // успешен login → ресетирај броење неуспеси
+        this.clearLoginBlock();     // ✅ ресетирај блок ако успее
+        this.loginFailCount = 0;    // ресетирај броење неуспеси
+
+        // ресетирај состојби
         this.needsEmailVerify = false;
 
         // 1) ако има redirect query param, почитувај го
@@ -227,24 +278,35 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
 
-        // 2) приоритет: ако e-mail == angjel... => оди директно на /admin
-        // const email = (res?.user?.email ?? '').toLowerCase();
-        // if (email === 'angjel.spasovski@gmail.com') {
-        //   this.router.navigateByUrl('/admin', { replaceUrl: true });
-        //   this.toast.success(this.translate.instant('LOGIN_SUCCESS'), { position: 'top-end' });
-        //   return;
-        // }
-
         // 3) инаку по улога во /user/*
         const role = (res.user.role || 'user').toLowerCase();
         switch (role) {
           case 'superadmin': this.router.navigateByUrl('/admin'); break;
-          //case 'adminuser': this.router.navigateByUrl('/admin'); break;
           // adminUser и user имаат ист дом
           default:           this.router.navigateByUrl('/user/buy-credits'); break;
         }
       },
-      error: err => {
+
+      error: (err) => {
+        // ако backend врати 429 
+        if (err?.status === 429) {
+          const retryAfter = Number(err?.headers?.get?.('Retry-After') || 30);
+          this.startLoginBlockCountdown(Date.now() + retryAfter * 1000);
+
+          this.toast.warn(
+            this.translate.instant('TOO_MANY_ATTEMPTS_WAIT', { secs: retryAfter }),
+            { position: 'top-end' }
+          );
+          return;
+        }
+
+        // UX backoff и без 429
+        // ✅ UX локален cooldown (ако сакаш)
+        this.loginFailCount++;
+        if (this.loginFailCount >= 5) {
+          this.startLoginBlockCountdown(Date.now() + 30_000); // 30s блокада
+        }
+
         if (err?.status === 403 && (err?.error?.message || '').toLowerCase().includes('not verified')) {
           this.needsEmailVerify = true;
           this.lastLoginEmail = email;

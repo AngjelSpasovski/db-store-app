@@ -6,9 +6,9 @@ import { finalize } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class EmailJsService {
-  private readonly serviceId          = 'service_9j8ez3k';
-  private readonly contactTemplateId  = 'template_3v4i0vq';
-  private readonly signupTemplateId   = 'template_1pnq6v8';
+  private readonly serviceId          = 'service_pl87r4j';
+  private readonly contactTemplateId  = 'template_dikcv5u';
+  private readonly signupTemplateId   = 'template_1u4sxcc';
 
   private initialized = false;
 
@@ -19,7 +19,7 @@ export class EmailJsService {
   // initialization only once, because emailjs.init()
   private initOnce(): void {
     if (this.initialized) return;
-    emailjs.init('7DIgrUFTWvWyol6Qr');  // user/public key
+    emailjs.init('pPWVoAZr2c5ASgSPU');  // user/public key
     this.initialized = true;
   }
 

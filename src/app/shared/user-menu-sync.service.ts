@@ -1,3 +1,4 @@
+// src/app/shared/user-menu-sync.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 

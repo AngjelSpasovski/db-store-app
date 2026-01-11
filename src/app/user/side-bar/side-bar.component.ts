@@ -25,7 +25,6 @@ import {
   faFileInvoiceDollar,
   faCircleQuestion,
   faUser,
-  faChevronLeft,
   faBars,
   faCoins,
   faUserShield
@@ -64,7 +63,7 @@ export class SidebarComponent implements OnInit {
   public credits$ = this.creditsSvc.credits$;
 
   // FontAwesome icons за toggle и кредити
-  public faToggleOpen   = faChevronLeft;
+  public faToggle       = faBars;
   public faToggleClosed = faBars;
   public faCredits      = faCoins;
   public faAdmin        = faUserShield;
